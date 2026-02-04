@@ -83,7 +83,7 @@ html,body,#root{
 }
 
 /* BUTTON */
-button{
+.left button{
     width: 100%;
     padding: 12px;
     border: 1px solid #333;
@@ -93,7 +93,7 @@ button{
     /* background:transparent; */
     background-color: #367f93;
 }
-button:hover{
+.left button:hover{
     background-color: grey;
 }
 /* SIGNUP */
@@ -213,7 +213,11 @@ caption{
     padding:10px;
 }
 header{
-    padding: 10px;
+    padding: 30px;
+    background: #0f0f0f;
+    width: 100%;
+}
+.mob{
     background: #0f0f0f;
 }
 .skit{
@@ -223,13 +227,10 @@ header{
 .link{
     color: #fff;
     text-decoration: none;
+    
     &:hover{
         color: aqua;
     }
-}
-@media screen and (max-width:880px) {
-
-    
 }
 
 .home{
@@ -239,3 +240,69 @@ header{
     justify-content: center;
     align-items: center;
 }
+/* 
+.ham-menu{
+    color:rgb(247, 241, 241);
+    display: none;
+}*/
+
+/*
+.nav-bar{
+    gap:30px;
+}
+.nav-container{
+    gap:30px;
+    position: relative;
+}
+.nav-container2 .menu-web ul  {
+    margin: 10px;
+    
+}
+
+.nav-container2 .menu-web ul .link {
+    margin: 10px;
+   
+}
+.menu-mob {
+    position: absolute;
+    top: 80px;
+    left:-10px;
+    border: #f3f3f3 2px solid;
+    background-color: #0f0f0f;
+    width: 100vw;
+}
+.menu-mob ul{
+    display: flex;
+    flex-direction: column;
+    justify-content:start;
+    align-items: center;
+    text-align: center;
+}
+.menu-mob ul .link{
+    padding:10px;
+    font-size: 17px;
+}
+
+
+
+
+
+@media screen and (max-width:768px) {
+.ham-menu{
+    display: block;
+}
+.menu-web{
+    display:none;
+}    
+}
+
+@media (min-width:768px) {
+    .menu-mob{
+        display: none;
+    }
+    
+}
+
+
+
+ */

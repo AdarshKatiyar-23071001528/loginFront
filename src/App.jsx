@@ -7,6 +7,9 @@ import Register from '../Users/Register';
 import Nav from '../Nav/Nav';
 import Login from '../Users/Login';
 import Home from '../Home/Home';
+import Course from '../Parts/Course';
+import Carrer from '../Parts/Carrer';
+import Contact from '../Parts/Contact';
 
 
 const App = () => {
@@ -21,7 +24,10 @@ const App = () => {
           <Route path='/users' element= {<AllUsers/>}/>
           <Route path='/register' element= {<Register/>}/>
           <Route path='/login' element= {<Login/>}/>
-          
+          <Route path='/course' element={<Course/>} />
+          <Route path='/carrer' element ={<Carrer/>} />
+          <Route path='/contact' element ={<Contact/>} />
+           
         </Routes>
       </Router>
       
