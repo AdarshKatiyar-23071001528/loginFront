@@ -1,18 +1,33 @@
 import React from 'react'
-import AppContext from '../src/Context/appContext'
+import AppContext from '../src/Context/AppContext'
 import { useContext } from 'react'
 
 const AllUsers = () => {
    const{Users} = useContext(AppContext);
   return (
     <>
-    {Users?.map((user) => 
-    <div key={user._id}>
+    <table border="1" width="100%" >
+      <caption>Teacher's Table</caption>
+      <thead>
+        <tr>
+          <th>Sr.no</th>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Users?.map((user,i) => 
+        <tr key={user._id}>
+          <td>{i+1}</td>
+          <td>{user.name}</td>
+          <td>{user.email}</td>
+          
+        </tr>
+        )}
         
-        <h1>Name: {user.name}</h1>
-        <p>Email: {user.email}</p>
-        
-    </div>)}
+      </tbody>
+
+    </table>
     </>
   )
 }

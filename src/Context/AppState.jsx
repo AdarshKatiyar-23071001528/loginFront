@@ -1,5 +1,5 @@
 import React from 'react'
-import AppContext from './appContext'
+import AppContext from './AppContext'
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ const AppState = (props) => {
 
     // const url = 'http://localhost:1000/api/user'
     const[Users,setUsers] = useState([])
+    const [userLogin, setUserLogin] = useState(false)
     const data = 10;
     useEffect(()=>{
         const fetchUser = async() =>{
@@ -44,13 +45,14 @@ const AppState = (props) => {
                 },
                 withCredentials: true
             })
+            setUserLogin(res.data.success);
           alert(res.data.message);
           return res.data;
         }
 
 
   return (
-   <AppContext.Provider value={{Users,register,login}}>
+   <AppContext.Provider value={{Users,register,login,userLogin}}>
     {
         props.children
     }

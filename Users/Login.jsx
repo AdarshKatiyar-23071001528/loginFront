@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import AppContext from '../src/Context/appContext';
+import AppContext from '../src/Context/AppContext';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +20,7 @@ const Login = () => {
         e.preventDefault();
         const result = await login(email,password);
         if(result.success) {
-            navigate('/home');
+            navigate('/');
         }
 
     }

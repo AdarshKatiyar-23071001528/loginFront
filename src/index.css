@@ -4,16 +4,24 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
+    text-decoration: none;
+    
 }
+html,body,#root{
+    height: 100%;
+    width: 100%;
+}
+
 
 /* PAGE CENTER */
 .page{
-    min-height: 100vh;
+    height: 100%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #0f0f0f;
+    /* border-radius: 20px; */
 }
 
 /* MAIN CARD */
@@ -21,7 +29,7 @@
     width: 90%;
     max-width: 1100px;
     display: flex;
-    border-radius: 16px;
+    /* border-radius: 20px; */
     overflow: hidden;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
@@ -91,12 +99,13 @@ button:hover{
 /* SIGNUP */
 .signup-text{
     margin-top: 20px;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .signup-text a{
     color: #4cbbd9;
     text-decoration: none;
+    font-size: 14px;
 }
 
 /* login with google/facebook  */
@@ -183,4 +192,50 @@ button:hover{
     .right h1{
         font-size: 24px;
     }
+}
+
+
+table{
+    border: 2px solid black;
+}
+th,td{
+    border: 1px solid black;
+    text-align: center;
+}
+caption{
+    caption-side: top;
+    text-align: center;
+    font-weight: bolder;
+    font-size: larger;
+
+}
+.logo{
+    padding:10px;
+}
+header{
+    padding: 10px;
+    background: #0f0f0f;
+}
+.skit{
+    color: #fff;
+    text-decoration: none;
+}
+.link{
+    color: #fff;
+    text-decoration: none;
+    &:hover{
+        color: aqua;
+    }
+}
+@media screen and (max-width:880px) {
+
+    
+}
+
+.home{
+    height: 80%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
