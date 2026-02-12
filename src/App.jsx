@@ -10,6 +10,10 @@ import Home from '../Home/Home';
 import Course from '../Parts/Course';
 import Carrer from '../Parts/Carrer';
 import Contact from '../Parts/Contact';
+import MultiLogin from '../Users/MultiLogin';
+import Adminlog from '../Users/Adminlog';
+import Teacherlog from '../Users/Teacherlog';
+import Studentlog from '../Users/Studentlog';
 
 
 const App = () => {
@@ -27,7 +31,10 @@ const App = () => {
           <Route path='/course' element={<Course/>} />
           <Route path='/carrer' element ={<Carrer/>} />
           <Route path='/contact' element ={<Contact/>} />
-           
+           <Route path='/log' element ={<MultiLogin/>} />
+           <Route path='/admin/login' element ={<Adminlog/>} />
+            <Route path='/faculty/login' element ={<Teacherlog/>} />
+             <Route path='/student/login' element ={<Studentlog/>} />
         </Routes>
       </Router>
       
