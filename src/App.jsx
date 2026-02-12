@@ -27,12 +27,12 @@ const App = () => {
           <Route path='/' element={<Home/>} />
           <Route path='/users' element= {<AllUsers/>}/>
           <Route path='/register' element= {<Register/>}/>
-          <Route path='/login' element= {<Login/>}/>
+          {/* <Route path='/login' element= {<Login/>}/> */}
           <Route path='/course' element={<Course/>} />
           <Route path='/carrer' element ={<Carrer/>} />
           <Route path='/contact' element ={<Contact/>} />
-           <Route path='/log' element ={<MultiLogin/>} />
-           <Route path='/admin/login' element ={<Adminlog/>} />
+           <Route path='/login' element ={<MultiLogin/>} />
+           <Route path='/admin/login' element ={<Login/>} />
             <Route path='/faculty/login' element ={<Teacherlog/>} />
              <Route path='/student/login' element ={<Studentlog/>} />
         </Routes>
