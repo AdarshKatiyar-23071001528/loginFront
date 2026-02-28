@@ -1,13 +1,14 @@
 import React from 'react'
 import { useState } from 'react'
-import AppContext from '../src/Context/AppContext';
+import AppContext from '../Context/AppContext';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const studentRegister = () => {
     const navigate = useNavigate();
-    const {login} = useContext(AppContext);
+    const {studentRegister} = useContext(AppContext);
     const [formData, setFormData] = useState({
+        rollno:"",
         email: "",
         password: ""
     });
@@ -15,45 +16,46 @@ const Login = () => {
         const {name,value} = e.target;
         setFormData({...formData,[name]:value});
     }
-    const {email,password} = formData;
+    const {rollno,email,password} = formData;
     const submitHandler = async(e) => {
         e.preventDefault();
-        const result = await login(email,password);
+        const result = await studentRegister(rollno,email,password);
         if(result.success) {
-            navigate('/admin/dash');
+            navigate('/login');
         }
-
+        console.log(formData);
     }
 
     return (
         <>
-           
+
 
             <div className='nav'>
-                <div className="page">
-                    <div className="container">
+                <div class="page">
+                    <div class="container">
 
 
-                        <div className="left">
-                            <center><h2>Login</h2><br /></center>
+                        <div class="left">
+                            <center><h2>Register</h2><br /></center>
 
                             <form id="loginForm" onSubmit={submitHandler}>
 
-                                <input name="email" value={formData.email} onChange={onChangeHandler} type="email" id="useremail" placeholder="UserEmail" />
+                                <input name="rollno" value={formData.rollno} onChange={onChangeHandler} type="number" id="userRoll" placeholder="Enter Roll Number" />
+                                <input name="email" value={formData.email} onChange={onChangeHandler}  type="email" id="useremail" placeholder="Enter Email" />
                                 <input name="password" value={formData.password} onChange={onChangeHandler} type="password" id="password" placeholder="Password" />
 
 
-                                <div className="remember">
+                                <div class="remember">
                                     <input type="checkbox" id="rememberMe" />
                                     <label for="rememberMe">Remember Me</label>
                                 </div>
 
-                                <a href="#" className="forgot">Forgot Password?</a>
+                                <a href="#" class="forgot">Forgot Password?</a>
 
-                                <button type="submit">Login</button>
+                                <button type="submit">Register</button>
 
-                                <p className="signup-text">
-                                    Don’t have an account? <a href="/register">Sign up</a>
+                                <p class="signup-text">
+                                    Already have an account? <a href="/">Login</a>
                                 </p>
 
 
@@ -61,14 +63,14 @@ const Login = () => {
                             </form>
                         </div>
 
-                        <div className="right">
+                        <div class="right">
                             <h1>Welcome to <span>SKIT</span></h1>
-                            <p className="tagline">Dreams Come True Here!</p>
+                            <p class="tagline">Dreams Come True Here!</p>
 
 
                             <img src="./s1.jpg"
                                 alt="Student Login Illustration"
-                                className="illustration" />
+                                class="illustration" />
                         </div>
 
                     </div>
@@ -78,4 +80,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default studentRegister

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../api/axios';
+import { useLocation } from 'react-router-dom';
 
 const AppState = (props) => {
 
@@ -13,7 +14,7 @@ const AppState = (props) => {
     const data = 10;
     useEffect(()=>{
         const fetchUser = async() =>{
-            const res = await api.get(`/allUser`,{
+            const res = await api.get(`user/allUser`,{
                 headers:{
                     "Content-Type":"Application/json"
                 },
@@ -27,7 +28,7 @@ const AppState = (props) => {
 
     //register User
     const register = async(name,email,password) =>{
-            const res = await api.post(`/register`,
+            const res = await api.post(`user/register`,
                 {name,email,password},{
                 headers:{
                     "Content-Type":"Application/json"
@@ -37,8 +38,8 @@ const AppState = (props) => {
           alert(res.data.message);
           return res.data;
         }
-         const login = async(email,password) =>{
-            const res = await api.post(`/login`,
+    const login = async(email,password) =>{
+            const res = await api.post(`user/login`,
                 {email,password},{
                 headers:{
                     "Content-Type":"Application/json"
@@ -50,9 +51,30 @@ const AppState = (props) => {
           return res.data;
         }
 
+    const studentRegister = async(rollno, email, password) =>{
+        const res = await api.post('/student/register', {rollno, email, password},{
+            headers:{
+                "Content-Type": "Application/json"
+            },
+            withCredentials: true
+        })
+        alert(res.data.message);
+        return res.data;
+    }
+    const studentLogin = async(email,password) => {
+        const res = await api.post('/student/login', {email,password},{
+            headers:{
+                'Content-Type' : "Application/json"
+        },
+        withCredentials: true
+    })
+    alert(res.data.message);
+    return res.data;
+    }
+    
 
   return (
-   <AppContext.Provider value={{Users,register,login,userLogin}}>
+   <AppContext.Provider value={{Users,register,login,userLogin,studentRegister,studentLogin}}>
     {
         props.children
     }
