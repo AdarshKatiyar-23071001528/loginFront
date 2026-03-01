@@ -76,6 +76,7 @@ const studentRegister = () => {
                     </div>
                 </div>
             </div>
+            
         </>
     )
 }
