@@ -1,11 +1,8 @@
-import React from 'react'
+import React from 'react';
+import TeacherDash from './TeacherDash';
 
 const Teacherlog = () => {
-  return (
-    <div className='home'>
-      <h1>Teacher</h1>
-    </div>
-  )
-}
+  return <TeacherDash />;
+};
 
-export default Teacherlog
+export default Teacherlog;

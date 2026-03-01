@@ -17,6 +17,9 @@ import Studentlog from '../Users/Studentlog';
 import StudentRegister from './Student/StudentRegister';
 import StudentLogin from './Student/StudentLogin';
 import AdminDash from '../Users/AdminDash';
+import TeacherDash from '../Users/TeacherDash';
+import StudentDash from './Student/StudentDash';
+
 
 const Layout = () => {
     const location = useLocation();
@@ -39,6 +42,9 @@ const Layout = () => {
              <Route path='/student/login' element ={<StudentLogin/>} />
              <Route path='/student/register' element={<StudentRegister/>} /> 
              <Route path="/admin/dash" element={<AdminDash/>} />
+             <Route path="/teacher/dash" element={<TeacherDash/>} />
+             <Route path="/student/dash" element={<StudentDash/>} />
+             <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
         </Routes>
         </>
   )

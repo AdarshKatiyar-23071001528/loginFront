@@ -8,75 +8,17 @@ import { FcMoneyTransfer } from "react-icons/fc";
 import AppContext from "../src/Context/AppContext";
 import axios from "axios";
 import StudentRegister from "../src/Student/StudentRegister";
+import SubjectManagement from "./SubjectManagement";
+import TeacherRegister from "../src/Teacher/TeacherRegister";
 
 const AdminDash = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectStudent, setSelectStudent] = useState(false);
   const [activePage, setActivePage] = useState("home");
+  const [teacher, setTeacher] = useState(false);
 
   // const { studentRegister } = useContext(AppContext);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    wrn: "",
-    enrollment: "",
-    course: "",
-    fathername: "",
-    mothername: "",
-    mobile1: "",
-    mobile2: "",
-    mobile3: "",
-    dob: "",
-    doa: "",
-    adhaar: "",
-    address: "",
-    pincode: "",
-    post: "",
-    district: "",
-    landmark: "",
-    rollno: "",
-    email: "",
-    password: "",
-    totalfees: "",
-  });
-
-  const onChangeHandler = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:5000/api/student", formData);
-      alert("Student Added Successfully ✅");
-      setFormData({
-        name: "",
-        wrn: "",
-        enrollment: "",
-        course: "",
-        fathername: "",
-        mothername: "",
-        mobile1: "",
-        mobile2: "",
-        mobile3: "",
-        dob: "",
-        doa: "",
-        adhaar: "",
-        address: "",
-        pincode: "",
-        post: "",
-        district: "",
-        landmark: "",
-        rollno: "",
-        email: "",
-        password: "",
-        totalfees: "",
-      });
-    } catch (error) {
-      alert("Error adding student ❌");
-    }
-  };
 
   return (
     <>
@@ -93,7 +35,7 @@ const AdminDash = () => {
           <h1 className="ml-4 text-xl font-semibold">Admin Dashboard</h1>
         </div>
 
-    <div className="h-screen flex overflow-hidden">
+    <div className="h-screen flex overflow-hidden w-screen bg-fuchsia-400">
 
     
       {/* ================= Sidebar ================= */}
@@ -156,6 +98,8 @@ const AdminDash = () => {
                 </li>
               </ul>
             )}
+
+
           </li>
 
           <li
@@ -165,11 +109,43 @@ const AdminDash = () => {
             <FaMoneyBillAlt /> Fees
           </li>
 
+          <li>
+            <div
+            className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-700 rounded"
+            onClick={() => setTeacher(!teacher)}
+          >
+            <FaUserGear /> Teacher
+            </div>  
+            
+              {teacher && (
+                <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
+                <li
+                  className={`cursor-pointer hover:text-yellow-400 ${
+                    activePage === "allTeacher" ? "text-yellow-400" : ""
+                  }`}
+                  onClick={() => setActivePage("allTeacher")}
+                >
+                  All Teacher
+                </li>
+                <li
+                  className={`cursor-pointer hover:text-yellow-400 ${
+                    activePage === "addTeacher" ? "text-yellow-400" : ""
+                  }`}
+                  onClick={() => setActivePage("addTeacher")}
+                >
+                  Add Teacher
+                </li>
+                
+              </ul>
+              )}
+           
+          </li>
+
           <li
             className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-700 rounded"
-            onClick={() => setActivePage("staff")}
+            onClick={() => setActivePage("subjects")}
           >
-            <FaUserGear /> Staff
+            📚 Subjects
           </li>
 
           <li
@@ -183,19 +159,23 @@ const AdminDash = () => {
 
       {/* ================= Right Side Content ================= */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300
+        className={`flex-1 flex flex-col transition-all duration-300 w-full
           ${sidebarOpen ? "ml-[20px]" : "ml-0"}`}
       >
        
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-100">
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-100 w-full">
           {activePage === "home" && (
             <h2 className="text-2xl font-bold">Welcome to Dashboard</h2>
           )}
 
           {activePage === "all" && (
             <h2 className="text-2xl font-bold">All Students Page</h2>
+          )}
+
+          {activePage === "subjects" && (
+            <SubjectManagement />
           )}
 
           {activePage === "add" && (
@@ -211,8 +191,19 @@ const AdminDash = () => {
           {activePage === "update" && (
             <h2 className="text-2xl font-bold">Update Student Page</h2>
           )}
+
+          {activePage === "addTeacher" && (
+            <div className="bg-red-500 w-full rounded-xl shadow-lg max-w-5xl mx-auto">
+              <h2 className="text-3xl font-bold mb-6 text-center text-blue-600">
+                Add New Teacher
+              </h2>
+
+              <TeacherRegister/>
+            </div>
+          )}
         </div>
       </div>
+
     </div>
     </>
   );

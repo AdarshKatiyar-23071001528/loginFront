@@ -20,7 +20,7 @@ const StudentLogin = () => {
     e.preventDefault();
     const result = await studentLogin(email, password);
     if(result.success){
-      navigate('/');
+      navigate('/student/dash');
     }
   }
 
