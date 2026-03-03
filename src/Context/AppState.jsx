@@ -1,6 +1,5 @@
 import React from 'react'
 import AppContext from './AppContext'
-import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../api/axios';
@@ -125,9 +124,13 @@ const AppState = (props) => {
       });
       return res.data;
     };
-
+    
+  const teacherprofile = async (teacherId) => {
+      const res = await api.get(`/teacher/profile/${teacherId}`);
+      return res.data;
+    }
   return (
-   <AppContext.Provider value={{Users,register,login,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance}}>
+   <AppContext.Provider value={{Users,register,login,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance,teacherprofile}}>
     {
         props.children
     }

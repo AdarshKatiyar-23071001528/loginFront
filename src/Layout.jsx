@@ -19,6 +19,7 @@ import StudentLogin from './Student/StudentLogin';
 import AdminDash from '../Users/AdminDash';
 import TeacherDash from '../Users/TeacherDash';
 import StudentDash from './Student/StudentDash';
+import TeacherDashboard from './Teacher/TeacherDashboard';
 
 
 const Layout = () => {
@@ -42,8 +43,10 @@ const Layout = () => {
              <Route path='/student/login' element ={<StudentLogin/>} />
              <Route path='/student/register' element={<StudentRegister/>} /> 
              <Route path="/admin/dash" element={<AdminDash/>} />
-             <Route path="/teacher/dash" element={<TeacherDash/>} />
+             {/* <Route path="/teacher/dash" element={<TeacherDashboard/>} /> */}
              <Route path="/student/dash" element={<StudentDash/>} />
+             {/* <Route path="/student/dash/:id" element={<StudentDash/>} /> */}
+             <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
              <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
         </Routes>
         </>

@@ -169,7 +169,7 @@ const StudentRegister = () => {
   }
 
   const inputClasses = (name) => `
-    w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all duration-300
+    w-full px-4 py-3 border-2  rounded-lg focus:outline-none transition-all duration-300
     ${focusedField === name 
       ? 'border-pink-500 shadow-lg shadow-pink-200 bg-pink-50' 
       : 'border-gray-300 hover:border-gray-400 bg-white'
@@ -178,28 +178,24 @@ const StudentRegister = () => {
   `
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-pink-600 via-rose-600 to-orange-500 py-12 px-4 relative overflow-hidden'>
+    <div className='min-h-screen relative overflow-hidden  '>
       {/* Decorative Background Elements */}
-      <div className='absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2'></div>
-      <div className='absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2'></div>
+      
+      
 
-      <div className='max-w-4xl mx-auto relative z-10'>
+      <div className='w-full relative z-10 '>
         {/* Header */}
-        <div className='text-center mb-10'>
-          <div className='inline-block p-4 bg-white/20 backdrop-blur-lg rounded-full mb-4 border border-white/30'>
-            <svg className='w-12 h-12 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17s4.5 10.747 10 10.747c5.5 0 10-4.692 10-10.747S17.5 6.253 12 6.253z' />
-            </svg>
-          </div>
-          <h1 className='text-5xl font-bold text-white mb-3 drop-shadow-lg'>Student Registration</h1>
-          <p className='text-white/90 text-lg font-medium drop-shadow'>Enroll now and start your learning journey</p>
-        </div>
+        
+          
+          <h3 className='text-5xl font-bold mb-3 drop-shadow-lg'>Student Registration</h3>
+          
+        
 
         {/* Main Card */}
-        <div className='bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 md:p-10 border border-white/20'>
+        <div className=''>
           {/* Alert Message */}
           {message && (
-            <div className={`mb-8 p-4 rounded-xl backdrop-blur-sm border-2 transition-all duration-300 ${
+            <div className={`mb-8 p-4 transition-all duration-300 ${
               messageType === 'success' 
                 ? 'bg-green-50/80 border-green-400 text-green-700 shadow-lg shadow-green-100' 
                 : 'bg-red-50/80 border-red-400 text-red-700 shadow-lg shadow-red-100'
@@ -213,11 +209,8 @@ const StudentRegister = () => {
 
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Essential Fields Section */}
-            <div className='bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-xl border border-pink-100'>
-              <h3 className='text-lg font-bold text-pink-900 mb-5 flex items-center gap-2'>
-                <span className='w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm'>*</span>
-                Essential Information
-              </h3>
+            <div className=' p-6 '>
+        
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
                 {/* Name */}
@@ -231,7 +224,7 @@ const StudentRegister = () => {
                     onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField(null)}
                     className={inputClasses('name')}
-                    placeholder='E.g., John Doe'
+                    placeholder='Enter Student Name'
                     required
                   />
                 </div>
@@ -634,42 +627,12 @@ const StudentRegister = () => {
           <p>© 2026 Student Management System. All rights reserved.</p>
         </div>
       </div>
+
+
+
+
     </div>
   )
 }
 
 export default StudentRegister
-//                                 </div>
-
-//                                 <a href="#" class="forgot">Forgot Password?</a>
-
-//                                 <button type="submit">Register</button>
-
-//                                 <p class="signup-text">
-//                                     Already have an account? <a href="/">Login</a>
-//                                 </p>
-
-
-
-//                             </form>
-//                         </div>
-
-//                         <div class="right">
-//                             <h1>Welcome to <span>SKIT</span></h1>
-//                             <p class="tagline">Dreams Come True Here!</p>
-
-
-//                             <img src="./s1.jpg"
-//                                 alt="Student Login Illustration"
-//                                 class="illustration" />
-//                         </div>
-
-//                     </div>
-//                 </div>
-//             </div>
-            
-//         </>
-//     )
-// }
-
-// export default studentRegister

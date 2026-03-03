@@ -3,6 +3,7 @@ import { useState } from 'react'
 import AppContext from '../src/Context/AppContext';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaUser, FaLock } from "react-icons/fa";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -29,51 +30,27 @@ const Login = () => {
         <>
            
 
-            <div className='nav'>
-                <div className="page">
-                    <div className="container">
-
-
-                        <div className="left">
-                            <center><h2>Login</h2><br /></center>
-
-                            <form id="loginForm" onSubmit={submitHandler}>
-
-                                <input name="email" value={formData.email} onChange={onChangeHandler} type="email" id="useremail" placeholder="UserEmail" />
-                                <input name="password" value={formData.password} onChange={onChangeHandler} type="password" id="password" placeholder="Password" />
-
-
-                                <div className="remember">
-                                    <input type="checkbox" id="rememberMe" />
-                                    <label for="rememberMe">Remember Me</label>
-                                </div>
-
-                                <a href="#" className="forgot">Forgot Password?</a>
-
-                                <button type="submit">Login</button>
-
-                                <p className="signup-text">
-                                    Don’t have an account? <a href="/register">Sign up</a>
-                                </p>
-
-
-
-                            </form>
+             <div className='AdminLoginContainer h-full w-full  flex  justify-center items-center '>
+                    <div className='h-[300px] w-[300px]
+                    md:h-[400px] md:w-[400px]  flex flex-col justify-center items-center gap-4'>
+                      <form action="" onSubmit={ submitHandler} className='h-[300px] w-[300px]
+                    md:h-[400px] md:w-[400px]  flex flex-col justify-center items-center gap-4'>
+                        <h1 className="text-2xl font-bold">Admin</h1>
+                        <div className='flex border-bottom border-black gap-2 w-[70%]'> <FaUser className='mt-2' />
+                          <input type="email" name="email" id="email" value={formData.email} onChange={onChangeHandler} placeholder='Enter Email' className='outline-none p-1 w-[70%] bg-trancparent' /></div>
+            
+            
+                        <div className='flex gap-2 w-[70%] border-bottom border-black'>
+                          <FaLock className='mt-2' />
+                          <input type="password" name="password" value={formData.password} onChange={onChangeHandler} placeholder='Enter Password' className='outline-none bg-transparent p-1  w-[70%]' />
                         </div>
-
-                        <div className="right">
-                            <h1>Welcome to <span>SKIT</span></h1>
-                            <p className="tagline">Dreams Come True Here!</p>
-
-
-                            <img src="./s1.jpg"
-                                alt="Student Login Illustration"
-                                className="illustration" />
-                        </div>
-
+            
+            
+                        <button type="submit" className='bg-green-400 px-4 py-2 rounded font-bold '>Submit</button>
+                      </form>
+            
                     </div>
-                </div>
-            </div>
+                  </div>
         </>
     )
 }

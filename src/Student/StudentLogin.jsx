@@ -20,7 +20,7 @@ const StudentLogin = () => {
     e.preventDefault();
     const result = await studentLogin(email, password);
     if(result.success){
-      navigate('/student/dash');
+      navigate(`/student/dash?id=${result.student._id}`);
     }
   }
 
@@ -28,12 +28,12 @@ const StudentLogin = () => {
 
   return (
     <>
-      <div className='studentLoginContainer h-full w-full bg-gray-300 flex  justify-center items-center '>
+      <div className='studentLoginContainer h-full w-full  flex  justify-center items-center '>
         <div className='h-[300px] w-[300px]
-        md:h-[400px] md:w-[400px] bg-gray-400 rounded-lg shadow-lg flex flex-col justify-center items-center gap-4'>
+        md:h-[400px] md:w-[400px]  rounded-lg flex flex-col justify-center items-center gap-4'>
           <form action="" onSubmit={ submithandler} className='h-[300px] w-[300px]
-        md:h-[400px] md:w-[400px] bg-gray-400 rounded-lg shadow-lg flex flex-col justify-center items-center gap-4'>
-            <h1>Student Login</h1>
+        md:h-[400px] md:w-[400px]  rounded-lg  flex flex-col justify-center items-center gap-4'>
+            <h1 className="text-2xl font-bold">Student</h1>
             <div className='flex border-bottom border-black gap-2 w-[70%]'> <FaUser className='mt-2' />
               <input type="email" name="email" id="email" value={FormData.email} onChange={onChangeHandler} placeholder='Enter Email' className='outline-none p-1 w-[70%] bg-trancparent' /></div>
 

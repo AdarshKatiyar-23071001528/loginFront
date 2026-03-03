@@ -135,25 +135,20 @@ const TeacherRegister = () => {
   `
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 py-12 px-4 relative overflow-hidden'>
+    <div className='min-h-screen relative overflow-hidden'>
       {/* Decorative Background Elements */}
-      <div className='absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2'></div>
-      <div className='absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2'></div>
+     
 
-      <div className='max-w-3xl mx-auto relative z-10'>
+      <div className='relative z-10'>
         {/* Header */}
-        <div className='text-center mb-10'>
-          <div className='inline-block p-4 bg-white/20 backdrop-blur-lg rounded-full mb-4 border border-white/30'>
-            <svg className='w-12 h-12 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' />
-            </svg>
-          </div>
-          <h1 className='text-5xl font-bold text-white mb-3 drop-shadow-lg'>Teacher Registration</h1>
-          <p className='text-white/90 text-lg font-medium drop-shadow'>Join our team and inspire the next generation</p>
+        <div className='mb-10'>
+          
+          <h3>Teacher Registration</h3>
+          
         </div>
 
         {/* Main Card */}
-        <div className='bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 md:p-10 border border-white/20'>
+        <div className=' w-full' >
           {/* Alert Message */}
           {message && (
             <div className={`mb-8 p-4 rounded-xl backdrop-blur-sm border-2 transition-all duration-300 ${
@@ -168,17 +163,14 @@ const TeacherRegister = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className='space-y-6'>
+          <form onSubmit={handleSubmit} className='space-y-6 w-full'>
             {/* Essential Fields Section */}
-            <div className='bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100'>
-              <h3 className='text-lg font-bold text-blue-900 mb-5 flex items-center gap-2'>
-                <span className='w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm'>*</span>
-                Essential Information
-              </h3>
+            <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-2'>
+              
 
               {/* Name */}
-              <div className='mb-5'>
-                <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Full Name</label>
+              <div >
+                <label className='block text-gray-800 font-bold mb-1 text-sm uppercase tracking-wide'>Full Name</label>
                 <input
                   type='text'
                   name='name'
@@ -193,8 +185,8 @@ const TeacherRegister = () => {
               </div>
 
               {/* Email */}
-              <div className='mb-5'>
-                <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Email Address</label>
+              <div>
+                <label className='block text-gray-800 font-bold mb-1 text-sm uppercase tracking-wide'>Email Address</label>
                 <input
                   type='email'
                   name='email'
@@ -209,8 +201,8 @@ const TeacherRegister = () => {
               </div>
 
               {/* Password */}
-              <div className='mb-5'>
-                <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Password</label>
+              <div>
+                <label className='block text-gray-800 font-bold mb-1 text-sm uppercase tracking-wide'>Password</label>
                 <input
                   type='password'
                   name='password'
@@ -226,7 +218,7 @@ const TeacherRegister = () => {
 
               {/* Mobile */}
               <div>
-                <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Mobile Number</label>
+                <label className='block text-gray-800 font-bold mb-1 text-sm uppercase tracking-wide'>Mobile Number</label>
                 <input
                   type='tel'
                   name='mobile'
@@ -243,10 +235,10 @@ const TeacherRegister = () => {
             </div>
 
             {/* Address Section */}
-            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100'>
-              <h3 className='text-lg font-bold text-purple-900 mb-5'>Address Details</h3>
+            <div className=' mt-4'>
+              <h3 className='text-lg font-bold text-purple-900'>Address Details</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Address</label>
                   <input
@@ -276,7 +268,7 @@ const TeacherRegister = () => {
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Landmark</label>
                   <input
@@ -308,10 +300,10 @@ const TeacherRegister = () => {
             </div>
 
             {/* Professional Details Section */}
-            <div className='bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-xl border border-green-100'>
-              <h3 className='text-lg font-bold text-green-900 mb-5'>Professional Details</h3>
+            <div className='mt-4'>
+              <h3 className='text-lg font-bold text-green-900'>Professional Details</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Post/Designation</label>
                   <input
@@ -360,7 +352,7 @@ const TeacherRegister = () => {
             <button
               type='submit'
               disabled={loading}
-              className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-300 transform ${
+              className={`mt-3 w-full py-4 rounded-xl font-bold text-lg uppercase rounded tracking-wider transition-all duration-300 transform ${
                 loading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95'
