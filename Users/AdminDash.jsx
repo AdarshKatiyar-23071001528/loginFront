@@ -40,6 +40,10 @@ const AdminDash = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  // 
+  const [pendingPaymentStudent, setPendingPaymentStudent] = useState(null);
+  const [receivedPayments, setReceivedPayments] = useState([]);
+
   // Modal states for edit
   const [showStudentEditModal, setShowStudentEditModal] = useState(false);
   const [showTeacherEditModal, setShowTeacherEditModal] = useState(false);
@@ -54,6 +58,7 @@ const AdminDash = () => {
       fetchAllTeachers();
     } else if (activePage === "payment") {
       fetchPendingPayments();
+      receivedPayment();
     }
   }, [activePage]);
 
@@ -247,6 +252,26 @@ const AdminDash = () => {
     }
   };
 
+
+  // all receive payment
+  const receivedPayment = async() =>{
+    try{
+      const receive = await api.get(`/payment/received`);
+      if(receive.data.success) {
+        // Handle the received payments data
+        setMessage("All Received payments");
+        setReceivedPayments(receive.data.approved);
+
+      } else {
+        setMessage("Failed to fetch received payments");
+      }
+    }
+    catch(err) {
+      setMessage("Error fetching received payments: " + err.message);
+    }
+  }
+
+  console.log(receivedPayments);
   return (
     <>
       <div className="adminDashboard h-full w-full flex flex-col">
@@ -360,12 +385,40 @@ const AdminDash = () => {
                 )}
               </li>
 
-              <li
+              <li>
+                <div
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
                 onClick={() => setActivePage("payment")}
               >
                 {" "}
                 <FaMoneyBillWave /> Payment
+                </div>
+                {activePage === "payment" && (
+                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("received Payments")}
+                    >
+                      {" "}
+                      Received Payments
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("pending payments")}
+                    >
+                      {" "}
+                      Pending Payments
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("rejected payments")}
+                    >
+                      {" "}
+                      Rejected Payments
+                    </li>
+                    
+                  </ul>
+                )}
               </li>
 
               <li
@@ -789,6 +842,57 @@ const AdminDash = () => {
                     )}
                   </div>
                 )}
+
+                {activePage === "payment" && subActivePage === "received Payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
+                  <h2 className="text-2xl font-bold text-orange-600">
+                    Received Payments
+                  </h2>
+                  {loading ? (
+                    <p>Loading received payments...</p>
+                  ) : receivedPayments.length === 0 ? (
+                    <p>No received payments found.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {receivedPayments.map((payment) => (
+                        <div key={payment._id} className="border border-gray-300 rounded p-4">
+                          <div className="grid grid-cols-3 gap-4">
+
+                            <div>
+                              <p className="text-sm text-gray-600">Student Name</p>
+                              <p className="font-semibold text-lg">
+                                {payment.name}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Amount</p>
+                              <p className="font-semibold text-lg">
+                                ₹{payment.payments.map(p => p.amount)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">
+                                Transaction ID
+                              </p>
+                              <p className="font-semibold">
+                                {payment.transactionId}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Date</p>
+                              <p className="font-semibold">
+                                {payment.date
+                                  ? new Date(
+                                      payment.date,
+                                    ).toLocaleDateString()
+                                  : "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>)}
 
                 {activePage === "subjects" && <SubjectManagement />}
 

@@ -82,6 +82,7 @@ const StudentDash = () => {
     setPaymentLoading(true)
     try {
       const paymentData = {
+        // studentName: paymentForm.studentName || profile?.name || '',
         studentId,
         amount: parseFloat(paymentForm.amount),
         transactionId: paymentForm.transactionId
@@ -246,6 +247,8 @@ const StudentDash = () => {
                   <h3 className='text-lg font-semibold mb-4 text-gray-700'>Upload Payment</h3>
                   <form onSubmit={handlePaymentSubmit} className='space-y-4'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+
+                      
                       <div>
                         <label className='block text-sm font-medium text-gray-700 mb-1'>Amount *</label>
                         <input
