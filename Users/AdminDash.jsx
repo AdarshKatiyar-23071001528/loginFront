@@ -41,7 +41,7 @@ const AdminDash = () => {
   const [message, setMessage] = useState("");
 
   // 
-  const [pendingPaymentStudent, setPendingPaymentStudent] = useState(null);
+  const [pendingPaymentStudent, setPendingPaymentStudent] = useState([]);
   const [receivedPayments, setReceivedPayments] = useState([]);
 
   // Modal states for edit
@@ -59,6 +59,7 @@ const AdminDash = () => {
     } else if (activePage === "payment") {
       fetchPendingPayments();
       receivedPayment();
+      pendingPayment();
     }
   }, [activePage]);
 
@@ -260,7 +261,8 @@ const AdminDash = () => {
       if(receive.data.success) {
         // Handle the received payments data
         setMessage("All Received payments");
-        setReceivedPayments(receive.data.approved);
+        setReceivedPayments(receive.data.data);
+        console.log("Received payments:", receive.data.data);
 
       } else {
         setMessage("Failed to fetch received payments");
@@ -271,7 +273,24 @@ const AdminDash = () => {
     }
   }
 
-  console.log(receivedPayments);
+  const pendingPayment = async() =>{
+    try{
+      const pending = await api.get(`/payment/pending`);
+      if(pending.data.success) {
+        // Handle the pending payments data
+        setMessage("All Pending payments");
+        setPendingPaymentStudent(pending.data.pending);
+        console.log("Pending payments:", pending.data);
+      } else {
+        setMessage("Failed to fetch pending payments");
+      }
+    }
+    catch(err) {
+      setMessage("Error fetching pending payments: " + err.message);
+    }
+  }
+
+
   return (
     <>
       <div className="adminDashboard h-full w-full flex flex-col">
@@ -388,13 +407,21 @@ const AdminDash = () => {
               <li>
                 <div
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
-                onClick={() => setActivePage("payment")}
+               
+                onClick={() => {  setActivePage("payment"); setSubActivePage("pending requests")}}
               >
                 {" "}
-                <FaMoneyBillWave /> Payment
+                <FaMoneyBillWave /> Payment      
                 </div>
                 {activePage === "payment" && (
                   <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("pending requests")}
+                    >
+                      {" "}
+                      Pending Payments Request
+                    </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("received Payments")}
@@ -416,6 +443,7 @@ const AdminDash = () => {
                       {" "}
                       Rejected Payments
                     </li>
+                    
                     
                   </ul>
                 )}
@@ -760,7 +788,7 @@ const AdminDash = () => {
                   )}
 
                 {/* ========== PAYMENT MANAGEMENT ========== */}
-                {activePage === "payment" && (
+                {activePage === "payment" && subActivePage === "pending requests" && (
                   <div className="bg-white p-4 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold text-green-600 mb-4">
                       Payment Management
@@ -820,7 +848,7 @@ const AdminDash = () => {
                                     payment._id,
                                   )
                                 }
-                                className="bg-green-500 text-white px-6 py-4 rounded hover:bg-green-600 font-semibold"
+                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold"
                               >
                                 Approve
                               </button>
@@ -831,7 +859,7 @@ const AdminDash = () => {
                                     payment._id,
                                   )
                                 }
-                                className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 font-semibold"
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-semibold"
                               >
                                 Reject
                               </button>
@@ -853,20 +881,20 @@ const AdminDash = () => {
                     <p>No received payments found.</p>
                   ) : (
                     <div className="space-y-4">
-                      {receivedPayments.map((payment) => (
-                        <div key={payment._id} className="border border-gray-300 rounded p-4">
+                      {receivedPayments.map((item,index) => (
+                        <div key={item._id} className="border border-gray-300 rounded p-4">
                           <div className="grid grid-cols-3 gap-4">
 
                             <div>
                               <p className="text-sm text-gray-600">Student Name</p>
                               <p className="font-semibold text-lg">
-                                {payment.name}
+                                {item.payment.studentName}
                               </p>
                             </div>
                             <div>
                               <p className="text-sm text-gray-600">Amount</p>
                               <p className="font-semibold text-lg">
-                                ₹{payment.payments.map(p => p.amount)}
+                                ₹{item.payment.amount}
                               </p>
                             </div>
                             <div>
@@ -874,13 +902,13 @@ const AdminDash = () => {
                                 Transaction ID
                               </p>
                               <p className="font-semibold">
-                                {payment.transactionId}
+                                {item.payment.transactionId}
                               </p>
                             </div>
                             <div>
                               <p className="text-sm text-gray-600">Date</p>
                               <p className="font-semibold">
-                                {payment.date
+                                {item.payment.date
                                   ? new Date(
                                       payment.date,
                                     ).toLocaleDateString()
@@ -893,6 +921,42 @@ const AdminDash = () => {
                     </div>
                   )}
                 </div>)}
+
+                  {activePage === "payment" && subActivePage === "pending payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
+                  <h2 className="text-2xl font-bold text-orange-600">
+                    Pending Payments
+                  </h2>
+                  {loading ? (      
+                    <p>Loading pending payments...</p>
+                  ) : pendingPaymentStudent.length === 0 ? (
+                    <p>No pending payments found.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {pendingPaymentStudent?.map((item,index) => (
+                        <div key={item._id} className="border border-gray-300 rounded p-4">
+                          <div className="grid grid-cols-2 gap-4">
+
+                            <div>
+                              <p className="text-sm text-gray-600">Student Name</p>
+                              <p className="font-semibold text-lg">
+                                {item.name}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Amount</p>
+                              <p className="font-semibold text-lg">
+                                ₹{item.totalfees - item.paidfees}
+                              </p>
+                            </div>
+                            
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>)}
+
+
 
                 {activePage === "subjects" && <SubjectManagement />}
 

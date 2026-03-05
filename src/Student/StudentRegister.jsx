@@ -32,6 +32,7 @@ const StudentRegister = () => {
     post: '',
     district: '',
     landmark: '',
+    totalfees: '',
   })
 
   const handleChange = (e) => {
@@ -123,6 +124,7 @@ const StudentRegister = () => {
         post: formData.post,
         district: formData.district,
         landmark: formData.landmark,
+        totalfees: formData.totalfees ? parseInt(formData.totalfees) : undefined,
       })
 
       if (response.data.success) {
@@ -151,6 +153,7 @@ const StudentRegister = () => {
           post: '',
           district: '',
           landmark: '',
+          totalfees: '',
         })
         setTimeout(() => {
           navigate('/studentlog')
@@ -390,6 +393,27 @@ const StudentRegister = () => {
                   />
                 </div>
               </div>
+
+              <div>
+                  <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Total Fees</label>
+                  <input
+                    type='Number'
+                    name='totalfees'
+                    value={formData.totalfees}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('totalfees')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('totalfees')}
+                    placeholder='Total Fees'
+                    // maxLength='10'
+                    required
+                  />
+                </div>
+
+
+              
+
+              
             </div>
 
             {/* Personal Details Section */}
