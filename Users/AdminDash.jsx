@@ -26,6 +26,7 @@ import TotalStudent from "./TotalStudent";
 import AllTeachers from "./AllTeachers";
 import TodayCollection from "./TodayCollection";
 import { Navigate, useNavigate } from "react-router-dom";
+import Box from "./Box";
 
 // using configured api instance from src/api/axios
 
@@ -574,15 +575,53 @@ const AdminDash = () => {
               className={`flex-1 flex flex-col transition-all duration-300 w-full overflow-scroll`}
             >
               {/* Message Alert */}
-              {message && (
+              {/* {message && (
                 <div className="bg-blue-500 text-white p-3 text-center sticky top-0 z-10">
                   {message}
                 </div>
-              )}
+              )} */}
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-4  w-full">
-                {activePage === "home" && ( <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
+                {activePage === "home" && ( <div className="flex flex-col gap-3">
+                  <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
+                  
+                   <PaymentChart paidPayment={totalPaid} pendingPayment={totalPending} />
+                   
+                  <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
+                
+                  <div className="cursor-pointer">
+                    {/* <TotalStudent totalStudent={studentInCollege} /> */}
+                    <Box value={totalPaid} name={"Receive Payment"}/>
+                  
+                    
+                  </div>
+                  <div className="cursor-pointer">
+                       {/* <AllTeachers totalTeacher = {totalTeacherInCollege}/> */}
+                       <Box value={totalPending} name={"Pending Payment"} />
+                  </div>
+
+                      <div className="cursor-pointer" >
+                       {/* <AllTeachers totalTeacher = {totalTeacherInCollege}/> */}
+                       {/* <Box value={totalPending} name={"Today Collection"} /> */}
+                       <TodayCollection/>
+                  </div>
+                  
+                  
+                  
+                  
+
+                 {/*  */}
+
+                 
+                 
+
+
+                  </div>
+                  </div>
+                  
+
+                  <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
                   
                    <PaymentChart paidPayment={totalPaid} pendingPayment={totalPending} />
                   <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
@@ -597,11 +636,15 @@ const AdminDash = () => {
                   </div>
                   
                 
-                 <TodayCollection/>
+                 {/* <TodayCollection/> */}
                   </div>
- </div>
-                  
+                  </div>
+
+                  </div>
                 )}
+
+
+
 
                 {/* ========== STUDENT PAGES ========== */}
                 {activePage === "student" &&
@@ -1146,6 +1189,8 @@ const AdminDash = () => {
                   </div>
                 )}
               </div>
+
+
             </div>
 
             {/* ========== STUDENT EDIT MODAL ========== */}

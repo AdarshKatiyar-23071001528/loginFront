@@ -29,11 +29,11 @@ const StudentLogin = () => {
   return (
     <>
       <div className='studentLoginContainer h-full w-full  flex  justify-center items-center '>
-        <div className='h-[300px] w-[300px]
-        md:h-[400px] md:w-[400px]  rounded-lg flex flex-col justify-center items-center gap-4'>
-          <form action="" onSubmit={ submithandler} className='h-[300px] w-[300px]
-        md:h-[400px] md:w-[400px]  rounded-lg  flex flex-col justify-center items-center gap-4'>
-            <h1 className="text-2xl font-bold">Student</h1>
+        <div className='h-[200px] w-[300px]
+        md:h-[200px] md:w-[300px]  rounded-lg flex flex-col justify-center items-center gap-1'>
+          <form action="" onSubmit={ submithandler} className='h-[200px] w-[300px]
+        md:h-[200px] md:w-[300px]  rounded-lg  flex flex-col justify-center items-center gap-2'>
+            <p className="text-3xl font-bold">Student</p>
             <div className='flex border-bottom border-black gap-2 w-[70%]'> <FaUser className='mt-2' />
               <input type="email" name="email" id="email" value={FormData.email} onChange={onChangeHandler} placeholder='Enter Email' className='outline-none p-1 w-[70%] bg-trancparent' /></div>
 
@@ -44,7 +44,7 @@ const StudentLogin = () => {
             </div>
 
 
-            <button type="submit" className='bg-green-400 px-4 py-2 rounded font-bold '>Submit</button>
+            <button type="submit" className='bg-green-400 px-4 py-2 rounded font-bold mt-2'>Submit</button>
           </form>
 
         </div>

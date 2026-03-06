@@ -39,7 +39,7 @@ const TodayCollection = () => {
   return (
 
 
-    <div className='w-[200px] border-l-4 border-blue-500 rounded-l-2xl flex flex-col bg-blue-100 p-2 shadow-lg'>
+    <div className='w-[200px] border-l-4 border-red-500 rounded-l-2xl flex flex-col bg-red-100 p-2 shadow-lg'>
       <p className='font-bold text-xl'>Today Collection</p>
       <p className='text-gray-600 text-2xl text-center'>₹{collection}</p>
     </div>
