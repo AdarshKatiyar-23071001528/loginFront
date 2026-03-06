@@ -27,8 +27,13 @@ const TeacherDashboard = () => {
   },[id])
 
   return (
+
     <div>Welcome {teacher ? teacher.name : 'Teacher'}
+
+
+    
     <TeacherAttendance teacherId={id} />
+
     </div>
   )
     

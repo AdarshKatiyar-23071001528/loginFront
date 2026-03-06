@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link, useLocation } from "react-router-dom";
 import AppContext from "../src/Context/AppContext";
+import logo from "../src/assest/logo.png"
 
 const Nav = () => {
   const { userLogin } = useContext(AppContext);
@@ -31,7 +32,9 @@ const Nav = () => {
         
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold skit">
-          <h1 title="Shankutla Krishna Institute of Technology">SKIT</h1>
+        <img src={logo} alt=""className="h-[70px] opacity-75" title="Shankutla Krishna Institute of Technology" />
+          {/* <h1 title="Shankutla Krishna Institute of Technology">SKIT</h1> */}
+
         </Link>
 
         {/* Desktop Menu */}

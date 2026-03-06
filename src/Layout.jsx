@@ -23,34 +23,36 @@ import TeacherDashboard from './Teacher/TeacherDashboard';
 
 
 const Layout = () => {
-    const location = useLocation();
-    
+  const location = useLocation();
+
+  const hideNav =
+    location.pathname === "/admin/dash" ||
+    location.pathname.startsWith("/teacher/dash") ||
+    location.pathname.startsWith("/student/dash") ||
+    location.pathname === "/login";
+
   return (
     <>
-    {(location.pathname != '/admin/dash') && <Nav/> }
-    
-        <Routes>
-          <Route path='/' element={<Home/>} />
-          <Route path='/users' element= {<AllUsers/>}/>
-          <Route path='/register' element= {<Register/>}/>
-          {/* <Route path='/login' element= {<Login/>}/> */}
-          <Route path='/course' element={<Course/>} />
-          <Route path='/carrer' element ={<Carrer/>} />
-          <Route path='/contact' element ={<Contact/>} />
-           <Route path='/login' element ={<MultiLogin/>} />
-           <Route path='/admin/login' element ={<Login/>} />
-            <Route path='/faculty/login' element ={<Teacherlog/>} />
-             <Route path='/student/login' element ={<StudentLogin/>} />
-             <Route path='/student/register' element={<StudentRegister/>} /> 
-             <Route path="/admin/dash" element={<AdminDash/>} />
-             {/* <Route path="/teacher/dash" element={<TeacherDashboard/>} /> */}
-             <Route path="/student/dash" element={<StudentDash/>} />
-             {/* <Route path="/student/dash/:id" element={<StudentDash/>} /> */}
-             <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
-             <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
-        </Routes>
-        </>
-  )
-}
+      {!hideNav && <Nav />}
 
+      <Routes>
+        <Route path='/' element={<Home/>} />
+        <Route path='/users' element={<AllUsers/>}/>
+        <Route path='/register' element={<Register/>}/>
+        <Route path='/course' element={<Course/>} />
+        <Route path='/carrer' element={<Carrer/>} />
+        <Route path='/contact' element={<Contact/>} />
+        <Route path='/login' element={<MultiLogin/>} />
+        <Route path='/admin/login' element={<Login/>} />
+        <Route path='/faculty/login' element={<Teacherlog/>} />
+        <Route path='/student/login' element={<StudentLogin/>} />
+        <Route path='/student/register' element={<StudentRegister/>} /> 
+        <Route path="/admin/dash" element={<AdminDash/>} />
+        <Route path="/student/dash" element={<StudentDash/>} />
+        <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
+        <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
+      </Routes>
+    </>
+  );
+};
 export default Layout

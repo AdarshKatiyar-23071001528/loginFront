@@ -6,14 +6,21 @@ import { Link } from "react-router-dom";
 import Login from "./Login";
 import StudentLogin from "../src/Student/StudentLogin";
 import TeacherLogin from "../src/Teacher/TeacherLogin";
+import logo from "../src/assest/logo.png"
+import { FaHome } from "react-icons/fa";
+import { GoMoveToStart } from "react-icons/go";
 
 const MultiLogin = () => {
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState("admin");  
   return (
     <>
+  
       <div className="h-full w-full flex justify-end items-center bg-gray-300 mt-20 p-4">
-
+       <Link to={"/"} className="absolute top-2 left-2 border border-black px-4 py-2 rounded flex items-center gap-2 opacity-50 hover:opacity-100 transition duration-300 text-decoration-none font-black text-black">
+  <FaHome /> Home
+</Link>
         <div className="w-[30%] md:w-[70%] h-[50%] md:h-[70%] flex flex-col justify-center items-center">
+          <img src={logo} alt="" className="h-[150px] mb-3 opacity-75" />
           <p className="text-6xl font-bold text-gray-800 mb-4 font-bold">Welcome to the Login Portal</p>
           <h2 className="">Shakuntala Krishna Institute of Technology</h2>
           <p className="text-gray-800 text-xl">Bahablapur, Kanpur Dehat</p>
