@@ -21,10 +21,18 @@ import StudentRegister from "../src/Student/StudentRegister";
 import SubjectManagement from "./SubjectManagement";
 import TeacherRegister from "../src/Teacher/TeacherRegister";
 import AllStudents from "./AllStudents";
+import PaymentChart from "./PaymentChart";
+import TotalStudent from "./TotalStudent";
+import AllTeachers from "./AllTeachers";
+import TodayCollection from "./TodayCollection";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // using configured api instance from src/api/axios
 
 const AdminDash = () => {
+
+
+  let navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectStudent, setSelectStudent] = useState(false);
   const [activePage, setActivePage] = useState("home");
@@ -32,6 +40,8 @@ const AdminDash = () => {
   const [teacher, setTeacher] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
   const [editTeacher, setEditTeacher] = useState(null);
+  const [studentInCollege, setStudentInCollege] = useState(0)
+  const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
 
   // Student management states
   const [students, setStudents] = useState([]);
@@ -43,6 +53,7 @@ const AdminDash = () => {
   // 
   const [pendingPaymentStudent, setPendingPaymentStudent] = useState([]);
   const [receivedPayments, setReceivedPayments] = useState([]);
+  const [rejectPaymentStudents, setRejectPaymentStudents] = useState([]);
 
   // Modal states for edit
   const [showStudentEditModal, setShowStudentEditModal] = useState(false);
@@ -60,6 +71,13 @@ const AdminDash = () => {
       fetchPendingPayments();
       receivedPayment();
       pendingPayment();
+      rejectPayment();
+    }
+    else if(activePage === "home") {
+      totalPaidPayment();
+      totalPendingPayment();
+      fetchAllStudents();
+      fetchAllTeachers();
     }
   }, [activePage]);
 
@@ -73,6 +91,7 @@ const AdminDash = () => {
       console.log("Students response:", response.data);
       if (response.data.success) {
         setStudents(response.data.students);
+        setStudentInCollege(response.data.students.length);
         console.log("Students set in state:", response.data.students);
       }
     } catch (error) {
@@ -92,6 +111,7 @@ const AdminDash = () => {
       console.log("Teachers response:", response.data);
       if (response.data.success) {
         setTeachers(response.data.teachers);
+        setTotalTeacherInCollege(response.data.teachers.length);
       }
     } catch (error) {
       console.error("Error fetching teachers:", error);
@@ -106,9 +126,26 @@ const AdminDash = () => {
     try {
       setLoading(true);
       const response = await api.get(`/student/pendingPayments`);
-      // backend returns an array of student documents that contain pending payments
+      // backend returns { success: true, pending: [...] }
       const data = response.data;
-      if (Array.isArray(data)) {
+      if (data.success && Array.isArray(data.pending)) {
+        const payments = [];
+        data.pending.forEach((student) => {
+          if (student.payments && Array.isArray(student.payments)) {
+            student.payments.forEach((p) => {
+              if (p.status === "pending") {
+                payments.push({
+                  ...p,
+                  studentName: student.name,
+                  studentId: student._id,
+                });
+              }
+            });
+          }
+        });
+        setPendingPayments(payments);
+      } else if (Array.isArray(data)) {
+        // fallback for older response format as array
         const payments = [];
         data.forEach((student) => {
           if (student.payments && Array.isArray(student.payments)) {
@@ -273,6 +310,22 @@ const AdminDash = () => {
     }
   }
 
+      const rejectPayment = async() =>{
+    try{
+      const reject = await api.get(`/payment/rejected`);
+      if(reject.data.success) {
+        // Handle the pending payments data
+        setMessage("All Reject payments");
+        setRejectPaymentStudents(reject.data.data);
+        console.log("Rejected payments:", reject.data.data);
+      } else {
+        setMessage("Failed to fetch rejected payments");
+      }
+    }
+    catch(err) {
+      setMessage("Error fetching rejected payments: " + err.message);
+    }
+  }
   const pendingPayment = async() =>{
     try{
       const pending = await api.get(`/payment/pending`);
@@ -290,15 +343,54 @@ const AdminDash = () => {
     }
   }
 
+  let [totalPaid, setTotalPaid] = useState(0);
+  let [totalPending, setTotalPending] = useState(0);
+  const totalPaidPayment = async() =>{
+    try{
+      const totalPaidResponse = await api.get(`/payment/totalpaid`);
+      if(totalPaidResponse.data.success) {
+        setTotalPaid(totalPaidResponse.data.totalPaid);
+      } else {
+        setMessage("Failed to fetch total paid payments");
+      }
+    }
+    catch(err) {
+      setMessage("Error fetching total paid payments: " + err.message);
+    }
+  }
+
+  const totalPendingPayment =  async() =>{
+    try {
+      const totalPending = await api.get(`/payment/totalpending`);
+      if(totalPending.data.success) {
+      setTotalPending(totalPending.data.totalPending);
+      }
+      else{
+        setMessage("Failed to pending payment");
+      }
+
+      
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
+
+
+
+
+
+  
+
 
   return (
     <>
       <div className="adminDashboard h-full w-full flex flex-col">
         <div className="h-[100px] py-2 bg-blue-300 w-full flex justify-between items-center px-4">
           <div className="ml-4 text-xl font-semibold ">Admin Dashboard</div>
-          <button
+          <button 
             className="flex items-center gap-2 font-bold text-red-600 hover:text-red-800 transition"
-            onClick={() => alert("Logging out...")}
+            onClick={() => {alert("Logging out..."); navigate("/login")}}
+            
           >
             Logout <IoIosLogOut />
           </button>
@@ -438,7 +530,7 @@ const AdminDash = () => {
                     </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected payments")}
+                      onClick={() => setSubActivePage("rejected Payments")}
                     >
                       {" "}
                       Rejected Payments
@@ -479,7 +571,7 @@ const AdminDash = () => {
           
             {/* ================= Right Side Content ================= */}
             <div
-              className={`flex-1 flex flex-col transition-all duration-300 w-full `}
+              className={`flex-1 flex flex-col transition-all duration-300 w-full overflow-scroll`}
             >
               {/* Message Alert */}
               {message && (
@@ -490,10 +582,25 @@ const AdminDash = () => {
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-4  w-full">
-                {activePage === "home" && (
-                  <h2 className="text-2xl font-bold">
-                    Welcome to Admin Dashboard
-                  </h2>
+                {activePage === "home" && ( <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
+                  
+                   <PaymentChart paidPayment={totalPaid} pendingPayment={totalPending} />
+                  <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
+                
+                  <div className="cursor-pointer" onClick={()=>{setActivePage("student"); setSubActivePage("all Student")}}>
+                    <TotalStudent totalStudent={studentInCollege} />
+                  
+                    
+                  </div>
+                  <div className="cursor-pointer" onClick ={() => {setActivePage("teacher"); setSubActivePage("all Teacher")}}>
+                       <AllTeachers totalTeacher = {totalTeacherInCollege}/>
+                  </div>
+                  
+                
+                 <TodayCollection/>
+                  </div>
+ </div>
+                  
                 )}
 
                 {/* ========== STUDENT PAGES ========== */}
@@ -806,7 +913,7 @@ const AdminDash = () => {
                             key={payment._id}
                             className="border-2 border-yellow-400 p-4 rounded-lg bg-yellow-50 hover:shadow-lg transition"
                           >
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                               <div>
                                 <p className="text-sm text-gray-600">
                                   Student Name
@@ -821,21 +928,28 @@ const AdminDash = () => {
                                   ₹{payment.amount}
                                 </p>
                               </div>
-                              <div>
-                                <p className="text-sm text-gray-600">
-                                  Transaction ID
+                               <div>
+                                  <p className="text-sm text-gray-600">
+                                    Payment Method
+                                </p>
+                                <p className="font-semibold">
+                                  {payment.paymentMethod }
+                                </p>
+                              </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Transaction ID
                                 </p>
                                 <p className="font-semibold">
                                   {payment.transactionId}
                                 </p>
                               </div>
+
                               <div>
                                 <p className="text-sm text-gray-600">Date</p>
                                 <p className="font-semibold">
-                                  {payment.date
-                                    ? new Date(
-                                        payment.date,
-                                      ).toLocaleDateString()
+                                  {payment.paidAt
+                                    ? new Date(payment.paidAt).toLocaleDateString('en-IN')
                                     : "N/A"}
                                 </p>
                               </div>
@@ -880,10 +994,10 @@ const AdminDash = () => {
                   ) : receivedPayments.length === 0 ? (
                     <p>No received payments found.</p>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="">
                       {receivedPayments.map((item,index) => (
-                        <div key={item._id} className="border border-gray-300 rounded p-4">
-                          <div className="grid grid-cols-3 gap-4">
+                        <div key={item._id} className="border border-gray-300 rounded p-2">
+                          <div className="grid grid-cols-5 ">
 
                             <div>
                               <p className="text-sm text-gray-600">Student Name</p>
@@ -899,6 +1013,14 @@ const AdminDash = () => {
                             </div>
                             <div>
                               <p className="text-sm text-gray-600">
+                                Payment Method
+                              </p>
+                              <p className="font-semibold">
+                                {item.payment.paymentMethod}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">
                                 Transaction ID
                               </p>
                               <p className="font-semibold">
@@ -908,10 +1030,8 @@ const AdminDash = () => {
                             <div>
                               <p className="text-sm text-gray-600">Date</p>
                               <p className="font-semibold">
-                                {item.payment.date
-                                  ? new Date(
-                                      payment.date,
-                                    ).toLocaleDateString()
+                                {item.payment.paidAt
+                                  ? new Date(item.payment.paidAt).toLocaleDateString('en-IN')
                                   : "N/A"}
                               </p>
                             </div>
@@ -955,6 +1075,61 @@ const AdminDash = () => {
                     </div>
                   )}
                 </div>)}
+
+
+                  {activePage === "payment" && subActivePage === "rejected Payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
+                  <h2 className="text-2xl font-bold text-orange-600">
+                    Rejected Payments
+                  </h2>
+                  {loading ? (
+                    <p>Loading rejected payments...</p>
+                  ) : rejectPaymentStudents.length === 0 ? (
+                    <p>No reject payments found.</p>
+                  ) : (
+                    <div className="">
+                      {rejectPaymentStudents.map((item,index) => (
+                        <div key={item._id} className="border border-gray-300 rounded p-2">
+                          <div className="grid grid-cols-4 ">
+
+                            <div>
+                              <p className="text-sm text-gray-600">Student Name</p>
+                              <p className="font-semibold text-lg">
+                                {item.payment.studentName}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Amount</p>
+                              <p className="font-semibold text-lg">
+                                ₹{item.payment.amount}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">
+                                Transaction ID
+                              </p>
+                              <p className="font-semibold">
+                                {item.payment.transactionId}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Date</p>
+                              <p className="font-semibold">
+                                {item.payment.paidAt
+                                  ? new Date(item.payment.paidAt).toLocaleDateString('en-IN')
+                                  : "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>)}
+
+
+
+
+
 
 
 
