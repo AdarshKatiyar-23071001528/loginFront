@@ -27,6 +27,8 @@ import AllTeachers from "./AllTeachers";
 import TodayCollection from "./TodayCollection";
 import { Navigate, useNavigate } from "react-router-dom";
 import Box from "./Box";
+import { CiLogout } from "react-icons/ci";
+import Expense from "../src/Expenses/Expense";
 
 // using configured api instance from src/api/axios
 
@@ -386,20 +388,12 @@ const AdminDash = () => {
   return (
     <>
       <div className="adminDashboard h-full w-full flex flex-col">
-        <div className="h-[100px] py-2 bg-blue-300 w-full flex justify-between items-center px-4">
-          <div className="ml-4 text-xl font-semibold ">Admin Dashboard</div>
-          <button 
-            className="flex items-center gap-2 font-bold text-red-600 hover:text-red-800 transition"
-            onClick={() => {alert("Logging out..."); navigate("/login")}}
-            
-          >
-            Logout <IoIosLogOut />
-          </button>
-        </div>
+       
 
         <div className="h-[100%] flex w-full items-center justify-center">
           <div className="AdminPannel bg-gray-600 pt-4 w-[300px] text-white h-[100%] shadow-lg rounded-r-lg">
-            <ul className="flex flex-col gap-4">
+            <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">Admin Pannel</p>
+            <ul className="flex flex-col gap-2">
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "home" && "bg-blue-300"}`}
                 onClick={() => setActivePage("home")}
@@ -407,6 +401,8 @@ const AdminDash = () => {
                 {" "}
                 <FaHome /> Home
               </li>
+
+
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
@@ -564,6 +560,13 @@ const AdminDash = () => {
                 {" "}
                 <FaBell /> Notice
               </li>
+              <li
+                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
+                onClick={() => navigate('/')}
+              >
+                {" "}
+                <CiLogout /> Logout
+              </li>
             </ul>
           </div>
 
@@ -580,6 +583,8 @@ const AdminDash = () => {
                   {message}
                 </div>
               )} */}
+
+              
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-4  w-full">
@@ -1179,14 +1184,17 @@ const AdminDash = () => {
                 {activePage === "subjects" && <SubjectManagement />}
 
                 {activePage === "expenses" && (
-                  <div className="bg-white p-4 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-bold text-orange-600">
-                      Expense Management
-                    </h2>
-                    <p className="text-gray-600 mt-4">
-                      Expense management module coming soon...
-                    </p>
-                  </div>
+                  // <div className="bg-white p-4 rounded-lg shadow-md">
+                  //   <h2 className="text-2xl font-bold text-orange-600">
+                  //     Expense Management
+                  //   </h2>
+                  //   <p className="text-gray-600 mt-4">
+                  //     Expense management module coming soon...
+                  //   </p>
+                  // </div>
+                  <div className="ml-[250px] p-6">
+   <Expense/>
+</div>
                 )}
               </div>
 

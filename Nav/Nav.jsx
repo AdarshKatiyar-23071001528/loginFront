@@ -27,11 +27,11 @@ const Nav = () => {
   }, []);
 
   return (
-    <header className="h-[90px] w-full shadow-lg  text-white relative">
+    <nav className="h-[90px] w-full shadow-lg bg-gray-400 backdrop-blur p-4">
       <div className="h-full flex items-center justify-between px-6">
         
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold skit">
+        <Link to="/" className="text-2xl font-bold ">
         <img src={logo} alt=""className="h-[70px] opacity-75" title="Shankutla Krishna Institute of Technology" />
           {/* <h1 title="Shankutla Krishna Institute of Technology">SKIT</h1> */}
 
@@ -70,7 +70,7 @@ const Nav = () => {
           </ul>
         </div>
       )}
-    </header>
+    </nav>
   );
 };
 

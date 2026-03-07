@@ -15,31 +15,31 @@ const Home = () => {
         </div>
         
         <div className="relative z-10 max-w-5xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 md:mb-8 leading-tight tracking-tight">
-            Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-yellow-200 to-orange-300">SKIT</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black  mb-10 md:mb-8 leading-tight tracking-tight">
+            Welcome to <span className="bg-clip-text text-grey-400 ">SKIT</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 md:mb-12 max-w-3xl mx-auto font-light leading-relaxed">
             Your gateway to world-class education. Learn from industry experts, build real-world skills, and accelerate your career.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
               onClick={() => navigate('/student/login')}
-              className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-yellow-400 text-slate-900 font-bold rounded-lg hover:bg-yellow-300 transform hover:scale-105 transition duration-300 shadow-lg hover:shadow-2xl text-base sm:text-lg p-2 rounded"
+              className="w-full sm:w-auto px-5 sm:px-10 py-3 sm:py-4 bg-yellow-400 text-slate-900 font-bold rounded-lg hover:bg-yellow-300 transform hover:scale-105 transition duration-300 shadow-lg hover:shadow-2xl text-base sm:text-lg p-2 rounded"
             >
               Student Login
             </button>
             <button 
               onClick={() => navigate('/faculty/login')}
-              className="w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-gray-100 transform hover:scale-105 transition duration-300 shadow-lg hover:shadow-2xl text-base sm:text-lg"
+              className="w-full sm:w-auto px-5 sm:px-10 py-3 sm:py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-gray-100 transform hover:scale-105 transition duration-300 shadow-lg hover:shadow-2xl text-base sm:text-lg"
             >
               Faculty Login
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gradient-to-r from-slate-50 to-blue-50 py-16 md:py-24 px-4 sm:px-6 lg:px-8">
+      <div className="bg-gradient-to-r from-slate-50 to-blue-50 py-16 md:py-24 px-4 sm:px-6 lg:px-">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             <div className="bg-white p-8 md:p-10 rounded-xl shadow-md hover:shadow-2xl transition duration-300 border-t-4 border-blue-500">
@@ -66,7 +66,7 @@ const Home = () => {
       <div className="py-20 md:py-32 bg-white px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 md:mb-20">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 md:mb-6">Why Choose Excellence Academy?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 md:mb-6">Why Choose SKIT?</h2>
             <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto"></div>
           </div>
           
