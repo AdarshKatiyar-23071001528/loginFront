@@ -1,16 +1,35 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Line } from "react-chartjs-2";
+import api from '../api/axios.js'
+// import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
+
+// import {
+//   Chart as ChartJS,
+//   LineElement,
+//   CategoryScale,
+//   LinearScale,
+//   PointElement
+// } from "chart.js";
+
+// ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+
 
 import {
   Chart as ChartJS,
-  LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
-  PointElement
+  Tooltip,
+  Legend
 } from "chart.js";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+);
 
 const Expense = () => {
 
@@ -39,7 +58,7 @@ const Expense = () => {
 
   const fetchTodayExpense = async ()=>{
     try{
-      const res = await axios.get("/api/today-expense")
+      const res = await api.get("/expense/today-expense")
       setTodayExpense(res?.data?.totalExpense || 0)
     }catch(err){
       console.log(err)
@@ -48,7 +67,7 @@ const Expense = () => {
 
   const fetchMonthExpense = async ()=>{
     try{
-      const res = await axios.get("/api/month-expense")
+      const res = await api.get("/expense/month-expense")
 
       if(res?.data?.data?.length > 0){
         setMonthExpense(res.data.data[0].totalExpense)
@@ -61,39 +80,80 @@ const Expense = () => {
     }
   }
 
+  // const fetchGraph = async ()=>{
+  //   try{
+  //     const res = await api.get(`{/expense/expense-graph?type=daily&month=${month}&year=${year}}`)
+
+  //     setGraph({
+  //       labels: res?.data?.labels || [],
+  //       values: res?.data?.values || []
+  //     })
+
+  //   }catch(err){
+  //     console.log(err)
+  //   }
+  // }
   const fetchGraph = async ()=>{
-    try{
-      const res = await axios.get("/api/expense-graph")
+  try{
 
-      setGraph({
-        labels: res?.data?.labels || [],
-        values: res?.data?.values || []
-      })
+    const today = new Date()
 
-    }catch(err){
-      console.log(err)
-    }
+    const month = today.getMonth() + 1
+    const year = today.getFullYear()
+
+    const res = await api.get(`/expense/expense-graph?type=daily&month=${month}&year=${year}`)
+
+    setGraph({
+      labels: res?.data?.labels || [],
+      values: res?.data?.values || []
+    })
+
+  }catch(err){
+    console.log(err)
   }
+}
 
   const fetchDateWise = async ()=>{
     try{
-      const res = await axios.get("/api/date-wise-expense")
+      const res = await api.get("/expense/getDateWiseExpense")
       setDateWise(res?.data?.data || [])
     }catch(err){
       console.log(err)
     }
   }
 
-  const chartData = {
-    labels: graph.labels,
-    datasets:[
-      {
-        label:"Expense",
-        data: graph.values
-      }
-    ]
-  }
+  // const chartData = {
+  //   labels: graph.labels,
+  //   datasets:[
+  //     {
+  //       label:"Expense",
+  //       data: graph.values
+  //     }
+  //   ]
+  // }
+// const chartData = {
+//   labels: graph.labels,
+//   datasets:[
+//     {
+//       label:"Expense",
+//       data: graph.values,
+//       borderColor:"red",
+//       backgroundColor:"rgba(255,0,0,0.3)",
+//       tension:0.4
+//     }
+//   ]
+// }
 
+const chartData = {
+  labels: graph.labels,
+  datasets:[
+    {
+      label:"Expense",
+      data: graph.values,
+      backgroundColor:"rgba(255,99,132,0.6)"
+    }
+  ]
+}
   if(loading){
     return <p className="p-6 text-lg">Loading...</p>
   }
@@ -118,11 +178,11 @@ const Expense = () => {
 
       {/* graph */}
 
-      <div className="bg-white shadow p-5 rounded mb-6">
+      <div className="bg-white shadow p-5 rounded mb-4">
         <h2 className="text-xl font-semibold mb-4">Expense Graph</h2>
 
         {graph.labels.length > 0 ? (
-          <Line data={chartData}/>
+          <Bar data={chartData}/>
         ) : (
           <p>No Graph Data</p>
         )}

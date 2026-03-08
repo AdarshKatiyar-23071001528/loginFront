@@ -29,12 +29,14 @@ import { Navigate, useNavigate } from "react-router-dom";
 import Box from "./Box";
 import { CiLogout } from "react-icons/ci";
 import Expense from "../src/Expenses/Expense";
+import CreateExp from "../src/Expenses/CreateExp";
+import All from "../src/Expenses/All";
+import Dashboard from "../Payment/Dashboard";
+import FinanceGraph from "../Admin/FinanceGraph";
 
 // using configured api instance from src/api/axios
 
 const AdminDash = () => {
-
-
   let navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectStudent, setSelectStudent] = useState(false);
@@ -43,7 +45,7 @@ const AdminDash = () => {
   const [teacher, setTeacher] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
   const [editTeacher, setEditTeacher] = useState(null);
-  const [studentInCollege, setStudentInCollege] = useState(0)
+  const [studentInCollege, setStudentInCollege] = useState(0);
   const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
 
   // Student management states
@@ -53,7 +55,7 @@ const AdminDash = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // 
+  //
   const [pendingPaymentStudent, setPendingPaymentStudent] = useState([]);
   const [receivedPayments, setReceivedPayments] = useState([]);
   const [rejectPaymentStudents, setRejectPaymentStudents] = useState([]);
@@ -75,8 +77,7 @@ const AdminDash = () => {
       receivedPayment();
       pendingPayment();
       rejectPayment();
-    }
-    else if(activePage === "home") {
+    } else if (activePage === "home") {
       totalPaidPayment();
       totalPendingPayment();
       fetchAllStudents();
@@ -293,30 +294,27 @@ const AdminDash = () => {
     }
   };
 
-
   // all receive payment
-  const receivedPayment = async() =>{
-    try{
+  const receivedPayment = async () => {
+    try {
       const receive = await api.get(`/payment/received`);
-      if(receive.data.success) {
+      if (receive.data.success) {
         // Handle the received payments data
         setMessage("All Received payments");
         setReceivedPayments(receive.data.data);
         console.log("Received payments:", receive.data.data);
-
       } else {
         setMessage("Failed to fetch received payments");
       }
-    }
-    catch(err) {
+    } catch (err) {
       setMessage("Error fetching received payments: " + err.message);
     }
-  }
+  };
 
-      const rejectPayment = async() =>{
-    try{
+  const rejectPayment = async () => {
+    try {
       const reject = await api.get(`/payment/rejected`);
-      if(reject.data.success) {
+      if (reject.data.success) {
         // Handle the pending payments data
         setMessage("All Reject payments");
         setRejectPaymentStudents(reject.data.data);
@@ -324,15 +322,14 @@ const AdminDash = () => {
       } else {
         setMessage("Failed to fetch rejected payments");
       }
-    }
-    catch(err) {
+    } catch (err) {
       setMessage("Error fetching rejected payments: " + err.message);
     }
-  }
-  const pendingPayment = async() =>{
-    try{
+  };
+  const pendingPayment = async () => {
+    try {
       const pending = await api.get(`/payment/pending`);
-      if(pending.data.success) {
+      if (pending.data.success) {
         // Handle the pending payments data
         setMessage("All Pending payments");
         setPendingPaymentStudent(pending.data.pending);
@@ -340,72 +337,57 @@ const AdminDash = () => {
       } else {
         setMessage("Failed to fetch pending payments");
       }
-    }
-    catch(err) {
+    } catch (err) {
       setMessage("Error fetching pending payments: " + err.message);
     }
-  }
+  };
 
   let [totalPaid, setTotalPaid] = useState(0);
   let [totalPending, setTotalPending] = useState(0);
-  const totalPaidPayment = async() =>{
-    try{
+  const totalPaidPayment = async () => {
+    try {
       const totalPaidResponse = await api.get(`/payment/totalpaid`);
-      if(totalPaidResponse.data.success) {
+      if (totalPaidResponse.data.success) {
         setTotalPaid(totalPaidResponse.data.totalPaid);
       } else {
         setMessage("Failed to fetch total paid payments");
       }
-    }
-    catch(err) {
+    } catch (err) {
       setMessage("Error fetching total paid payments: " + err.message);
     }
-  }
+  };
 
-  const totalPendingPayment =  async() =>{
+  const totalPendingPayment = async () => {
     try {
       const totalPending = await api.get(`/payment/totalpending`);
-      if(totalPending.data.success) {
-      setTotalPending(totalPending.data.totalPending);
-      }
-      else{
+      if (totalPending.data.success) {
+        setTotalPending(totalPending.data.totalPending);
+      } else {
         setMessage("Failed to pending payment");
       }
-
-      
     } catch (error) {
       setMessage(error.message);
     }
-  }
-
-
-
-
-
-  
-
+  };
 
   return (
     <>
       <div className="adminDashboard h-full w-full flex flex-col">
-       
-
         <div className="h-[100%] flex w-full items-center justify-center">
           <div className="AdminPannel bg-gray-600 pt-4 w-[300px] text-white h-[100%] shadow-lg rounded-r-lg">
-            <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">Admin Pannel</p>
+            <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">
+              Admin                
+            </p>
             <ul className="flex flex-col gap-2">
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "home" && "bg-blue-300"}`}
                 onClick={() => setActivePage("home")}
               >
-                {" "}
+                {" "}       
                 <FaHome /> Home
               </li>
-
-
               <li>
-                <div
-                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
+                          <div className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
                   onClick={() => {
                     setActivePage("student");
                     setSubActivePage("all Student");
@@ -451,8 +433,8 @@ const AdminDash = () => {
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "teacher" && "bg-blue-300"}`}
                   onClick={() => {
-                    setActivePage("teacher")
-                    setSubActivePage("all Teacher")
+                    setActivePage("teacher");
+                    setSubActivePage("all Teacher");
                   }}
                 >
                   {" "}
@@ -495,15 +477,24 @@ const AdminDash = () => {
 
               <li>
                 <div
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
-               
-                onClick={() => {  setActivePage("payment"); setSubActivePage("pending requests")}}
-              >
-                {" "}
-                <FaMoneyBillWave /> Payment      
+                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
+                  onClick={() => {
+                    setActivePage("payment");
+                    setSubActivePage("Dashboard");
+                  }}
+                >
+                  {" "}
+                  <FaMoneyBillWave /> Payment
                 </div>
                 {activePage === "payment" && (
                   <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashborad" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("Dashboard")}
+                    >
+                      {" "}
+                      Dashboard
+                    </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("pending requests")}
@@ -532,18 +523,51 @@ const AdminDash = () => {
                       {" "}
                       Rejected Payments
                     </li>
-                    
-                    
                   </ul>
                 )}
               </li>
 
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "expenses" && "bg-blue-300"}`}
-                onClick={() => setActivePage("expenses")}
-              >
-                {" "}
-                <FaMoneyBillWave /> Expenses
+              <li>
+                <div
+                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "expenses" && "bg-blue-300"}`}
+                  onClick={() => {setActivePage("expenses"); setSubActivePage("Dashboard")}}
+                >
+                  {" "}
+                  <FaMoneyBillWave /> Expenses{" "}
+                </div>
+
+                {activePage === "expenses" && (
+                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("Dashboard")}
+                    >
+                      {" "}
+                      Dashboard
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Create Expense" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("Create Expense")}
+                    >
+                      {" "}
+                      Create Expense
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "All Expense" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("All Expense")}
+                    >
+                      {" "}
+                      All Expense
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("rejected Payments")}
+                    >
+                      {" "}
+                      Rejected Payments
+                    </li>
+                  </ul>
+                )}
               </li>
 
               <li
@@ -562,7 +586,7 @@ const AdminDash = () => {
               </li>
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
               >
                 {" "}
                 <CiLogout /> Logout
@@ -572,7 +596,7 @@ const AdminDash = () => {
 
           <div className="flex-1 flex flex-col transition-all duration-300 w-full h-[100%]">
             {/* Message Alert */}
-          
+
             {/* ================= Right Side Content ================= */}
             <div
               className={`flex-1 flex flex-col transition-all duration-300 w-full overflow-scroll`}
@@ -584,72 +608,14 @@ const AdminDash = () => {
                 </div>
               )} */}
 
-              
-
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-4  w-full">
-                {activePage === "home" && ( <div className="flex flex-col gap-3">
-                  <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
-                  
-                   <PaymentChart paidPayment={totalPaid} pendingPayment={totalPending} />
-                   
-                  <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
-                
-                  <div className="cursor-pointer">
-                    {/* <TotalStudent totalStudent={studentInCollege} /> */}
-                    <Box value={totalPaid} name={"Receive Payment"}/>
-                  
-                    
-                  </div>
-                  <div className="cursor-pointer">
-                       {/* <AllTeachers totalTeacher = {totalTeacherInCollege}/> */}
-                       <Box value={totalPending} name={"Pending Payment"} />
-                  </div>
-
-                      <div className="cursor-pointer" >
-                       {/* <AllTeachers totalTeacher = {totalTeacherInCollege}/> */}
-                       {/* <Box value={totalPending} name={"Today Collection"} /> */}
-                       <TodayCollection/>
+              <div className="flex-1 overflow-y-auto p-2  w-full">
+                {activePage === "home" && (
+                  <div className='h-full w-full'>
+                    <FinanceGraph/>
                   </div>
                   
-                  
-                  
-                  
-
-                 {/*  */}
-
-                 
-                 
-
-
-                  </div>
-                  </div>
-                  
-
-                  <div className="flex items-center bg-gray-200 p-4 rounded w-full gap-4 border-2 border-gray-300"> 
-                  
-                   <PaymentChart paidPayment={totalPaid} pendingPayment={totalPending} />
-                  <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
-                
-                  <div className="cursor-pointer" onClick={()=>{setActivePage("student"); setSubActivePage("all Student")}}>
-                    <TotalStudent totalStudent={studentInCollege} />
-                  
-                    
-                  </div>
-                  <div className="cursor-pointer" onClick ={() => {setActivePage("teacher"); setSubActivePage("all Teacher")}}>
-                       <AllTeachers totalTeacher = {totalTeacherInCollege}/>
-                  </div>
-                  
-                
-                 {/* <TodayCollection/> */}
-                  </div>
-                  </div>
-
-                  </div>
                 )}
-
-
-
 
                 {/* ========== STUDENT PAGES ========== */}
                 {activePage === "student" &&
@@ -716,7 +682,6 @@ const AdminDash = () => {
                 {activePage === "student" &&
                   subActivePage === "add Student" && (
                     <div className="w-full">
-                      
                       <StudentRegister
                         onSuccess={() => {
                           setActivePage("all Student");
@@ -801,7 +766,6 @@ const AdminDash = () => {
                 {activePage === "teacher" &&
                   subActivePage === "all Teacher" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                     
                       {loading ? (
                         <p>Loading...</p>
                       ) : (
@@ -858,7 +822,6 @@ const AdminDash = () => {
                 {activePage === "teacher" &&
                   subActivePage === "add Teacher" && (
                     <div className="w-full">
-                      
                       <TeacherRegister
                         onSuccess={() => {
                           setActivePage("all Teacher");
@@ -943,262 +906,296 @@ const AdminDash = () => {
                   )}
 
                 {/* ========== PAYMENT MANAGEMENT ========== */}
-                {activePage === "payment" && subActivePage === "pending requests" && (
-                  <div className="bg-white p-4 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-bold text-green-600 mb-4">
-                      Payment Management
-                    </h2>
-                    {loading ? (
-                      <p>Loading payments...</p>
-                    ) : pendingPayments.length === 0 ? (
-                      <p className="text-center text-gray-600">
-                        No pending payments
-                      </p>
-                    ) : (
-                      <div className="space-y-4">
-                        {pendingPayments.map((payment) => (
-                          <div
-                            key={payment._id}
-                            className="border-2 border-yellow-400 p-4 rounded-lg bg-yellow-50 hover:shadow-lg transition"
-                          >
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-                              <div>
-                                <p className="text-sm text-gray-600">
-                                  Student Name
-                                </p>
-                                <p className="font-semibold">
-                                  {payment.studentName}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-600">Amount</p>
-                                <p className="font-semibold text-lg">
-                                  ₹{payment.amount}
-                                </p>
-                              </div>
-                               <div>
+                  {activePage === "payment" &&
+                  subActivePage === "Dashboard" && (
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                      
+                      {loading ? (
+                        <p>Loading payments...</p>
+                      ) : (
+                        <Dashboard/>
+                      )}
+                    </div>
+                  )}
+
+
+                {activePage === "payment" &&
+                  subActivePage === "pending requests" && (
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                      <h2 className="text-2xl font-bold text-green-600 mb-4">
+                        Payment Management
+                      </h2>
+                      {loading ? (
+                        <p>Loading payments...</p>
+                      ) : pendingPayments.length === 0 ? (
+                        <p className="text-center text-gray-600">
+                          No pending payments
+                        </p>
+                      ) : (
+                        <div className="space-y-4">
+                          {pendingPayments.map((payment) => (
+                            <div
+                              key={payment._id}
+                              className="border-2 border-yellow-400 p-4 rounded-lg bg-yellow-50 hover:shadow-lg transition"
+                            >
+                              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Student Name
+                                  </p>
+                                  <p className="font-semibold">
+                                    {payment.studentName}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Amount
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    ₹{payment.amount}
+                                  </p>
+                                </div>
+                                <div>
                                   <p className="text-sm text-gray-600">
                                     Payment Method
-                                </p>
-                                <p className="font-semibold">
-                                  {payment.paymentMethod }
-                                </p>
-                              </div>
+                                  </p>
+                                  <p className="font-semibold">
+                                    {payment.paymentMethod}
+                                  </p>
+                                </div>
                                 <div>
                                   <p className="text-sm text-gray-600">
                                     Transaction ID
-                                </p>
-                                <p className="font-semibold">
-                                  {payment.transactionId}
-                                </p>
+                                  </p>
+                                  <p className="font-semibold">
+                                    {payment.transactionId}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <p className="text-sm text-gray-600">Date</p>
+                                  <p className="font-semibold">
+                                    {payment.paidAt
+                                      ? new Date(
+                                          payment.paidAt,
+                                        ).toLocaleDateString("en-IN")
+                                      : "N/A"}
+                                  </p>
+                                </div>
                               </div>
-
-                              <div>
-                                <p className="text-sm text-gray-600">Date</p>
-                                <p className="font-semibold">
-                                  {payment.paidAt
-                                    ? new Date(payment.paidAt).toLocaleDateString('en-IN')
-                                    : "N/A"}
-                                </p>
+                              <div className="flex gap-3 justify-end">
+                                <button
+                                  onClick={() =>
+                                    handleApprovePayment(
+                                      payment.studentId,
+                                      payment._id,
+                                    )
+                                  }
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleRejectPayment(
+                                      payment.studentId,
+                                      payment._id,
+                                    )
+                                  }
+                                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-semibold"
+                                >
+                                  Reject
+                                </button>
                               </div>
                             </div>
-                            <div className="flex gap-3 justify-end">
-                              <button
-                                onClick={() =>
-                                  handleApprovePayment(
-                                    payment.studentId,
-                                    payment._id,
-                                  )
-                                }
-                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleRejectPayment(
-                                    payment.studentId,
-                                    payment._id,
-                                  )
-                                }
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-semibold"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {activePage === "payment" && subActivePage === "received Payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
-                  <h2 className="text-2xl font-bold text-orange-600">
-                    Received Payments
-                  </h2>
-                  {loading ? (
-                    <p>Loading received payments...</p>
-                  ) : receivedPayments.length === 0 ? (
-                    <p>No received payments found.</p>
-                  ) : (
-                    <div className="">
-                      {receivedPayments.map((item,index) => (
-                        <div key={item._id} className="border border-gray-300 rounded p-2">
-                          <div className="grid grid-cols-5 ">
-
-                            <div>
-                              <p className="text-sm text-gray-600">Student Name</p>
-                              <p className="font-semibold text-lg">
-                                {item.payment.studentName}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Amount</p>
-                              <p className="font-semibold text-lg">
-                                ₹{item.payment.amount}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">
-                                Payment Method
-                              </p>
-                              <p className="font-semibold">
-                                {item.payment.paymentMethod}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">
-                                Transaction ID
-                              </p>
-                              <p className="font-semibold">
-                                {item.payment.transactionId}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Date</p>
-                              <p className="font-semibold">
-                                {item.payment.paidAt
-                                  ? new Date(item.payment.paidAt).toLocaleDateString('en-IN')
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
-                </div>)}
 
-                  {activePage === "payment" && subActivePage === "pending payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
-                  <h2 className="text-2xl font-bold text-orange-600">
-                    Pending Payments
-                  </h2>
-                  {loading ? (      
-                    <p>Loading pending payments...</p>
-                  ) : pendingPaymentStudent.length === 0 ? (
-                    <p>No pending payments found.</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {pendingPaymentStudent?.map((item,index) => (
-                        <div key={item._id} className="border border-gray-300 rounded p-4">
-                          <div className="grid grid-cols-2 gap-4">
-
-                            <div>
-                              <p className="text-sm text-gray-600">Student Name</p>
-                              <p className="font-semibold text-lg">
-                                {item.name}
-                              </p>
+                {activePage === "payment" &&
+                  subActivePage === "received Payments" && (
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                      <h2 className="text-2xl font-bold text-orange-600">
+                        Received Payments
+                      </h2>
+                      {loading ? (
+                        <p>Loading received payments...</p>
+                      ) : receivedPayments.length === 0 ? (
+                        <p>No received payments found.</p>
+                      ) : (
+                        <div className="">
+                          {receivedPayments.map((item, index) => (
+                            <div
+                              key={item._id}
+                              className="border border-gray-300 rounded p-2"
+                            >
+                              <div className="grid grid-cols-5 ">
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Student Name
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    {item.payment.studentName}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Amount
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    ₹{item.payment.amount}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Payment Method
+                                  </p>
+                                  <p className="font-semibold">
+                                    {item.payment.paymentMethod}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Transaction ID
+                                  </p>
+                                  <p className="font-semibold">
+                                    {item.payment.transactionId}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">Date</p>
+                                  <p className="font-semibold">
+                                    {item.payment.paidAt
+                                      ? new Date(
+                                          item.payment.paidAt,
+                                        ).toLocaleDateString("en-IN")
+                                      : "N/A"}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Amount</p>
-                              <p className="font-semibold text-lg">
-                                ₹{item.totalfees - item.paidfees}
-                              </p>
-                            </div>
-                            
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
-                </div>)}
 
-
-                  {activePage === "payment" && subActivePage === "rejected Payments" && (<div className="bg-white p-4 rounded-lg shadow-md">
-                  <h2 className="text-2xl font-bold text-orange-600">
-                    Rejected Payments
-                  </h2>
-                  {loading ? (
-                    <p>Loading rejected payments...</p>
-                  ) : rejectPaymentStudents.length === 0 ? (
-                    <p>No reject payments found.</p>
-                  ) : (
-                    <div className="">
-                      {rejectPaymentStudents.map((item,index) => (
-                        <div key={item._id} className="border border-gray-300 rounded p-2">
-                          <div className="grid grid-cols-4 ">
-
-                            <div>
-                              <p className="text-sm text-gray-600">Student Name</p>
-                              <p className="font-semibold text-lg">
-                                {item.payment.studentName}
-                              </p>
+                {activePage === "payment" &&
+                  subActivePage === "pending payments" && (
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                      <h2 className="text-2xl font-bold text-orange-600">
+                        Pending Payments
+                      </h2>
+                      {loading ? (
+                        <p>Loading pending payments...</p>
+                      ) : pendingPaymentStudent.length === 0 ? (
+                        <p>No pending payments found.</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {pendingPaymentStudent?.map((item, index) => (
+                            <div
+                              key={item._id}
+                              className="border border-gray-300 rounded p-4"
+                            >
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Student Name
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    {item.name}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Amount
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    ₹{item.totalfees - item.paidfees}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Amount</p>
-                              <p className="font-semibold text-lg">
-                                ₹{item.payment.amount}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">
-                                Transaction ID
-                              </p>
-                              <p className="font-semibold">
-                                {item.payment.transactionId}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Date</p>
-                              <p className="font-semibold">
-                                {item.payment.paidAt
-                                  ? new Date(item.payment.paidAt).toLocaleDateString('en-IN')
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
-                </div>)}
 
-
-
-
-
-
-
+                {activePage === "payment" &&
+                  subActivePage === "rejected Payments" && (
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                      <h2 className="text-2xl font-bold text-orange-600">
+                        Rejected Payments
+                      </h2>
+                      {loading ? (
+                        <p>Loading rejected payments...</p>
+                      ) : rejectPaymentStudents.length === 0 ? (
+                        <p>No reject payments found.</p>
+                      ) : (
+                        <div className="">
+                          {rejectPaymentStudents.map((item, index) => (
+                            <div
+                              key={item._id}
+                              className="border border-gray-300 rounded p-2"
+                            >
+                              <div className="grid grid-cols-4 ">
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Student Name
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    {item.payment.studentName}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Amount
+                                  </p>
+                                  <p className="font-semibold text-lg">
+                                    ₹{item.payment.amount}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    Transaction ID
+                                  </p>
+                                  <p className="font-semibold">
+                                    {item.payment.transactionId}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">Date</p>
+                                  <p className="font-semibold">
+                                    {item.payment.paidAt
+                                      ? new Date(
+                                          item.payment.paidAt,
+                                        ).toLocaleDateString("en-IN")
+                                      : "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 {activePage === "subjects" && <SubjectManagement />}
 
-                {activePage === "expenses" && (
-                  // <div className="bg-white p-4 rounded-lg shadow-md">
-                  //   <h2 className="text-2xl font-bold text-orange-600">
-                  //     Expense Management
-                  //   </h2>
-                  //   <p className="text-gray-600 mt-4">
-                  //     Expense management module coming soon...
-                  //   </p>
-                  // </div>
+                {activePage === "expenses" && subActivePage === "Dashboard" && (
                   <div className="ml-[250px] p-6">
-   <Expense/>
-</div>
+                    <Expense />
+                  </div>
                 )}
+
+                {activePage === "expenses" && subActivePage === "Create Expense" && <CreateExp/>}
+
+                {activePage === "expenses" && subActivePage === "All Expense" && <All/>}
               </div>
-
-
             </div>
 
             {/* ========== STUDENT EDIT MODAL ========== */}

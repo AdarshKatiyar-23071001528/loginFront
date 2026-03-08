@@ -33,6 +33,8 @@ const StudentRegister = () => {
     district: '',
     landmark: '',
     totalfees: '',
+    branch:'',
+    reference:""
   })
 
   const handleChange = (e) => {
@@ -46,6 +48,16 @@ const StudentRegister = () => {
   const validateForm = () => {
     if (!formData.name.trim()) {
       setMessage('Full Name is required')
+      setMessageType('error')
+      return false
+    }
+    if (!formData.branch.trim()) {
+      setMessage('Branch is required')
+      setMessageType('error')
+      return false
+    }
+    if (!formData.reference.trim()) {
+      setMessage('reference is required')
       setMessageType('error')
       return false
     }
@@ -124,6 +136,8 @@ const StudentRegister = () => {
         post: formData.post,
         district: formData.district,
         landmark: formData.landmark,
+        branch : formData.branch,
+        reference: formData.reference,
         totalfees: formData.totalfees ? parseInt(formData.totalfees) : undefined,
       })
 
@@ -154,9 +168,11 @@ const StudentRegister = () => {
           district: '',
           landmark: '',
           totalfees: '',
+          branch:"",
+          reference:""
         })
         setTimeout(() => {
-          navigate('/studentlog')
+          navigate('/login')
         }, 2000)
       } else {
         setMessage(response.data.message || 'Registration failed')
@@ -528,6 +544,44 @@ const StudentRegister = () => {
                   placeholder='Optional'
                   maxLength='10'
                 />
+              </div>
+            </div>
+
+
+          {/* Required Section */}
+            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100'>
+              <h3 className='text-lg font-bold text-purple-900 mb-5'>Required Details</h3>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
+                {/* Branch */}
+                <div>
+                  <label className='block text-gray-800 font-semibold mb-2 text-sm'>Branch</label>
+                  <input
+                    type='text'
+                    name='branch'
+                    value={formData.branch}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('branch')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('branch')}
+                    placeholder='Branch'
+                  />
+                </div>
+
+                {/* Refernece */}
+                <div>
+                  <label className='block text-gray-800 font-semibold mb-2 text-sm'>Reference</label>
+                  <input
+                    type='text'
+                    name='mothername'
+                    value={formData.reference}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('reference')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('reference')}
+                    placeholder='Reference'
+                  />
+                </div>
               </div>
             </div>
 
