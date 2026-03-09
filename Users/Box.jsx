@@ -25,7 +25,7 @@ const Box = ({name, value}) => {
     },[name])
     
   return (
-    <div className={`w-[170px] border-l-4  rounded-l-2xl flex flex-col 
+    <div className={`w-[170px] border-l-4  rounded-l-2xl flex flex-col h-[100px] 
     bg-${color}-100 border-${color}-500 p-2 shadow-lg`}>
       <p className={`font-bold text-xl text-${textColor}-600`}>{name}</p>
       <p className={`text-${textColor}-600 text-2xl text-center`}>₹{value}</p>

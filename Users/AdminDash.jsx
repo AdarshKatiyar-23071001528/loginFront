@@ -908,7 +908,7 @@ const AdminDash = () => {
                 {/* ========== PAYMENT MANAGEMENT ========== */}
                   {activePage === "payment" &&
                   subActivePage === "Dashboard" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
+                    <div className="bg-white p-4 rounded-lg shadow-md w-full">
                       
                       {loading ? (
                         <p>Loading payments...</p>

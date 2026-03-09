@@ -11,6 +11,8 @@ import {
   Legend
 } from "chart.js";
 
+import Box from "../Users/Box.jsx";
+
 ChartJS.register(
   BarElement,
   CategoryScale,
@@ -67,19 +69,24 @@ const Dashboard = () => {
 
   }
 
+  // const totalFees = 
+
+  const fees = graph.values.reduce((sum, value) => sum + value,0)
+
   const chartData = {
     labels: graph.labels,
     datasets:[
       {
         label:"Payment",
         data: graph.values,
-        backgroundColor:"rgba(59,130,246,0.7)"
+        backgroundColor:"rgba(37,99,235,0.8)"
       }
     ]
   }
 
   const options = {
     responsive:true,
+    maintainAspectRatio:false,
     plugins:{
       legend:{
         display:true
@@ -89,94 +96,114 @@ const Dashboard = () => {
 
   return (
 
-    <div className="p-6">
+    <div className="p-6 bg-gray-100 min-h-screen flex flex-col gap-6">
 
-      {/* cards */}
+      {/* Top Section */}
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="flex justify-between items-center flex-wrap gap-4">
 
-        <div className="bg-white shadow p-5 rounded">
-          <h2 className="text-lg font-semibold">Today Payment</h2>
-          <p className="text-2xl font-bold">₹ {todayPayment}</p>
-        </div>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
 
-        <div className="bg-white shadow p-5 rounded">
-          <h2 className="text-lg font-semibold">Month Payment</h2>
-          <p className="text-2xl font-bold">₹ {monthPayment}</p>
-        </div>
-
-      </div>
-
-
-      {/* filter */}
-
-      <div className="flex gap-4 mb-6 flex-wrap">
-
-        <select
-          value={type}
-          onChange={(e)=>setType(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="daily">Daily</option>
-          <option value="yearly">Yearly</option>
-        </select>
-
-
-        {type === "daily" && (
+        {/* Filter */}
+        <div className="flex gap-3 flex-wrap">
 
           <select
-            value={month}
-            onChange={(e)=>setMonth(e.target.value)}
-            className="border p-2 rounded"
+            value={type}
+            onChange={(e)=>setType(e.target.value)}
+            className="border px-3 py-2 rounded"
           >
-
-            <option value="1">Jan</option>
-            <option value="2">Feb</option>
-            <option value="3">Mar</option>
-            <option value="4">Apr</option>
-            <option value="5">May</option>
-            <option value="6">Jun</option>
-            <option value="7">Jul</option>
-            <option value="8">Aug</option>
-            <option value="9">Sep</option>
-            <option value="10">Oct</option>
-            <option value="11">Nov</option>
-            <option value="12">Dec</option>
-
+            <option value="daily">Daily</option>
+            <option value="yearly">Yearly</option>
           </select>
 
-        )}
+          {type === "daily" && (
+            <select
+              value={month}
+              onChange={(e)=>setMonth(e.target.value)}
+              className="border px-3 py-2 rounded"
+            >
+              <option value="1">Jan</option>
+              <option value="2">Feb</option>
+              <option value="3">Mar</option>
+              <option value="4">Apr</option>
+              <option value="5">May</option>
+              <option value="6">Jun</option>
+              <option value="7">Jul</option>
+              <option value="8">Aug</option>
+              <option value="9">Sep</option>
+              <option value="10">Oct</option>
+              <option value="11">Nov</option>
+              <option value="12">Dec</option>
+            </select>
+          )}
 
-        <input
-          type="number"
-          value={year}
-          onChange={(e)=>setYear(e.target.value)}
-          className="border p-2 rounded"
-        />
+          <input
+            type="number"
+            value={year}
+            onChange={(e)=>setYear(e.target.value)}
+            className="border px-3 py-2 rounded w-[100px]"
+          />
 
-        <button
-          onClick={fetchGraph}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Apply
-        </button>
+          <button
+            onClick={fetchGraph}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            Apply
+          </button>
+
+        </div>
 
       </div>
 
 
-      {/* bar graph */}
+      {/* Cards */}
 
-      <div className="bg-white shadow p-5 rounded">
+      <div className="grid md:grid-cols-2 gap-2">
 
-        <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white shadow-md p-2 rounded-lg">
+          <h2 className="text-gray-600">Today Fees</h2>
+          <p className="text-3xl font-bold text-blue-600 mt-2 p-2">
+            ₹ {todayPayment}
+          </p>
+        </div>
+
+        <div className="bg-white shadow-md p-2 rounded-lg">
+          <h2 className="text-gray-600">Month Fees</h2>
+          <p className="text-3xl font-bold text-green-600 mt-2">
+            ₹ {monthPayment}
+          </p>
+        </div>
+
+      </div>
+
+
+      {/* Chart Section */}
+
+      <div className="bg-white shadow-md p-6 rounded-lg">
+
+        <h2 className="text-xl font-semibold mb-6">
           Payment Graph
         </h2>
 
-        {graph.labels.length > 0 ? (
-          <Bar data={chartData} options={options}/>
-        ) : (
-          <p>No Data Found</p>
-        )}
+        <div className="flex flex-col lg:flex-row gap-6">
+
+          {/* Chart */}
+          <div className="flex-1 h-[350px]">
+
+            {graph.labels.length > 0 ? (
+              <Bar data={chartData} options={options}/>
+            ) : (
+              <p className="text-gray-500">No Data Found</p>
+            )}
+
+          </div>
+
+          {/* Side Box */}
+          <div className="w-full lg:w-[200px]">
+            <Box name={"Fees"} value={fees}/>
+          </div>
+
+        </div>
 
       </div>
 
@@ -186,4 +213,4 @@ const Dashboard = () => {
 
 }
 
-export default Dashboard
+export default Dashboard;
