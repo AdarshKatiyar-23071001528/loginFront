@@ -33,6 +33,7 @@ import CreateExp from "../src/Expenses/CreateExp";
 import All from "../src/Expenses/All";
 import Dashboard from "../Payment/Dashboard";
 import FinanceGraph from "../Admin/FinanceGraph";
+import PendingPayment from "../Payment/PendingPayment";
 
 // using configured api instance from src/api/axios
 
@@ -1084,44 +1085,7 @@ const AdminDash = () => {
 
                 {activePage === "payment" &&
                   subActivePage === "pending payments" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <h2 className="text-2xl font-bold text-orange-600">
-                        Pending Payments
-                      </h2>
-                      {loading ? (
-                        <p>Loading pending payments...</p>
-                      ) : pendingPaymentStudent.length === 0 ? (
-                        <p>No pending payments found.</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {pendingPaymentStudent?.map((item, index) => (
-                            <div
-                              key={item._id}
-                              className="border border-gray-300 rounded p-4"
-                            >
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Student Name
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    {item.name}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Amount
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    ₹{item.totalfees - item.paidfees}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <PendingPayment/>
                   )}
 
                 {activePage === "payment" &&

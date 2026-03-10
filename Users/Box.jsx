@@ -7,8 +7,9 @@ const Box = ({name, value}) => {
         if(name === "Receive Payment"){
             setColor("blue");
         }
-        else if(name === "Pending Payment"){
+        else if(name === "Pending Payment" || name === "Fees"){
             setColor("green");
+            setTextColor("green");
         }
         else if(name === "Fees Collection"){
           setColor("green");
