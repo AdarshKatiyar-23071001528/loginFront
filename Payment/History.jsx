@@ -6,7 +6,6 @@ const History = () => {
 
   const [search, setSearch] = useState("");
   const [transactionFilter, setTransactionFilter] = useState("");
-  const [nameFilter, setNameFilter] = useState("");
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -27,42 +26,59 @@ const History = () => {
   useEffect(() => {
     fetchPayments();
   }, []);
+  const [data, setNewData] = useState([])
 
   // 🔎 Filter Logic
+  const filteredPayment = payments.filter((item) => {
+    const payment = item.payment;
 
- const filteredPayments = payments.filter((item) => {
-  return (item.payment.studentName.toLowerCase().includes((nameFilter).toLowerCase()) 
+    const nameMatch =
+      !search ||
+      payment?.studentName?.toLowerCase().includes(search.toLowerCase());
 
- );
-}
+    const idMatch =
+      !transactionFilter ||
+      payment?.transactionId
+        ?.toLowerCase()
+        .includes(transactionFilter.toLowerCase());
+
+    const itemDate = new Date(payment?.paidAt);
+
+    let from = fromDate ? new Date(fromDate) : null;
+    let to = toDate ? new Date(toDate) : null;
+
+    if (to) {
+      to.setHours(23, 59, 59, 999);
+    }
+
+    const fromMatch = from ? itemDate >= from : true;
+    const toMatch = to ? itemDate <= to : true;
+
+    return nameMatch && idMatch && fromMatch && toMatch;
+  });
 
 
-
-
-);
 
   // 💰 Total Collection
-
-  const totalAmount = filteredPayments.reduce(
+  const totalAmount = filteredPayment.reduce(
     (acc, item) => acc + (item.payment?.amount || 0),
-    0,
+    0
   );
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-gray-100 min-h-screen p-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-gray-700">
           Received Payments
         </h1>
 
         {/* Filters */}
-
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           <input
             type="text"
             placeholder="Search Name"
-            value={nameFilter}
-            onChange={(e) => setNameFilter(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="border p-3 rounded"
           />
 
@@ -90,9 +106,8 @@ const History = () => {
         </div>
 
         {/* Total Collection */}
-
         <div className="bg-white shadow rounded p-4 mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Filtered Total Collection</h2>
+          <h2 className="text-xl font-semibold">Total Collection</h2>
 
           <span className="text-2xl font-bold text-green-600">
             ₹ {totalAmount}
@@ -100,7 +115,6 @@ const History = () => {
         </div>
 
         {/* Table */}
-
         <div className="bg-white shadow rounded overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-200">
@@ -114,34 +128,28 @@ const History = () => {
             </thead>
 
             <tbody>
-              {filteredPayments.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="text-center p-5">
-                    No Data Found
-                  </td>
-                </tr>
-              ) : (
-                filteredPayments.map((item) => {
-                  const payment = item.payment;
+              {
+                filteredPayment.map((item,index) => (
+                
 
-                  return (
-                    <tr key={item._id} className="border-b hover:bg-gray-100">
-                      <td className="p-3">{payment?.studentName}</td>
+                 
+                    <tr key={index} className="border-b hover:bg-gray-100">
+                      <td className="p-3">{item.payment?.studentName}</td>
 
                       <td className="p-3 text-green-600 font-semibold">
-                        ₹ {payment?.amount}
+                        ₹ {item.payment?.amount}
                       </td>
 
-                      <td className="p-3">{payment?.paymentMethod}</td>
+                      <td className="p-3">{item.payment?.paymentMethod}</td>
 
-                      <td className="p-3">{payment?.transactionId}</td>
+                      <td className="p-3">{item.payment?.transactionId}</td>
 
                       <td className="p-3">
-                        {new Date(payment?.paidAt).toLocaleDateString("en-IN")}
+                        {new Date(item.payment?.paidAt).toLocaleDateString("en-IN")}
                       </td>
                     </tr>
-                  );
-                })
+                  )
+                
               )}
             </tbody>
           </table>

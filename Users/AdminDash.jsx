@@ -36,6 +36,7 @@ import FinanceGraph from "../Admin/FinanceGraph";
 import PendingPayment from "../Payment/PendingPayment";
 import All_Payment from "../Payment/All_Payment";
 import History from "../Payment/History";
+import PendingRequest from "../Payment/PendingRequest";
 
 // using configured api instance from src/api/axios
 
@@ -489,42 +490,14 @@ const AdminDash = () => {
                   {" "}
                   <FaMoneyBillWave /> Payment
                 </div>
-                {activePage === "payment" && (
+                {activePage === "payment" &&  (
                   <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
                     <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashborad" ? "text-yellow-400" : ""}`}
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("Dashboard")}
                     >
                       {" "}
                       Dashboard
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("pending requests")}
-                    >
-                      {" "}
-                      Pending Payments Request
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("received Payments")}
-                    >
-                      {" "}
-                      Received Payments
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("pending payments")}
-                    >
-                      {" "}
-                      Pending Payments
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected Payments")}
-                    >
-                      {" "}
-                      Rejected Payments
                     </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all payments" ? "text-yellow-400" : ""}`}
@@ -533,6 +506,36 @@ const AdminDash = () => {
                       {" "}
                       All Payments
                     </li>
+                    
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("received Payments")}
+                    >
+                      {" "}
+                      Payment History
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("pending payments")}
+                    >
+                      {" "}
+                      Pending Payments
+                    </li>
+                    {/* <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("rejected Payments")}
+                    >
+                      {" "}
+                      Rejected Payments
+                    </li> */}
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("pending requests")}
+                    >
+                      {" "}
+                      Pending Payments Request
+                    </li>
+                    
                   </ul>
                 )}
               </li>
@@ -932,95 +935,7 @@ const AdminDash = () => {
                 {activePage === "payment" &&
                   subActivePage === "pending requests" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      <h2 className="text-2xl font-bold text-green-600 mb-4">
-                        Payment Management
-                      </h2>
-                      {loading ? (
-                        <p>Loading payments...</p>
-                      ) : pendingPayments.length === 0 ? (
-                        <p className="text-center text-gray-600">
-                          No pending payments
-                        </p>
-                      ) : (
-                        <div className="space-y-4">
-                          {pendingPayments.map((payment) => (
-                            <div
-                              key={payment._id}
-                              className="border-2 border-yellow-400 p-4 rounded-lg bg-yellow-50 hover:shadow-lg transition"
-                            >
-                              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Student Name
-                                  </p>
-                                  <p className="font-semibold">
-                                    {payment.studentName}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Amount
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    ₹{payment.amount}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Payment Method
-                                  </p>
-                                  <p className="font-semibold">
-                                    {payment.paymentMethod}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Transaction ID
-                                  </p>
-                                  <p className="font-semibold">
-                                    {payment.transactionId}
-                                  </p>
-                                </div>
-
-                                <div>
-                                  <p className="text-sm text-gray-600">Date</p>
-                                  <p className="font-semibold">
-                                    {payment.paidAt
-                                      ? new Date(
-                                          payment.paidAt,
-                                        ).toLocaleDateString("en-IN")
-                                      : "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex gap-3 justify-end">
-                                <button
-                                  onClick={() =>
-                                    handleApprovePayment(
-                                      payment.studentId,
-                                      payment._id,
-                                    )
-                                  }
-                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold"
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    handleRejectPayment(
-                                      payment.studentId,
-                                      payment._id,
-                                    )
-                                  }
-                                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-semibold"
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <PendingRequest/>
                     </div>
                   )}
 
@@ -1042,7 +957,7 @@ const AdminDash = () => {
                       <All_Payment/>
                     )}
 
-                {activePage === "payment" &&
+                {/* {activePage === "payment" &&
                   subActivePage === "rejected Payments" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
                       <h2 className="text-2xl font-bold text-orange-600">
@@ -1100,7 +1015,7 @@ const AdminDash = () => {
                         </div>
                       )}
                     </div>
-                  )}
+                  )} */}
 
                 {activePage === "subjects" && <SubjectManagement />}
 

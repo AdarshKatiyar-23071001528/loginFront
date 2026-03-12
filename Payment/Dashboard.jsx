@@ -96,7 +96,7 @@ const Dashboard = () => {
 
   return (
 
-    <div className="p-6 bg-gray-100 min-h-screen flex flex-col gap-6">
+    <div className="p-4 bg-gray-100 min-h-screen flex flex-col gap-6">
 
       {/* Top Section */}
 
@@ -179,9 +179,9 @@ const Dashboard = () => {
 
       {/* Chart Section */}
 
-      <div className="bg-white shadow-md p-6 rounded-lg">
+      <div className="bg-white shadow-md p-4 rounded-lg">
 
-        <h2 className="text-xl font-semibold mb-6">
+        <h2 className="text-xl font-semibold mb-4">
           Payment Graph
         </h2>
 

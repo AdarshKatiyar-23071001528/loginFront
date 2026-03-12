@@ -40,6 +40,7 @@ const SubjectManagement = () => {
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Subject Management</h2>
+    
       <form onSubmit={handleCreate} className="mb-6">
         <input
           className="border p-1 mr-2"
@@ -104,7 +105,7 @@ const SubjectManagement = () => {
       <table className="w-full text-left">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Subject Name</th>
             <th>Course</th>
             <th>Sem</th>
             <th>Sec</th>
