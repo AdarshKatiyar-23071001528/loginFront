@@ -34,6 +34,8 @@ import All from "../src/Expenses/All";
 import Dashboard from "../Payment/Dashboard";
 import FinanceGraph from "../Admin/FinanceGraph";
 import PendingPayment from "../Payment/PendingPayment";
+import All_Payment from "../Payment/All_Payment";
+import History from "../Payment/History";
 
 // using configured api instance from src/api/axios
 
@@ -523,6 +525,13 @@ const AdminDash = () => {
                     >
                       {" "}
                       Rejected Payments
+                    </li>
+                    <li
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all payments" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("all payments")}
+                    >
+                      {" "}
+                      All Payments
                     </li>
                   </ul>
                 )}
@@ -1018,68 +1027,8 @@ const AdminDash = () => {
                 {activePage === "payment" &&
                   subActivePage === "received Payments" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      <h2 className="text-2xl font-bold text-orange-600">
-                        Received Payments
-                      </h2>
-                      {loading ? (
-                        <p>Loading received payments...</p>
-                      ) : receivedPayments.length === 0 ? (
-                        <p>No received payments found.</p>
-                      ) : (
-                        <div className="">
-                          {receivedPayments.map((item, index) => (
-                            <div
-                              key={item._id}
-                              className="border border-gray-300 rounded p-2"
-                            >
-                              <div className="grid grid-cols-5 ">
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Student Name
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    {item.payment.studentName}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Amount
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    ₹{item.payment.amount}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Payment Method
-                                  </p>
-                                  <p className="font-semibold">
-                                    {item.payment.paymentMethod}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Transaction ID
-                                  </p>
-                                  <p className="font-semibold">
-                                    {item.payment.transactionId}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">Date</p>
-                                  <p className="font-semibold">
-                                    {item.payment.paidAt
-                                      ? new Date(
-                                          item.payment.paidAt,
-                                        ).toLocaleDateString("en-IN")
-                                      : "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      
+                     <History/>
                     </div>
                   )}
 
@@ -1087,6 +1036,11 @@ const AdminDash = () => {
                   subActivePage === "pending payments" && (
                     <PendingPayment/>
                   )}
+
+                  {activePage === "payment" && 
+                    subActivePage === "all payments" && (
+                      <All_Payment/>
+                    )}
 
                 {activePage === "payment" &&
                   subActivePage === "rejected Payments" && (

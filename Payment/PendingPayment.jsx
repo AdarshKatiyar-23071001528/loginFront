@@ -5,7 +5,7 @@ const PendingPayment = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [nameFilter, setNameFilter] = useState("");
+  const [enrollFilter, setEnrollFilter] = useState("");
   const [referenceFilter, setReferenceFilter] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
@@ -43,12 +43,12 @@ const PendingPayment = () => {
   // Filter + Sort
   const filteredStudents = useMemo(() => {
     let data = students.filter((item) => {
-      const name = item.name.toLowerCase();
+      const enrollment = item.enrollment.toLowerCase();
       const reference = item.reference.toLowerCase();
       const branch = item.branch.toLowerCase();
 
       return (
-        name.includes(nameFilter.toLowerCase()) &&
+        enrollment.includes(enrollFilter.toLowerCase()) &&
         reference.includes(referenceFilter.toLowerCase()) &&
         branch.includes(branchFilter.toLowerCase())
       );
@@ -62,7 +62,7 @@ const PendingPayment = () => {
     });
 
     return data;
-  }, [students, nameFilter, referenceFilter, branchFilter, sortOrder]);
+  }, [students, enrollFilter, referenceFilter, branchFilter, sortOrder]);
 
   // Total Pending
   const totalPending = useMemo(() => {
@@ -87,9 +87,9 @@ const PendingPayment = () => {
       <div className="flex flex-wrap gap-3 p-4">
         <input
           type="text"
-          placeholder="Search Name"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
+          placeholder="Search Enrollment"
+          value={enrollFilter}
+          onChange={(e) => setEnrollFilter(e.target.value)}
           className="border p-2 rounded"
         />
 
@@ -127,6 +127,7 @@ const PendingPayment = () => {
         <table className="w-full">
           <thead className="bg-gray-200">
             <tr>
+              <th className="p-3 text-left">Enrollment</th>
               <th className="p-3 text-left">Student Name</th>
               <th className="p-3 text-left">Class</th>
               <th className="p-3 text-left">Pending</th>
@@ -148,6 +149,7 @@ const PendingPayment = () => {
 
                 return (
                   <tr key={item._id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 font-medium">{item.enrollment}</td>
                     <td className="p-3 font-medium">{item.name}</td>
 
                     <td className="p-3">
