@@ -29,14 +29,18 @@ const TeacherAttendance = ({ teacherId }) => {
       const map = {};
       res.students.forEach((s) => (map[s._id] = 'present'));
       setRecords(map);
+      
     }
   };
-
+  
   const handleMark = async () => {
     const recs = students.map((s) => ({ studentId: s._id, status: records[s._id] }));
     const res = await markAttendance({ subjectId: selected, records: recs, teacherId });
+    console.log(res);
     alert(res.message);
+    
   };
+  console.log(records)
 
   return (
     <div>
@@ -54,7 +58,6 @@ const TeacherAttendance = ({ teacherId }) => {
           </option>
         ))}
       </select>
-
       {students.length > 0 && (
         <>
           <table className="w-full">
@@ -90,6 +93,7 @@ const TeacherAttendance = ({ teacherId }) => {
           </button>
         </>
       )}
+
     </div>
   );
 };

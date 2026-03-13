@@ -27,7 +27,7 @@ const Nav = () => {
   }, []);
 
   return (
-    <nav className="h-[90px] w-full shadow-lg bg-gray-400 backdrop-blur p-4">
+    <nav className="h-[90px] w-full shadow-lg bg-black/30 backdrop-blur p-4 fixed z-19">
       <div className="h-full flex items-center justify-between px-6">
         
         {/* Logo */}
@@ -38,12 +38,13 @@ const Nav = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-8 text-lg">
-          <Link to="/carrer" className="link">Career</Link>
-          <Link to="/contact" className="link">Contact</Link>
-          <Link to="/course" className="link">Course</Link>
-          {userLogin && <Link to="/users" className="link">All Users</Link>}
-          <Link to="/login" className="link">Login</Link>
+        <nav className="hidden md:flex gap-8 text-lg ">
+          <Link to="/carrer" className="link text-white">Career</Link>
+          <Link to="/contact" className="link  text-white">Contact</Link>
+          <Link to="/course" className="link  text-white">Course</Link>
+          {userLogin && <Link to="/users" className="link  text-white">All Users</Link>}
+          {/* <Link to="" className="link">Register</Link> */}
+          <Link to="/login" className="link  text-white">Login</Link>
         </nav>
 
         {/* Hamburger */}

@@ -15,6 +15,7 @@ const TeacherDash = () => {
     e.preventDefault();
     const res = await teacherLogin(email, password);
     if (res.success) {
+     
       setTeacher(res.teacher);
     }
   };
@@ -45,7 +46,7 @@ const TeacherDash = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold">Welcome {teacher.name}</h2>
+      <h2 className="text-2xl font-bold bg-red-400">Welcome {teacher.name}</h2>
       <TeacherAttendance teacherId={teacher._id} />
     </div>
   );
