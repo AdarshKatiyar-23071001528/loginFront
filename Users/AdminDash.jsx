@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, act } from "react";
 import { IoIosLogOut } from "react-icons/io";
 import { IoMdMenu } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
@@ -37,6 +37,8 @@ import PendingPayment from "../Payment/PendingPayment";
 import All_Payment from "../Payment/All_Payment";
 import History from "../Payment/History";
 import PendingRequest from "../Payment/PendingRequest";
+import SendMessage from "../Message/SendMessage";
+import NoticeManagement from "../Notice/NoticeManagement";
 
 // using configured api instance from src/api/axios
 
@@ -597,6 +599,14 @@ const AdminDash = () => {
                 {" "}
                 <FaBell /> Notice
               </li>
+               <li
+                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "message" && "bg-blue-300"}`}
+                onClick={() => setActivePage("message")}
+              >
+                {" "}
+                <FaBell /> Send Message
+              </li>
+              
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
                 onClick={() => navigate("/")}
@@ -1028,6 +1038,10 @@ const AdminDash = () => {
                 {activePage === "expenses" && subActivePage === "Create Expense" && <CreateExp/>}
 
                 {activePage === "expenses" && subActivePage === "All Expense" && <All/>}
+
+
+                {activePage === "notice" && <NoticeManagement />}
+                {activePage === "message" && <SendMessage/>}
               </div>
             </div>
 
