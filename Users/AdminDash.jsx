@@ -574,13 +574,13 @@ const AdminDash = () => {
                       {" "}
                       All Expense
                     </li>
-                    <li
+                    {/* <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("rejected Payments")}
                     >
                       {" "}
                       Rejected Payments
-                    </li>
+                    </li> */}
                   </ul>
                 )}
               </li>
@@ -700,6 +700,7 @@ const AdminDash = () => {
                         </div>
                       )}
                     </div>
+                    
                   )}
 
                 {activePage === "student" &&

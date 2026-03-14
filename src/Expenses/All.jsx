@@ -49,13 +49,13 @@ const All = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-gray-700">All Expenses</h1>
 
         {/* Filters */}
 
-        <div className="grid md:grid-cols-4 gap-4 mb-6">
+        <div className="grid md:grid-cols-4 gap-4 mb-4 shadow p-2 rounded-xl">
           {/* Search */}
 
           <input
@@ -110,7 +110,7 @@ const All = () => {
 
         {/* Expense Table */}
 
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white shadow-lg  overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-200">
               <tr>

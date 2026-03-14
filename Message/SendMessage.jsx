@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../src/api/axios";
+import api from "../src/api/axios.js";
 
 const SendMessage = () => {
 
@@ -10,45 +10,54 @@ const SendMessage = () => {
   useEffect(()=>{
 
     api.get("/contacts")
-    .then(res=>setContacts(res.data));
+    .then(res=>{
+      setContacts(res.data)
+    })
 
   },[]);
 
   const toggleSelect = (number)=>{
 
     if(selected.includes(number)){
-      setSelected(selected.filter(n=>n!==number));
+      setSelected(selected.filter(n=>n!==number))
     }else{
-      setSelected([...selected,number]);
+      setSelected([...selected,number])
     }
 
-  };
+  }
 
   const selectAll = ()=>{
 
-    const numbers = contacts.map(c=>c.number);
-    setSelected(numbers);
+    const numbers = contacts.map(c=>c.number)
+    setSelected(numbers)
 
-  };
+  }
 
   const sendMessage = async ()=>{
 
+    const selectedContacts = contacts.filter(c =>
+      selected.includes(c.number)
+    )
+
     await api.post("/send-message",{
-      numbers:selected,
+      contacts:selectedContacts,
       message:message
-    });
+    })
 
-    alert("Message Sent");
+    alert("Message Sent Successfully")
 
-  };
+  }
 
   return(
 
     <div style={{padding:"40px"}}>
 
-      <h2>WhatsApp Bulk Sender</h2>
+      <h2>Send Message</h2>
 
       <textarea
+        rows="5"
+        cols="40"
+        className="border border-gray-200 border-1 p-2 rounded"
         placeholder="Type message"
         onChange={(e)=>setMessage(e.target.value)}
       />
@@ -62,6 +71,7 @@ const SendMessage = () => {
       <br/><br/>
 
       {contacts.map(c=>(
+
         <div key={c.id}>
 
           <input
@@ -73,6 +83,7 @@ const SendMessage = () => {
           {c.name} - {c.number}
 
         </div>
+
       ))}
 
       <br/>
@@ -83,7 +94,7 @@ const SendMessage = () => {
 
     </div>
 
-  );
+  )
 
 }
 

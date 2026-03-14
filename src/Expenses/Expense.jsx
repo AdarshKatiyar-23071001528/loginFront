@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react";
-import api from '../api/axios.js'
-// import { Line } from "react-chartjs-2";
+import api from "../api/axios.js";
 import { Bar } from "react-chartjs-2";
-
-// import {
-//   Chart as ChartJS,
-//   LineElement,
-//   CategoryScale,
-//   LinearScale,
-//   PointElement
-// } from "chart.js";
-
-// ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
-
 
 import {
   Chart as ChartJS,
@@ -36,7 +24,6 @@ const Expense = () => {
   const [todayExpense,setTodayExpense] = useState(0);
   const [monthExpense,setMonthExpense] = useState(0);
   const [graph,setGraph] = useState({labels:[],values:[]});
-  const [dateWise,setDateWise] = useState([]);
   const [loading,setLoading] = useState(true);
 
   useEffect(()=>{
@@ -48,7 +35,6 @@ const Expense = () => {
       await fetchTodayExpense()
       await fetchMonthExpense()
       await fetchGraph()
-      await fetchDateWise()
     }catch(err){
       console.log(err)
     }finally{
@@ -58,164 +44,119 @@ const Expense = () => {
 
   const fetchTodayExpense = async ()=>{
     try{
-      const res = await api.get("/expense/today-expense")
-      setTodayExpense(res?.data?.totalExpense || 0)
+      const res = await api.get("/expense/today-expense");
+      setTodayExpense(res?.data?.totalExpense || 0);
     }catch(err){
-      console.log(err)
+      console.log(err);
     }
   }
 
   const fetchMonthExpense = async ()=>{
     try{
-      const res = await api.get("/expense/month-expense")
+      const res = await api.get("/expense/month-expense");
 
       if(res?.data?.data?.length > 0){
-        setMonthExpense(res.data.data[0].totalExpense)
+        setMonthExpense(res.data.data[0].totalExpense);
       }else{
-        setMonthExpense(0)
+        setMonthExpense(0);
       }
 
     }catch(err){
-      console.log(err)
+      console.log(err);
     }
   }
 
-  // const fetchGraph = async ()=>{
-  //   try{
-  //     const res = await api.get(`{/expense/expense-graph?type=daily&month=${month}&year=${year}}`)
-
-  //     setGraph({
-  //       labels: res?.data?.labels || [],
-  //       values: res?.data?.values || []
-  //     })
-
-  //   }catch(err){
-  //     console.log(err)
-  //   }
-  // }
   const fetchGraph = async ()=>{
-  try{
-
-    const today = new Date()
-
-    const month = today.getMonth() + 1
-    const year = today.getFullYear()
-
-    const res = await api.get(`/expense/expense-graph?type=daily&month=${month}&year=${year}`)
-
-    setGraph({
-      labels: res?.data?.labels || [],
-      values: res?.data?.values || []
-    })
-
-  }catch(err){
-    console.log(err)
-  }
-}
-
-  const fetchDateWise = async ()=>{
     try{
-      const res = await api.get("/expense/getDateWiseExpense")
-      setDateWise(res?.data?.data || [])
+
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+
+      const res = await api.get(`/expense/expense-graph?type=daily&month=${month}&year=${year}`);
+
+      setGraph({
+        labels: res?.data?.labels || [],
+        values: res?.data?.values || []
+      });
+
     }catch(err){
-      console.log(err)
+      console.log(err);
     }
   }
 
-  // const chartData = {
-  //   labels: graph.labels,
-  //   datasets:[
-  //     {
-  //       label:"Expense",
-  //       data: graph.values
-  //     }
-  //   ]
-  // }
-// const chartData = {
-//   labels: graph.labels,
-//   datasets:[
-//     {
-//       label:"Expense",
-//       data: graph.values,
-//       borderColor:"red",
-//       backgroundColor:"rgba(255,0,0,0.3)",
-//       tension:0.4
-//     }
-//   ]
-// }
+  const chartData = {
+    labels: graph.labels,
+    datasets:[
+      {
+        label:"Daily Expense",
+        data: graph.values,
+        backgroundColor:"#4f46e5",
+        borderRadius:6
+      }
+    ]
+  };
 
-const chartData = {
-  labels: graph.labels,
-  datasets:[
-    {
-      label:"Expense",
-      data: graph.values,
-      backgroundColor:"rgba(255,99,132,0.6)"
+  const chartOptions = {
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{
+        position:"top"
+      }
     }
-  ]
-}
+  };
+
   if(loading){
     return <p className="p-6 text-lg">Loading...</p>
   }
 
   return (
-    <div className="p-6">
+    <div className="h-screen bg-gray-100 p-4 flex flex-col">
+
+      {/* heading */}
+
+      <h1 className="text-2xl font-bold mb-4">
+        Expense Dashboard
+      </h1>
 
       {/* cards */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
 
-        <div className="bg-white shadow p-5 rounded">
-          <h2 className="text-lg font-semibold">Today Expense</h2>
-          <p className="text-2xl font-bold">₹ {todayExpense}</p>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow p-4 rounded-lg">
+          <h2 className="text-sm">Today Expense</h2>
+          <p className="text-xl font-bold mt-1">
+            ₹ {todayExpense}
+          </p>
         </div>
 
-        <div className="bg-white shadow p-5 rounded">
-          <h2 className="text-lg font-semibold">Month Expense</h2>
-          <p className="text-2xl font-bold">₹ {monthExpense}</p>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow p-4 rounded-lg">
+          <h2 className="text-sm">Month Expense</h2>
+          <p className="text-xl font-bold mt-1">
+            ₹ {monthExpense}
+          </p>
         </div>
 
       </div>
 
       {/* graph */}
 
-      <div className="bg-white shadow p-5 rounded mb-4">
-        <h2 className="text-xl font-semibold mb-4">Expense Graph</h2>
+      <div className="bg-white shadow rounded-lg p-4 flex-1">
 
-        {graph.labels.length > 0 ? (
-          <Bar data={chartData}/>
-        ) : (
-          <p>No Graph Data</p>
-        )}
+        <h2 className="text-lg font-semibold mb-2">
+          Expense Graph
+        </h2>
 
-      </div>
+        <div className="h-[300px]">
 
-      {/* date wise expense */}
+          {graph.labels.length > 0 ? (
+            <Bar data={chartData} options={chartOptions}/>
+          ) : (
+            <p>No Graph Data</p>
+          )}
 
-      <div className="bg-white shadow p-5 rounded">
-        <h2 className="text-xl font-semibold mb-4">Date Wise Expense</h2>
-
-        {dateWise.length === 0 && (
-          <p>No Expense Found</p>
-        )}
-
-        {dateWise.map((item)=>(
-          <div key={item._id} className="mb-4">
-
-            <h3 className="font-bold mb-2">
-              {item._id} (Total ₹{item.totalExpense})
-            </h3>
-
-            {item?.expenses?.map((exp)=>(
-              <div key={exp._id} className="flex justify-between border-b py-1">
-
-                <p>{exp.name}</p>
-                <p>₹ {exp.amount}</p>
-
-              </div>
-            ))}
-
-          </div>
-        ))}
+        </div>
 
       </div>
 
@@ -223,4 +164,4 @@ const chartData = {
   )
 }
 
-export default Expense
+export default Expense;
