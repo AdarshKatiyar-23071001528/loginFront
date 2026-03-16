@@ -248,9 +248,11 @@ const TeacherDashboard = () => {
         
         </main>
       </div>
-        <div>
-          <TeacherAttendance teacherId={teacher._id} />
-        </div>
+            <div>
+              <TeacherAttendance teacherId={teacher._id} />
+            </div>
+          
+      
     </div>
   );
 };
