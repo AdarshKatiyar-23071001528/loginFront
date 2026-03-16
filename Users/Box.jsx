@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
 const Box = ({name, value}) => {
+
+  
     let [color, setColor] = useState('');
     let [textColor, setTextColor] = useState('');
     useEffect(() =>{
@@ -15,11 +17,15 @@ const Box = ({name, value}) => {
           setColor("green");
           setTextColor("green");
         }
-        else if(name === "Expense"){
+        else if(name === "Expense" || name === "Today Expense"){
           setColor("red");
           setTextColor("red");
         }
         else if(name === "Profit"){
+          setColor("blue");
+          setTextColor("blue");
+        }
+        else if(name === "Month Expense" ){
           setColor("blue");
           setTextColor("blue");
         }

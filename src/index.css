@@ -224,8 +224,9 @@ header{
     text-decoration: none;
 }
 .link{
-    color: #131313;
+    color: #000000;
     text-decoration: none;
+    backdrop-filter: inherit;
     
     &:hover{
         color: aqua;

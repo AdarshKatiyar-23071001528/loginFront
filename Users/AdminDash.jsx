@@ -1,7 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { IoIosLogOut } from "react-icons/io";
-import { IoMdMenu } from "react-icons/io";
-import { RxCross2 } from "react-icons/rx";
+import React, { useState, useContext, useEffect, act } from "react";
+
 import {
   FaHome,
   FaMoneyBillAlt,
@@ -29,7 +27,6 @@ import { Navigate, useNavigate } from "react-router-dom";
 import Box from "./Box";
 import { CiLogout } from "react-icons/ci";
 import Expense from "../src/Expenses/Expense";
-import CreateExp from "../src/Expenses/CreateExp";
 import All from "../src/Expenses/All";
 import Dashboard from "../Payment/Dashboard";
 import FinanceGraph from "../Admin/FinanceGraph";
@@ -37,6 +34,12 @@ import PendingPayment from "../Payment/PendingPayment";
 import All_Payment from "../Payment/All_Payment";
 import History from "../Payment/History";
 import PendingRequest from "../Payment/PendingRequest";
+import SendMessage from "../Message/SendMessage";
+import NoticeManagement from "../Notice/NoticeManagement";
+import CreateExpense from "../src/Expenses/CreateExp";
+import StudentDash from "../src/StudentForAdmin/StudentDash";
+import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
+
 
 // using configured api instance from src/api/axios
 
@@ -47,7 +50,7 @@ const AdminDash = () => {
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
   const [teacher, setTeacher] = useState(false);
-  const [editStudent, setEditStudent] = useState(null);
+
   const [editTeacher, setEditTeacher] = useState(null);
   const [studentInCollege, setStudentInCollege] = useState(0);
   const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
@@ -380,18 +383,19 @@ const AdminDash = () => {
         <div className="h-[100%] flex w-full items-center justify-center">
           <div className="AdminPannel bg-gray-600 pt-4 w-[300px] text-white h-[100%] shadow-lg rounded-r-lg">
             <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">
-              Admin                
+              Admin
             </p>
             <ul className="flex flex-col gap-2">
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "home" && "bg-blue-300"}`}
                 onClick={() => setActivePage("home")}
               >
-                {" "}       
+                {" "}
                 <FaHome /> Home
               </li>
               <li>
-                          <div className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
+                <div
+                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
                   onClick={() => {
                     setActivePage("student");
                     setSubActivePage("all Student");
@@ -407,7 +411,7 @@ const AdminDash = () => {
                       onClick={() => setSubActivePage("all Student")}
                     >
                       {" "}
-                      All Students
+                      Student Record
                     </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "add Student" ? "text-yellow-400" : ""}`}
@@ -416,23 +420,13 @@ const AdminDash = () => {
                       {" "}
                       Add Student
                     </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "update Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("update Student")}
-                    >
-                      {" "}
-                      Update Student
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "remove Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("remove Student")}
-                    >
-                      {" "}
-                      Remove Student
-                    </li>
+                   
+                
                   </ul>
                 )}
               </li>
+
+              {/* Teacher Option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "teacher" && "bg-blue-300"}`}
@@ -461,24 +455,11 @@ const AdminDash = () => {
                       {" "}
                       Add Teacher
                     </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "update Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("update Teacher")}
-                    >
-                      {" "}
-                      Update Teacher
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "remove Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("remove Teacher")}
-                    >
-                      {" "}
-                      Remove Teacher
-                    </li>
+                  
                   </ul>
                 )}
               </li>
-
+              {/* Payment Option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
@@ -490,7 +471,7 @@ const AdminDash = () => {
                   {" "}
                   <FaMoneyBillWave /> Payment
                 </div>
-                {activePage === "payment" &&  (
+                {activePage === "payment" && (
                   <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
@@ -500,13 +481,13 @@ const AdminDash = () => {
                       Dashboard
                     </li>
                     <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("all payments")}
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Pay Fees" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("Pay Fees")}
                     >
                       {" "}
-                      All Payments
+                      Pay Fees
                     </li>
-                    
+
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("received Payments")}
@@ -521,13 +502,7 @@ const AdminDash = () => {
                       {" "}
                       Pending Payments
                     </li>
-                    {/* <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected Payments")}
-                    >
-                      {" "}
-                      Rejected Payments
-                    </li> */}
+                   
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("pending requests")}
@@ -535,52 +510,23 @@ const AdminDash = () => {
                       {" "}
                       Pending Payments Request
                     </li>
-                    
                   </ul>
                 )}
               </li>
-
+              {/* Expense option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "expenses" && "bg-blue-300"}`}
-                  onClick={() => {setActivePage("expenses"); setSubActivePage("Dashboard")}}
+                  onClick={() => {
+                    setActivePage("expenses");
+    
+                  }}
                 >
                   {" "}
                   <FaMoneyBillWave /> Expenses{" "}
                 </div>
 
-                {activePage === "expenses" && (
-                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Dashboard")}
-                    >
-                      {" "}
-                      Dashboard
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Create Expense" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Create Expense")}
-                    >
-                      {" "}
-                      Create Expense
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "All Expense" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("All Expense")}
-                    >
-                      {" "}
-                      All Expense
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected Payments")}
-                    >
-                      {" "}
-                      Rejected Payments
-                    </li>
-                  </ul>
-                )}
+                
               </li>
 
               <li
@@ -597,6 +543,14 @@ const AdminDash = () => {
                 {" "}
                 <FaBell /> Notice
               </li>
+              <li
+                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "message" && "bg-blue-300"}`}
+                onClick={() => setActivePage("message")}
+              >
+                {" "}
+                <FaBell /> Send Message
+              </li>
+
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
                 onClick={() => navigate("/")}
@@ -624,72 +578,26 @@ const AdminDash = () => {
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-2  w-full">
                 {activePage === "home" && (
-                  <div className='h-full w-full'>
-                    <FinanceGraph/>
+                  <div className="h-full w-full flex flex-col gap-4">
+                    <div className="bg-white rounded shadow">
+                      <FinanceGraph />
+                    </div>
+                       <div className="bg-white rounded shadow">
+                      < Dashboard/>
+                    </div>
+                    <div className="bg-white rounded shadow">
+                      <Expense />
+                    </div>
+                    
                   </div>
-                  
                 )}
 
                 {/* ========== STUDENT PAGES ========== */}
                 {activePage === "student" &&
                   subActivePage === "all Student" && (
-                    <div className="">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        All Students
-                      </h2>
-                      {loading ? (
-                        <p>Loading...</p>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
-                            <thead className="bg-blue-600 text-white">
-                              <tr>
-                                <th className="border p-3">Name</th>
-                                <th className="border p-3">Email</th>
-                                <th className="border p-3">Roll No</th>
-                                <th className="border p-3">Mobile</th>
-                                <th className="border p-3">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {students.map((student) => (
-                                <tr
-                                  key={student._id}
-                                  className="hover:bg-gray-100"
-                                >
-                                  <td className="border p-3">{student.name}</td>
-                                  <td className="border p-3">
-                                    {student.email}
-                                  </td>
-                                  <td className="border p-3">
-                                    {student.rollno}
-                                  </td>
-                                  <td className="border p-3">
-                                    {student.mobile1}
-                                  </td>
-                                  <td className="border p-3">
-                                    <button
-                                      onClick={() => handleEditStudent(student)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteStudent(student._id)
-                                      }
-                                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                    
+                    <StudentDash/>
+                    
                   )}
 
                 {activePage === "student" &&
@@ -704,134 +612,14 @@ const AdminDash = () => {
                     </div>
                   )}
 
-                {activePage === "student" &&
-                  subActivePage === "update Student" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        Update Student
-                      </h2>
-                      {students.length === 0 ? (
-                        <p>No students available to update</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {students.map((student) => (
-                            <div
-                              key={student._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{student.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {student.email}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleEditStudent(student)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                              >
-                                <FaEdit /> Edit
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                {activePage === "student" &&
-                  subActivePage === "remove Student" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-red-600 mb-4">
-                        Remove Students
-                      </h2>
-                      {students.length === 0 ? (
-                        <p>No students to remove</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {students.map((student) => (
-                            <div
-                              key={student._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{student.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {student.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Roll No: {student.rollno}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleDeleteStudent(student._id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                              >
-                                <FaTrash /> Delete
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+               
 
                 {/* ========== TEACHER PAGES ========== */}
                 {activePage === "teacher" &&
                   subActivePage === "all Teacher" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      {loading ? (
-                        <p>Loading...</p>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
-                            <thead className="bg-blue-600 text-white">
-                              <tr>
-                                <th className="border p-3">Name</th>
-                                <th className="border p-3">Email</th>
-                                <th className="border p-3">Post</th>
-                                <th className="border p-3">Mobile</th>
-                                <th className="border p-3">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {teachers.map((teacher) => (
-                                <tr
-                                  key={teacher._id}
-                                  className="hover:bg-gray-100"
-                                >
-                                  <td className="border p-3">{teacher.name}</td>
-                                  <td className="border p-3">
-                                    {teacher.email}
-                                  </td>
-                                  <td className="border p-3">{teacher.post}</td>
-                                  <td className="border p-3">
-                                    {teacher.mobile}
-                                  </td>
-                                  <td className="border p-3">
-                                    <button
-                                      onClick={() => handleEditTeacher(teacher)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteTeacher(teacher._id)
-                                      }
-                                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                    <TeacherDash/>
                   )}
-
+{/* add teacher */}
                 {activePage === "teacher" &&
                   subActivePage === "add Teacher" && (
                     <div className="w-full">
@@ -843,435 +631,55 @@ const AdminDash = () => {
                       />
                     </div>
                   )}
-
-                {activePage === "teacher" &&
-                  subActivePage === "update Teacher" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        Update Teacher
-                      </h2>
-                      {teachers.length === 0 ? (
-                        <p>No teachers available to update</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {teachers.map((teacher) => (
-                            <div
-                              key={teacher._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{teacher.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {teacher.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Post: {teacher.post}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleEditTeacher(teacher)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                              >
-                                <FaEdit /> Edit
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                {activePage === "teacher" &&
-                  subActivePage === "remove Teacher" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-red-600 mb-4">
-                        Remove Teachers
-                      </h2>
-                      {teachers.length === 0 ? (
-                        <p>No teachers to remove</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {teachers.map((teacher) => (
-                            <div
-                              key={teacher._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{teacher.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {teacher.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Post: {teacher.post}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleDeleteTeacher(teacher._id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                              >
-                                <FaTrash /> Delete
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+ 
 
                 {/* ========== PAYMENT MANAGEMENT ========== */}
-                  {activePage === "payment" &&
-                  subActivePage === "Dashboard" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md w-full">
-                      
-                      {loading ? (
-                        <p>Loading payments...</p>
-                      ) : (
-                        <Dashboard/>
-                      )}
-                    </div>
-                  )}
-
+                {activePage === "payment" && subActivePage === "Dashboard" && (
+                  <div className="bg-white p-4 rounded-lg shadow-md w-full">
+                    {loading ? <p>Loading payments...</p> : <Dashboard />}
+                  </div>
+                )}
 
                 {activePage === "payment" &&
                   subActivePage === "pending requests" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      <PendingRequest/>
+                      <PendingRequest />
                     </div>
                   )}
 
                 {activePage === "payment" &&
                   subActivePage === "received Payments" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      
-                     <History/>
+                      <History />
                     </div>
                   )}
 
                 {activePage === "payment" &&
-                  subActivePage === "pending payments" && (
-                    <PendingPayment/>
-                  )}
+                  subActivePage === "pending payments" && <PendingPayment />}
 
-                  {activePage === "payment" && 
-                    subActivePage === "all payments" && (
-                      <All_Payment/>
-                    )}
+                {activePage === "payment" && subActivePage === "Pay Fees" && (
+                  <All_Payment />
+                )}
 
-                {/* {activePage === "payment" &&
-                  subActivePage === "rejected Payments" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <h2 className="text-2xl font-bold text-orange-600">
-                        Rejected Payments
-                      </h2>
-                      {loading ? (
-                        <p>Loading rejected payments...</p>
-                      ) : rejectPaymentStudents.length === 0 ? (
-                        <p>No reject payments found.</p>
-                      ) : (
-                        <div className="">
-                          {rejectPaymentStudents.map((item, index) => (
-                            <div
-                              key={item._id}
-                              className="border border-gray-300 rounded p-2"
-                            >
-                              <div className="grid grid-cols-4 ">
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Student Name
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    {item.payment.studentName}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Amount
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    ₹{item.payment.amount}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Transaction ID
-                                  </p>
-                                  <p className="font-semibold">
-                                    {item.payment.transactionId}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">Date</p>
-                                  <p className="font-semibold">
-                                    {item.payment.paidAt
-                                      ? new Date(
-                                          item.payment.paidAt,
-                                        ).toLocaleDateString("en-IN")
-                                      : "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )} */}
+              
 
                 {activePage === "subjects" && <SubjectManagement />}
 
-                {activePage === "expenses" && subActivePage === "Dashboard" && (
-                  <div className="ml-[250px] p-6">
+                {activePage === "expenses" && (
+                  <div className="ml-[250px] gap-4 flex flex-col  ">
                     <Expense />
+                      <All/>
                   </div>
                 )}
 
-                {activePage === "expenses" && subActivePage === "Create Expense" && <CreateExp/>}
+         
 
-                {activePage === "expenses" && subActivePage === "All Expense" && <All/>}
+                {activePage === "notice" && <NoticeManagement />}
+                {activePage === "message" && <SendMessage />}
               </div>
             </div>
 
-            {/* ========== STUDENT EDIT MODAL ========== */}
-            {showStudentEditModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-blue-600 text-white p-4 flex justify-between items-center">
-                    <h3 className="text-xl font-bold">Edit Student</h3>
-                    <button
-                      onClick={() => setShowStudentEditModal(false)}
-                      className="text-2xl font-bold cursor-pointer hover:text-gray-200"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.name || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={editStudentForm.email || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Mobile
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.mobile1 || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            mobile1: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Roll No
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.rollno || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            rollno: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.address || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            address: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div className="flex gap-3 justify-end pt-4">
-                      <button
-                        onClick={() => setShowStudentEditModal(false)}
-                        className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleUpdateStudent}
-                        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 font-semibold"
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ========== TEACHER EDIT MODAL ========== */}
-            {showTeacherEditModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-blue-600 text-white p-4 flex justify-between items-center">
-                    <h3 className="text-xl font-bold">Edit Teacher</h3>
-                    <button
-                      onClick={() => setShowTeacherEditModal(false)}
-                      className="text-2xl font-bold cursor-pointer hover:text-gray-200"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.name || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={editTeacherForm.email || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Mobile
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.mobile || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            mobile: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Post
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.post || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            post: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Salary
-                      </label>
-                      <input
-                        type="number"
-                        value={editTeacherForm.salary || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            salary: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.address || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            address: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div className="flex gap-3 justify-end pt-4">
-                      <button
-                        onClick={() => setShowTeacherEditModal(false)}
-                        className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleUpdateTeacher}
-                        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 font-semibold"
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+           
           </div>
         </div>
       </div>

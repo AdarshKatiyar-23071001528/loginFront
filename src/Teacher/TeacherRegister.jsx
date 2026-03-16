@@ -139,11 +139,11 @@ const TeacherRegister = () => {
       {/* Decorative Background Elements */}
      
 
-      <div className='relative z-10'>
+      <div className='relative z-10 p-2'>
         {/* Header */}
-        <div className='mb-10'>
+        <div className='mb-4'>
           
-          <h3>Teacher Registration</h3>
+          <p className='text-5xl font-bold mb-3 drop-shadow-lg p-3 text-gray-500'>Add Teacher</p>
           
         </div>
 
@@ -151,7 +151,7 @@ const TeacherRegister = () => {
         <div className=' w-full' >
           {/* Alert Message */}
           {message && (
-            <div className={`mb-8 p-4 rounded-xl backdrop-blur-sm border-2 transition-all duration-300 ${
+            <div className={`mb-4 p-4 rounded-xl backdrop-blur-sm border-2 transition-all duration-300 ${
               messageType === 'success' 
                 ? 'bg-green-50/80 border-green-400 text-green-700 shadow-lg shadow-green-100' 
                 : 'bg-red-50/80 border-red-400 text-red-700 shadow-lg shadow-red-100'
@@ -165,7 +165,7 @@ const TeacherRegister = () => {
 
           <form onSubmit={handleSubmit} className='space-y-6 w-full'>
             {/* Essential Fields Section */}
-            <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-2'>
+            <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-2 p-4 bg-gray-300 rounded shadow mb-4'>
               
 
               {/* Name */}
@@ -235,10 +235,10 @@ const TeacherRegister = () => {
             </div>
 
             {/* Address Section */}
-            <div className=' mt-4'>
+            <div className='p-4 bg-gray-300 rounded shadow mb-4'>
               <h3 className='text-lg font-bold text-purple-900'>Address Details</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2 p-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Address</label>
                   <input
@@ -268,7 +268,7 @@ const TeacherRegister = () => {
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2 p-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Landmark</label>
                   <input
@@ -300,10 +300,10 @@ const TeacherRegister = () => {
             </div>
 
             {/* Professional Details Section */}
-            <div className='mt-4'>
-              <h3 className='text-lg font-bold text-green-900'>Professional Details</h3>
+            <div className='p-4 bg-gray-300 rounded shadow mb-4'>
+              <h3 className='text-lg font-bold text-green-900 p-2'>Professional Details</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2 p-2'>
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Post/Designation</label>
                   <input
@@ -333,7 +333,7 @@ const TeacherRegister = () => {
                 </div>
               </div>
 
-              <div>
+              <div className='p-2'>
                 <label className='block text-gray-800 font-semibold mb-2 text-sm'>Salary</label>
                 <input
                   type='number'
@@ -369,15 +369,7 @@ const TeacherRegister = () => {
             </button>
           </form>
 
-          {/* Footer */}
-          <div className='mt-8 pt-8 border-t border-gray-200'>
-            <p className='text-center text-gray-700 font-medium'>
-              Already have an account?{' '}
-              <a href='/teacherlog' className='text-blue-600 font-bold hover:text-blue-700 hover:underline transition-all'>
-                Login here
-              </a>
-            </p>
-          </div>
+        
         </div>
 
         {/* Footer Text */}

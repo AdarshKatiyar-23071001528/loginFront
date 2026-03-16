@@ -52,9 +52,9 @@ const CreateExpense = () => {
   };
 
   return (
-    <div className="h-full flex   w-full">
+    <div className="h-full flex  w-full">
 
-      <div className=" shadow-xl p-2 transform transition-all duration-300 w-full h-[100px] flex items-center justify-center rounded">
+      <div className=" shadow-xl p-2 transform transition-all duration-300 w-full h-[100px] flex items-center justify-center rounded bg-white">
 
 
         {success && (
@@ -63,7 +63,7 @@ const CreateExpense = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 flex gap-2 ">
+        <form onSubmit={handleSubmit} className=" flex gap-2 ">
 
           <div>
             <input

@@ -27,7 +27,8 @@ const Nav = () => {
   }, []);
 
   return (
-    <nav className="h-[90px] w-full shadow-lg bg-black/30 backdrop-blur p-4 fixed z-19">
+
+    <nav className="h-[90px] w-full shadow-lg bg-transparent backdrop-blur p-4 fixed z-10">
       <div className="h-full flex items-center justify-between px-6">
         
         {/* Logo */}

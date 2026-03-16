@@ -5,7 +5,7 @@ const SubjectManagement = () => {
   const { createSubject, assignTeacher, getTeachers, getSubjects } = useContext(AppContext);
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [form, setForm] = useState({ name: '', course: 'BBA', semester: 1, section: 'A' });
+  const [form, setForm] = useState({ name: '', course: '', semester: '', section: '' });
   const [assign, setAssign] = useState({ subjectId: '', teacherId: '' });
 
   useEffect(() => {
