@@ -1,7 +1,5 @@
 import React, { useState, useContext, useEffect, act } from "react";
-import { IoIosLogOut } from "react-icons/io";
-import { IoMdMenu } from "react-icons/io";
-import { RxCross2 } from "react-icons/rx";
+
 import {
   FaHome,
   FaMoneyBillAlt,
@@ -40,6 +38,7 @@ import SendMessage from "../Message/SendMessage";
 import NoticeManagement from "../Notice/NoticeManagement";
 import CreateExpense from "../src/Expenses/CreateExp";
 import StudentDash from "../src/StudentForAdmin/StudentDash";
+import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 
 
 // using configured api instance from src/api/axios
@@ -456,20 +455,7 @@ const AdminDash = () => {
                       {" "}
                       Add Teacher
                     </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "update Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("update Teacher")}
-                    >
-                      {" "}
-                      Update Teacher
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "remove Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("remove Teacher")}
-                    >
-                      {" "}
-                      Remove Teacher
-                    </li>
+                  
                   </ul>
                 )}
               </li>
@@ -516,13 +502,7 @@ const AdminDash = () => {
                       {" "}
                       Pending Payments
                     </li>
-                    {/* <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected Payments")}
-                    >
-                      {" "}
-                      Rejected Payments
-                    </li> */}
+                   
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("pending requests")}
@@ -615,63 +595,7 @@ const AdminDash = () => {
                 {/* ========== STUDENT PAGES ========== */}
                 {activePage === "student" &&
                   subActivePage === "all Student" && (
-                    // <div className="">
-                    //   <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                    //     All Students
-                    //   </h2>
-                    //   {loading ? (
-                    //     <p>Loading...</p>
-                    //   ) : (
-                    //     <div className="overflow-x-auto">
-                    //       <table className="w-full border-collapse border border-gray-300">
-                    //         <thead className="bg-blue-600 text-white">
-                    //           <tr>
-                    //             <th className="border p-3">Name</th>
-                    //             <th className="border p-3">Email</th>
-                    //             <th className="border p-3">Roll No</th>
-                    //             <th className="border p-3">Mobile</th>
-                    //             <th className="border p-3">Action</th>
-                    //           </tr>
-                    //         </thead>
-                    //         <tbody>
-                    //           {students.map((student) => (
-                    //             <tr
-                    //               key={student._id}
-                    //               className="hover:bg-gray-100"
-                    //             >
-                    //               <td className="border p-3">{student.name}</td>
-                    //               <td className="border p-3">
-                    //                 {student.email}
-                    //               </td>
-                    //               <td className="border p-3">
-                    //                 {student.rollno}
-                    //               </td>
-                    //               <td className="border p-3">
-                    //                 {student.mobile1}
-                    //               </td>
-                    //               <td className="border p-3">
-                    //                 <button
-                    //                   onClick={() => handleEditStudent(student)}
-                    //                   className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
-                    //                 >
-                    //                   <FaEdit />
-                    //                 </button>
-                    //                 <button
-                    //                   onClick={() =>
-                    //                     handleDeleteStudent(student._id)
-                    //                   }
-                    //                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    //                 >
-                    //                   <FaTrash />
-                    //                 </button>
-                    //               </td>
-                    //             </tr>
-                    //           ))}
-                    //         </tbody>
-                    //       </table>
-                    //     </div>
-                    //   )}
-                    // </div>
+                    
                     <StudentDash/>
                     
                   )}
@@ -693,60 +617,9 @@ const AdminDash = () => {
                 {/* ========== TEACHER PAGES ========== */}
                 {activePage === "teacher" &&
                   subActivePage === "all Teacher" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      {loading ? (
-                        <p>Loading...</p>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
-                            <thead className="bg-blue-600 text-white">
-                              <tr>
-                                <th className="border p-3">Name</th>
-                                <th className="border p-3">Email</th>
-                                <th className="border p-3">Post</th>
-                                <th className="border p-3">Mobile</th>
-                                <th className="border p-3">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {teachers.map((teacher) => (
-                                <tr
-                                  key={teacher._id}
-                                  className="hover:bg-gray-100"
-                                >
-                                  <td className="border p-3">{teacher.name}</td>
-                                  <td className="border p-3">
-                                    {teacher.email}
-                                  </td>
-                                  <td className="border p-3">{teacher.post}</td>
-                                  <td className="border p-3">
-                                    {teacher.mobile}
-                                  </td>
-                                  <td className="border p-3">
-                                    <button
-                                      onClick={() => handleEditTeacher(teacher)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteTeacher(teacher._id)
-                                      }
-                                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                    <TeacherDash/>
                   )}
-
+{/* add teacher */}
                 {activePage === "teacher" &&
                   subActivePage === "add Teacher" && (
                     <div className="w-full">
@@ -758,80 +631,7 @@ const AdminDash = () => {
                       />
                     </div>
                   )}
-
-                {activePage === "teacher" &&
-                  subActivePage === "update Teacher" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        Update Teacher
-                      </h2>
-                      {teachers.length === 0 ? (
-                        <p>No teachers available to update</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {teachers.map((teacher) => (
-                            <div
-                              key={teacher._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{teacher.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {teacher.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Post: {teacher.post}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleEditTeacher(teacher)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                              >
-                                <FaEdit /> Edit
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                {activePage === "teacher" &&
-                  subActivePage === "remove Teacher" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-red-600 mb-4">
-                        Remove Teachers
-                      </h2>
-                      {teachers.length === 0 ? (
-                        <p>No teachers to remove</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {teachers.map((teacher) => (
-                            <div
-                              key={teacher._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{teacher.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {teacher.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Post: {teacher.post}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleDeleteTeacher(teacher._id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                              >
-                                <FaTrash /> Delete
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+ 
 
                 {/* ========== PAYMENT MANAGEMENT ========== */}
                 {activePage === "payment" && subActivePage === "Dashboard" && (
@@ -861,69 +661,11 @@ const AdminDash = () => {
                   <All_Payment />
                 )}
 
-                {/* {activePage === "payment" &&
-                  subActivePage === "rejected Payments" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <h2 className="text-2xl font-bold text-orange-600">
-                        Rejected Payments
-                      </h2>
-                      {loading ? (
-                        <p>Loading rejected payments...</p>
-                      ) : rejectPaymentStudents.length === 0 ? (
-                        <p>No reject payments found.</p>
-                      ) : (
-                        <div className="">
-                          {rejectPaymentStudents.map((item, index) => (
-                            <div
-                              key={item._id}
-                              className="border border-gray-300 rounded p-2"
-                            >
-                              <div className="grid grid-cols-4 ">
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Student Name
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    {item.payment.studentName}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Amount
-                                  </p>
-                                  <p className="font-semibold text-lg">
-                                    ₹{item.payment.amount}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">
-                                    Transaction ID
-                                  </p>
-                                  <p className="font-semibold">
-                                    {item.payment.transactionId}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-600">Date</p>
-                                  <p className="font-semibold">
-                                    {item.payment.paidAt
-                                      ? new Date(
-                                          item.payment.paidAt,
-                                        ).toLocaleDateString("en-IN")
-                                      : "N/A"}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )} */}
+              
 
                 {activePage === "subjects" && <SubjectManagement />}
 
-                {activePage === "expenses" && subActivePage === "Dashboard" && (
+                {activePage === "expenses" && (
                   <div className="ml-[250px] gap-4 flex flex-col  ">
                     <Expense />
                       <All/>
@@ -937,247 +679,7 @@ const AdminDash = () => {
               </div>
             </div>
 
-            {/* ========== STUDENT EDIT MODAL ========== */}
-            {showStudentEditModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-blue-600 text-white p-4 flex justify-between items-center">
-                    <h3 className="text-xl font-bold">Edit Student</h3>
-                    <button
-                      onClick={() => setShowStudentEditModal(false)}
-                      className="text-2xl font-bold cursor-pointer hover:text-gray-200"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.name || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={editStudentForm.email || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Mobile
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.mobile1 || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            mobile1: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Roll No
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.rollno || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            rollno: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        value={editStudentForm.address || ""}
-                        onChange={(e) =>
-                          setEditStudentForm({
-                            ...editStudentForm,
-                            address: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div className="flex gap-3 justify-end pt-4">
-                      <button
-                        onClick={() => setShowStudentEditModal(false)}
-                        className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleUpdateStudent}
-                        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 font-semibold"
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ========== TEACHER EDIT MODAL ========== */}
-            {showTeacherEditModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-blue-600 text-white p-4 flex justify-between items-center">
-                    <h3 className="text-xl font-bold">Edit Teacher</h3>
-                    <button
-                      onClick={() => setShowTeacherEditModal(false)}
-                      className="text-2xl font-bold cursor-pointer hover:text-gray-200"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.name || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={editTeacherForm.email || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Mobile
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.mobile || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            mobile: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Post
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.post || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            post: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Salary
-                      </label>
-                      <input
-                        type="number"
-                        value={editTeacherForm.salary || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            salary: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        value={editTeacherForm.address || ""}
-                        onChange={(e) =>
-                          setEditTeacherForm({
-                            ...editTeacherForm,
-                            address: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                      />
-                    </div>
-                    <div className="flex gap-3 justify-end pt-4">
-                      <button
-                        onClick={() => setShowTeacherEditModal(false)}
-                        className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleUpdateTeacher}
-                        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 font-semibold"
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+           
           </div>
         </div>
       </div>

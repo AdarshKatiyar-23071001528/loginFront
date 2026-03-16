@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
 const Box = ({name, value}) => {
+
+  
     let [color, setColor] = useState('');
     let [textColor, setTextColor] = useState('');
     useEffect(() =>{
