@@ -96,13 +96,13 @@ const Dashboard = () => {
 
   return (
 
-    <div className="p-4 bg-gray-100 min-h-screen flex flex-col gap-6">
+    <div className="p-4 bg-white h-full w-full flex flex-col gap-6 rounded shadow  ">
 
       {/* Top Section */}
 
       <div className="flex justify-between items-center flex-wrap gap-4">
 
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">Fees</h1>
 
         {/* Filter */}
         <div className="flex gap-3 flex-wrap">
@@ -200,7 +200,7 @@ const Dashboard = () => {
 
           {/* Side Box */}
           <div className="w-full lg:w-[200px]">
-            <Box name={"Fees"} value={fees}/>
+            <Box name={"Receive"} value={fees}/>
           </div>
 
         </div>

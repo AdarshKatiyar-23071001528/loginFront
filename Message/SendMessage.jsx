@@ -9,7 +9,7 @@ const SendMessage = () => {
 
   useEffect(()=>{
 
-    api.get("/contacts")
+    api.get("/message/contacts")
     .then(res=>{
       setContacts(res.data)
     })
@@ -39,7 +39,7 @@ const SendMessage = () => {
       selected.includes(c.number)
     )
 
-    await api.post("/send-message",{
+    await api.post("/message/send-message",{
       contacts:selectedContacts,
       message:message
     })

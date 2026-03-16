@@ -29,7 +29,6 @@ import { Navigate, useNavigate } from "react-router-dom";
 import Box from "./Box";
 import { CiLogout } from "react-icons/ci";
 import Expense from "../src/Expenses/Expense";
-import CreateExp from "../src/Expenses/CreateExp";
 import All from "../src/Expenses/All";
 import Dashboard from "../Payment/Dashboard";
 import FinanceGraph from "../Admin/FinanceGraph";
@@ -39,6 +38,9 @@ import History from "../Payment/History";
 import PendingRequest from "../Payment/PendingRequest";
 import SendMessage from "../Message/SendMessage";
 import NoticeManagement from "../Notice/NoticeManagement";
+import CreateExpense from "../src/Expenses/CreateExp";
+import StudentDash from "../src/StudentForAdmin/StudentDash";
+
 
 // using configured api instance from src/api/axios
 
@@ -49,7 +51,7 @@ const AdminDash = () => {
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
   const [teacher, setTeacher] = useState(false);
-  const [editStudent, setEditStudent] = useState(null);
+
   const [editTeacher, setEditTeacher] = useState(null);
   const [studentInCollege, setStudentInCollege] = useState(0);
   const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
@@ -382,18 +384,19 @@ const AdminDash = () => {
         <div className="h-[100%] flex w-full items-center justify-center">
           <div className="AdminPannel bg-gray-600 pt-4 w-[300px] text-white h-[100%] shadow-lg rounded-r-lg">
             <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">
-              Admin                
+              Admin
             </p>
             <ul className="flex flex-col gap-2">
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "home" && "bg-blue-300"}`}
                 onClick={() => setActivePage("home")}
               >
-                {" "}       
+                {" "}
                 <FaHome /> Home
               </li>
               <li>
-                          <div className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
+                <div
+                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
                   onClick={() => {
                     setActivePage("student");
                     setSubActivePage("all Student");
@@ -409,7 +412,7 @@ const AdminDash = () => {
                       onClick={() => setSubActivePage("all Student")}
                     >
                       {" "}
-                      All Students
+                      Student Record
                     </li>
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "add Student" ? "text-yellow-400" : ""}`}
@@ -418,23 +421,13 @@ const AdminDash = () => {
                       {" "}
                       Add Student
                     </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "update Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("update Student")}
-                    >
-                      {" "}
-                      Update Student
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "remove Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("remove Student")}
-                    >
-                      {" "}
-                      Remove Student
-                    </li>
+                   
+                
                   </ul>
                 )}
               </li>
+
+              {/* Teacher Option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "teacher" && "bg-blue-300"}`}
@@ -480,7 +473,7 @@ const AdminDash = () => {
                   </ul>
                 )}
               </li>
-
+              {/* Payment Option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
@@ -492,7 +485,7 @@ const AdminDash = () => {
                   {" "}
                   <FaMoneyBillWave /> Payment
                 </div>
-                {activePage === "payment" &&  (
+                {activePage === "payment" && (
                   <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
@@ -502,13 +495,13 @@ const AdminDash = () => {
                       Dashboard
                     </li>
                     <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("all payments")}
+                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Pay Fees" ? "text-yellow-400" : ""}`}
+                      onClick={() => setSubActivePage("Pay Fees")}
                     >
                       {" "}
-                      All Payments
+                      Pay Fees
                     </li>
-                    
+
                     <li
                       className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
                       onClick={() => setSubActivePage("received Payments")}
@@ -537,52 +530,23 @@ const AdminDash = () => {
                       {" "}
                       Pending Payments Request
                     </li>
-                    
                   </ul>
                 )}
               </li>
-
+              {/* Expense option */}
               <li>
                 <div
                   className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "expenses" && "bg-blue-300"}`}
-                  onClick={() => {setActivePage("expenses"); setSubActivePage("Dashboard")}}
+                  onClick={() => {
+                    setActivePage("expenses");
+    
+                  }}
                 >
                   {" "}
                   <FaMoneyBillWave /> Expenses{" "}
                 </div>
 
-                {activePage === "expenses" && (
-                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Dashboard")}
-                    >
-                      {" "}
-                      Dashboard
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Create Expense" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Create Expense")}
-                    >
-                      {" "}
-                      Create Expense
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "All Expense" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("All Expense")}
-                    >
-                      {" "}
-                      All Expense
-                    </li>
-                    {/* <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "rejected payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("rejected Payments")}
-                    >
-                      {" "}
-                      Rejected Payments
-                    </li> */}
-                  </ul>
-                )}
+                
               </li>
 
               <li
@@ -599,14 +563,14 @@ const AdminDash = () => {
                 {" "}
                 <FaBell /> Notice
               </li>
-               <li
+              <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "message" && "bg-blue-300"}`}
                 onClick={() => setActivePage("message")}
               >
                 {" "}
                 <FaBell /> Send Message
               </li>
-              
+
               <li
                 className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
                 onClick={() => navigate("/")}
@@ -634,72 +598,81 @@ const AdminDash = () => {
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-2  w-full">
                 {activePage === "home" && (
-                  <div className='h-full w-full'>
-                    <FinanceGraph/>
+                  <div className="h-full w-full flex flex-col gap-4">
+                    <div className="bg-white rounded shadow">
+                      <FinanceGraph />
+                    </div>
+                       <div className="bg-white rounded shadow">
+                      < Dashboard/>
+                    </div>
+                    <div className="bg-white rounded shadow">
+                      <Expense />
+                    </div>
+                    
                   </div>
-                  
                 )}
 
                 {/* ========== STUDENT PAGES ========== */}
                 {activePage === "student" &&
                   subActivePage === "all Student" && (
-                    <div className="">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        All Students
-                      </h2>
-                      {loading ? (
-                        <p>Loading...</p>
-                      ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
-                            <thead className="bg-blue-600 text-white">
-                              <tr>
-                                <th className="border p-3">Name</th>
-                                <th className="border p-3">Email</th>
-                                <th className="border p-3">Roll No</th>
-                                <th className="border p-3">Mobile</th>
-                                <th className="border p-3">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {students.map((student) => (
-                                <tr
-                                  key={student._id}
-                                  className="hover:bg-gray-100"
-                                >
-                                  <td className="border p-3">{student.name}</td>
-                                  <td className="border p-3">
-                                    {student.email}
-                                  </td>
-                                  <td className="border p-3">
-                                    {student.rollno}
-                                  </td>
-                                  <td className="border p-3">
-                                    {student.mobile1}
-                                  </td>
-                                  <td className="border p-3">
-                                    <button
-                                      onClick={() => handleEditStudent(student)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteStudent(student._id)
-                                      }
-                                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                    // <div className="">
+                    //   <h2 className="text-2xl font-bold text-blue-600 mb-4">
+                    //     All Students
+                    //   </h2>
+                    //   {loading ? (
+                    //     <p>Loading...</p>
+                    //   ) : (
+                    //     <div className="overflow-x-auto">
+                    //       <table className="w-full border-collapse border border-gray-300">
+                    //         <thead className="bg-blue-600 text-white">
+                    //           <tr>
+                    //             <th className="border p-3">Name</th>
+                    //             <th className="border p-3">Email</th>
+                    //             <th className="border p-3">Roll No</th>
+                    //             <th className="border p-3">Mobile</th>
+                    //             <th className="border p-3">Action</th>
+                    //           </tr>
+                    //         </thead>
+                    //         <tbody>
+                    //           {students.map((student) => (
+                    //             <tr
+                    //               key={student._id}
+                    //               className="hover:bg-gray-100"
+                    //             >
+                    //               <td className="border p-3">{student.name}</td>
+                    //               <td className="border p-3">
+                    //                 {student.email}
+                    //               </td>
+                    //               <td className="border p-3">
+                    //                 {student.rollno}
+                    //               </td>
+                    //               <td className="border p-3">
+                    //                 {student.mobile1}
+                    //               </td>
+                    //               <td className="border p-3">
+                    //                 <button
+                    //                   onClick={() => handleEditStudent(student)}
+                    //                   className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600"
+                    //                 >
+                    //                   <FaEdit />
+                    //                 </button>
+                    //                 <button
+                    //                   onClick={() =>
+                    //                     handleDeleteStudent(student._id)
+                    //                   }
+                    //                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    //                 >
+                    //                   <FaTrash />
+                    //                 </button>
+                    //               </td>
+                    //             </tr>
+                    //           ))}
+                    //         </tbody>
+                    //       </table>
+                    //     </div>
+                    //   )}
+                    // </div>
+                    <StudentDash/>
                     
                   )}
 
@@ -715,76 +688,7 @@ const AdminDash = () => {
                     </div>
                   )}
 
-                {activePage === "student" &&
-                  subActivePage === "update Student" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                        Update Student
-                      </h2>
-                      {students.length === 0 ? (
-                        <p>No students available to update</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {students.map((student) => (
-                            <div
-                              key={student._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{student.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {student.email}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleEditStudent(student)}
-                                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                              >
-                                <FaEdit /> Edit
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                {activePage === "student" &&
-                  subActivePage === "remove Student" && (
-                    <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-bold text-red-600 mb-4">
-                        Remove Students
-                      </h2>
-                      {students.length === 0 ? (
-                        <p>No students to remove</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {students.map((student) => (
-                            <div
-                              key={student._id}
-                              className="border p-4 rounded-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100"
-                            >
-                              <div>
-                                <p className="font-semibold">{student.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {student.email}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  Roll No: {student.rollno}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleDeleteStudent(student._id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                              >
-                                <FaTrash /> Delete
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+               
 
                 {/* ========== TEACHER PAGES ========== */}
                 {activePage === "teacher" &&
@@ -930,43 +834,32 @@ const AdminDash = () => {
                   )}
 
                 {/* ========== PAYMENT MANAGEMENT ========== */}
-                  {activePage === "payment" &&
-                  subActivePage === "Dashboard" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md w-full">
-                      
-                      {loading ? (
-                        <p>Loading payments...</p>
-                      ) : (
-                        <Dashboard/>
-                      )}
-                    </div>
-                  )}
-
+                {activePage === "payment" && subActivePage === "Dashboard" && (
+                  <div className="bg-white p-4 rounded-lg shadow-md w-full">
+                    {loading ? <p>Loading payments...</p> : <Dashboard />}
+                  </div>
+                )}
 
                 {activePage === "payment" &&
                   subActivePage === "pending requests" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      <PendingRequest/>
+                      <PendingRequest />
                     </div>
                   )}
 
                 {activePage === "payment" &&
                   subActivePage === "received Payments" && (
                     <div className="bg-white p-4 rounded-lg shadow-md">
-                      
-                     <History/>
+                      <History />
                     </div>
                   )}
 
                 {activePage === "payment" &&
-                  subActivePage === "pending payments" && (
-                    <PendingPayment/>
-                  )}
+                  subActivePage === "pending payments" && <PendingPayment />}
 
-                  {activePage === "payment" && 
-                    subActivePage === "all payments" && (
-                      <All_Payment/>
-                    )}
+                {activePage === "payment" && subActivePage === "Pay Fees" && (
+                  <All_Payment />
+                )}
 
                 {/* {activePage === "payment" &&
                   subActivePage === "rejected Payments" && (
@@ -1031,18 +924,16 @@ const AdminDash = () => {
                 {activePage === "subjects" && <SubjectManagement />}
 
                 {activePage === "expenses" && subActivePage === "Dashboard" && (
-                  <div className="ml-[250px] p-6">
+                  <div className="ml-[250px] gap-4 flex flex-col  ">
                     <Expense />
+                      <All/>
                   </div>
                 )}
 
-                {activePage === "expenses" && subActivePage === "Create Expense" && <CreateExp/>}
-
-                {activePage === "expenses" && subActivePage === "All Expense" && <All/>}
-
+         
 
                 {activePage === "notice" && <NoticeManagement />}
-                {activePage === "message" && <SendMessage/>}
+                {activePage === "message" && <SendMessage />}
               </div>
             </div>
 

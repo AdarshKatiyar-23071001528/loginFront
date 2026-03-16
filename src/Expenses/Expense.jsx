@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend
 } from "chart.js";
+import Box from "../../Users/Box.jsx";
 
 ChartJS.register(
   BarElement,
@@ -91,8 +92,8 @@ const Expense = () => {
       {
         label:"Daily Expense",
         data: graph.values,
-        backgroundColor:"#4f46e5",
-        borderRadius:6
+        backgroundColor:"rgba(200,00,0,0.6)",
+        borderRadius:0,
       }
     ]
   };
@@ -108,59 +109,37 @@ const Expense = () => {
   };
 
   if(loading){
-    return <p className="p-6 text-lg">Loading...</p>
+    return <p className="p-4 text-lg">Loading...</p>
   }
 
   return (
-    <div className="h-screen bg-gray-100 p-4 flex flex-col">
+    <div className="shadow p-4 rounded relative flex justify-around h-full flex-col">
 
       {/* heading */}
 
-      <h1 className="text-2xl font-bold mb-4">
-        Expense Dashboard
+      <h1 className="text-2xl font-bold mb-4 p-2">
+        Expense Overview
       </h1>
 
-      {/* cards */}
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
+     
+     
 
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow p-4 rounded-lg">
-          <h2 className="text-sm">Today Expense</h2>
-          <p className="text-xl font-bold mt-1">
-            ₹ {todayExpense}
-          </p>
+
+          <div>
+        <div className="flex justify-between w-[80%] h-full   gap-9 ">
+        <Bar data={chartData} options={chartOptions} className="w-[80%] pt-4 " />
+        <div className="flex flex-col gap-4 pt-4 ">
+           <Box title="Month Expense" value={`${monthExpense}`} name={"Month Expense"}/>
+          <Box title="Today Expense" value={`${todayExpense}`} name={"Today Expense"}/>
         </div>
-
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow p-4 rounded-lg">
-          <h2 className="text-sm">Month Expense</h2>
-          <p className="text-xl font-bold mt-1">
-            ₹ {monthExpense}
-          </p>
-        </div>
+      </div>
+      </div>
+        
 
       </div>
 
-      {/* graph */}
-
-      <div className="bg-white shadow rounded-lg p-4 flex-1">
-
-        <h2 className="text-lg font-semibold mb-2">
-          Expense Graph
-        </h2>
-
-        <div className="h-[300px]">
-
-          {graph.labels.length > 0 ? (
-            <Bar data={chartData} options={chartOptions}/>
-          ) : (
-            <p>No Graph Data</p>
-          )}
-
-        </div>
-
-      </div>
-
-    </div>
+   
   )
 }
 

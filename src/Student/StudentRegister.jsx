@@ -206,7 +206,7 @@ const StudentRegister = () => {
         {/* Header */}
         
           
-          <h3 className='text-5xl font-bold mb-3 drop-shadow-lg'>Student Registration</h3>
+          <p className='text-5xl font-bold mb-3 drop-shadow-lg p-3 text-gray-500'>Student Registration</p>
           
         
 
@@ -228,7 +228,7 @@ const StudentRegister = () => {
 
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Essential Fields Section */}
-            <div className=' p-6 '>
+            <div className=' p-4 '>
         
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
@@ -336,10 +336,10 @@ const StudentRegister = () => {
             </div>
 
             {/* Academic Details Section */}
-            <div className='bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100'>
+            <div className='bg-gradient-to-r from-blue-50 to-indigo-50 p-4 mt-4 rounded-xl border border-blue-100'>
               <h3 className='text-lg font-bold text-blue-900 mb-5'>Academic Details</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-4'>
                 {/* Course */}
                 <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Course</label>
@@ -433,7 +433,7 @@ const StudentRegister = () => {
             </div>
 
             {/* Personal Details Section */}
-            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100'>
+            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-100 mt-4'>
               <h3 className='text-lg font-bold text-purple-900 mb-5'>Personal Details</h3>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
@@ -549,7 +549,7 @@ const StudentRegister = () => {
 
 
           {/* Required Section */}
-            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100'>
+            <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-4 mt-4 rounded-xl border border-purple-100'>
               <h3 className='text-lg font-bold text-purple-900 mb-5'>Required Details</h3>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
@@ -586,7 +586,7 @@ const StudentRegister = () => {
             </div>
 
             {/* Address Section */}
-            <div className='bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-xl border border-green-100'>
+            <div className='bg-gradient-to-r from-green-50 to-teal-50 p-4 mt-4 rounded-xl border border-green-100'>
               <h3 className='text-lg font-bold text-green-900 mb-5'>Address Details</h3>
 
               <div className='mb-5'>
@@ -672,7 +672,7 @@ const StudentRegister = () => {
             <button
               type='submit'
               disabled={loading}
-              className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-300 transform ${
+              className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-300 transform mt-2 ${
                 loading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 text-white shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95'
@@ -684,20 +684,12 @@ const StudentRegister = () => {
                   Registering...
                 </div>
               ) : (
-                '✓ Register as Student'
+                'New Admission'
               )}
             </button>
           </form>
 
-          {/* Footer */}
-          <div className='mt-8 pt-8 border-t border-gray-200'>
-            <p className='text-center text-gray-700 font-medium'>
-              Already have an account?{' '}
-              <a href='/studentlog' className='text-pink-600 font-bold hover:text-pink-700 hover:underline transition-all'>
-                Login here
-              </a>
-            </p>
-          </div>
+          
         </div>
 
         {/* Footer Text */}

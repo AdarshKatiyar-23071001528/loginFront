@@ -85,7 +85,7 @@ const FinanceGraph = () => {
   };
 
   return (
-    <div className="bg-white shadow p-6 rounded relative flex justify-around h-full flex-col w-full  ">
+    <div className="shadow p-4 rounded relative flex justify-around h-full flex-col w-full  ">
       <div >
        <h2 className="text-xl font-semibold mb-4 p-3">
         Finance Overview

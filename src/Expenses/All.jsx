@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios.js";
+import CreateExpense from "./CreateExp.jsx";
 
 const All = () => {
   const [expenses, setExpenses] = useState([]);
@@ -49,15 +50,25 @@ const All = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-4 relative">
+      <div className="mb-2 ">
+        <p className="p-2 text-3xl font-bold absolute top-0 text-gray-500">Add Expense</p>
+         <CreateExpense/>
+      </div>
+     
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-gray-700">All Expenses</h1>
-
+       
         {/* Filters */}
 
-        <div className="grid md:grid-cols-4 gap-4 mb-4 shadow p-2 rounded-xl">
-          {/* Search */}
+       
 
+        {/* Total Expense Card */}
+
+        <div className="bg-white shadow-md rounded-lg flex flex-col justify-between items-left mt-4 relative mb-4" >
+         
+        <div className="grid md:grid-cols-4 gap-4 py-2  shadow px-2 rounded-xl ">
+          {/* Search */}
+          
           <input
             type="text"
             placeholder="Search expense..."
@@ -96,16 +107,12 @@ const All = () => {
             onChange={(e) => setToDate(e.target.value)}
             className="border p-3 rounded focus:ring-2 focus:ring-blue-400"
           />
+          
+
+          
         </div>
 
-        {/* Total Expense Card */}
-
-        <div className="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Filtered Total Expense</h2>
-
-          <span className="text-2xl font-bold text-green-600">
-            ₹ {totalExpense}
-          </span>
+          
         </div>
 
         {/* Expense Table */}
