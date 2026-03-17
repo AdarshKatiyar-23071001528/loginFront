@@ -1,59 +1,79 @@
-
-
-import React, { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import AppContext from '../Context/AppContext';
-import { FaUser, FaLock } from "react-icons/fa";
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaLock, FaUser } from "react-icons/fa";
+import AppContext from "../Context/AppContext";
 
 const TeacherLogin = () => {
-    const navigate = useNavigate();
-    const {teacherLogin} = useContext(AppContext);
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
-    const onChangeHandler = (e) =>{
-        const {name,value} = e.target;
-        setFormData({...formData,[name]:value});
+  const navigate = useNavigate();
+  const { teacherLogin } = useContext(AppContext);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const result = await teacherLogin(formData.email, formData.password);
+    if (result.success) {
+      navigate(`/teacher/dash/${result.teacher._id}`);
     }
-    const {email,password} = formData;
-    const submitHandler = async(e) => {
-        e.preventDefault();
-        const result = await teacherLogin(email,password);
-        if(result.success) {
-            navigate(`/teacher/dash/${result.teacher._id}`);
-        }
-    }
-
-
-
-
-
-
+  };
 
   return (
-       <div className='TeacherLoginContainer h-full w-full  flex  justify-center items-center '>
-                        <div className='h-[200px] w-[300px]
-                        md:h-[200px] md:w-[300px]  flex flex-col justify-center items-center gap-2'>
-                          <form action="" onSubmit={ submitHandler} className='h-[200px] w-[300px]
-                        md:h-[200px] md:w-[300px]  flex flex-col justify-center items-center gap-2'>
-                            <p className="text-3xl font-bold">Teacher</p>
-                            <div className='flex border-bottom border-black gap-2 w-[70%]'> <FaUser className='mt-2' />
-                              <input type="email" name="email" id="email" value={formData.email} onChange={onChangeHandler} placeholder='Enter Email' className='outline-none p-1 w-[70%] bg-transparent' /></div>
-                
-                
-                            <div className='flex gap-2 w-[70%] border-bottom border-black'>
-                              <FaLock className='mt-2' />
-                              <input type="password" name="password" value={formData.password} onChange={onChangeHandler} placeholder='Enter Password' className='outline-none bg-transparent p-1  w-[70%]' />
-                            </div>
-                
-                
-                            <button type="submit" className='bg-green-400 px-4 py-2 rounded font-bold mt-2'>Submit</button>
-                          </form>
-                
-                        </div>
-                      </div>
-  )
-}
+    <form onSubmit={submitHandler} className="w-full space-y-4">
+      <div className="text-center">
+        <div className="text-xl font-semibold text-slate-900">Faculty</div>
+        <div className="mt-1 text-sm text-slate-600">Sign in to continue</div>
+      </div>
 
-export default TeacherLogin
+      <div>
+        <label className="ui-label" htmlFor="teacher-email">
+          Email
+        </label>
+        <div className="relative mt-2">
+          <FaUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            id="teacher-email"
+            name="email"
+            value={formData.email}
+            onChange={onChangeHandler}
+            type="email"
+            className="ui-input pl-10"
+            placeholder="name@example.com"
+            autoComplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="ui-label" htmlFor="teacher-password">
+          Password
+        </label>
+        <div className="relative mt-2">
+          <FaLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            id="teacher-password"
+            name="password"
+            value={formData.password}
+            onChange={onChangeHandler}
+            type="password"
+            className="ui-input pl-10"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
+        </div>
+      </div>
+
+      <button type="submit" className="ui-btn ui-btn-primary w-full justify-center py-2.5">
+        Sign in
+      </button>
+    </form>
+  );
+};
+
+export default TeacherLogin;
+

@@ -73,7 +73,7 @@ const CreateExpense = () => {
               value={form.amount}
               onChange={handleChange}
               required
-              className="w-[100px] scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
+              className="w-[100px] scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
             />
           </div>
 
@@ -84,7 +84,7 @@ const CreateExpense = () => {
               placeholder="Expense Name"
               value={form.name}
               onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
+              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
             />
           </div>
 
@@ -95,7 +95,7 @@ const CreateExpense = () => {
               placeholder="Paid To"
               value={form.paidTo}
               onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border" 
+              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border" 
             />
           </div>
 
@@ -106,7 +106,7 @@ const CreateExpense = () => {
               placeholder="Paid By"
               value={form.paidBy}
               onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
+              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
             />
           </div>
 
@@ -115,7 +115,7 @@ const CreateExpense = () => {
               name="mode"
               value={form.mode}
               onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
+              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
             >
               <option value="">Payment Mode</option>
               <option value="Cash">Cash</option>
@@ -130,7 +130,7 @@ const CreateExpense = () => {
               placeholder="Remark"
               value={form.remark}
               onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 text-decoration-none rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
+              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
             />
           </div>
 

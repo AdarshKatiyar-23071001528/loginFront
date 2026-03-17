@@ -1,57 +1,79 @@
-import React, { useContext, useState } from 'react'
-import { FaUser, FaLock } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
-import AppContext from '../Context/AppContext';
-import Login from '../../Users/Login';
-const StudentLogin = () => {
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaLock, FaUser } from "react-icons/fa";
+import AppContext from "../Context/AppContext";
 
+const StudentLogin = () => {
   const navigate = useNavigate();
-  const{studentLogin} = useContext(AppContext);
-  const [FormData, setFormData] = useState({
-    email:"",
-    password:""
-  });
+  const { studentLogin } = useContext(AppContext);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+
   const onChangeHandler = (e) => {
-    const {name , value} = e.target;
-    setFormData({...FormData, [name] : value});
-  }
-  const {email, password} = FormData;
-  const submithandler = async(e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    const result = await studentLogin(email, password);
-    if(result.success){
+    const result = await studentLogin(formData.email, formData.password);
+    if (result.success) {
       navigate(`/student/dash?id=${result.student._id}`);
     }
-  }
-
-
+  };
 
   return (
-    <>
-      <div className='studentLoginContainer h-full w-full  flex  justify-center items-center '>
-        <div className='h-[200px] w-[300px]
-        md:h-[200px] md:w-[300px]  rounded-lg flex flex-col justify-center items-center gap-1'>
-          <form action="" onSubmit={ submithandler} className='h-[200px] w-[300px]
-        md:h-[200px] md:w-[300px]  rounded-lg  flex flex-col justify-center items-center gap-2'>
-            <p className="text-3xl font-bold">Student</p>
-            <div className='flex border-bottom border-black gap-2 w-[70%]'> <FaUser className='mt-2' />
-              <input type="email" name="email" id="email" value={FormData.email} onChange={onChangeHandler} placeholder='Enter Email' className='outline-none p-1 w-[70%] bg-trancparent' /></div>
+    <form onSubmit={submitHandler} className="w-full space-y-4">
+      <div className="text-center">
+        <div className="text-xl font-semibold text-slate-900">Student</div>
+        <div className="mt-1 text-sm text-slate-600">Sign in to continue</div>
+      </div>
 
-
-            <div className='flex gap-2 w-[70%] border-bottom border-black'>
-              <FaLock className='mt-2' />
-              <input type="password" name="password" value={FormData.password} onChange={onChangeHandler} placeholder='Enter Password' className='outline-none bg-transparent p-1  w-[70%]' />
-            </div>
-
-
-            <button type="submit" className='bg-green-400 px-4 py-2 rounded font-bold mt-2'>Submit</button>
-          </form>
-
+      <div>
+        <label className="ui-label" htmlFor="student-email">
+          Email
+        </label>
+        <div className="relative mt-2">
+          <FaUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            id="student-email"
+            name="email"
+            value={formData.email}
+            onChange={onChangeHandler}
+            type="email"
+            className="ui-input pl-10"
+            placeholder="name@example.com"
+            autoComplete="email"
+            required
+          />
         </div>
       </div>
-    </>
 
-  )
-}
+      <div>
+        <label className="ui-label" htmlFor="student-password">
+          Password
+        </label>
+        <div className="relative mt-2">
+          <FaLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            id="student-password"
+            name="password"
+            value={formData.password}
+            onChange={onChangeHandler}
+            type="password"
+            className="ui-input pl-10"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
+        </div>
+      </div>
 
-export default StudentLogin
+      <button type="submit" className="ui-btn ui-btn-primary w-full justify-center py-2.5">
+        Sign in
+      </button>
+    </form>
+  );
+};
+
+export default StudentLogin;
+

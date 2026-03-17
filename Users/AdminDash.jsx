@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect, act } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
+  FaBars,
+  FaChevronLeft,
   FaHome,
-  FaMoneyBillAlt,
-  FaTrash,
-  FaEdit,
   FaMoneyBillWave,
   FaBook,
   FaBell,
@@ -12,19 +11,11 @@ import {
 } from "react-icons/fa";
 import { PiStudent } from "react-icons/pi";
 
-import { FcMoneyTransfer } from "react-icons/fc";
-import AppContext from "../src/Context/AppContext";
 import api from "../src/api/axios";
 import StudentRegister from "../src/Student/StudentRegister";
 import SubjectManagement from "./SubjectManagement";
 import TeacherRegister from "../src/Teacher/TeacherRegister";
-import AllStudents from "./AllStudents";
-import PaymentChart from "./PaymentChart";
-import TotalStudent from "./TotalStudent";
-import AllTeachers from "./AllTeachers";
-import TodayCollection from "./TodayCollection";
-import { Navigate, useNavigate } from "react-router-dom";
-import Box from "./Box";
+import { useNavigate } from "react-router-dom";
 import { CiLogout } from "react-icons/ci";
 import Expense from "../src/Expenses/Expense";
 import All from "../src/Expenses/All";
@@ -36,7 +27,6 @@ import History from "../Payment/History";
 import PendingRequest from "../Payment/PendingRequest";
 import SendMessage from "../Message/SendMessage";
 import NoticeManagement from "../Notice/NoticeManagement";
-import CreateExpense from "../src/Expenses/CreateExp";
 import StudentDash from "../src/StudentForAdmin/StudentDash";
 import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 
@@ -46,6 +36,7 @@ import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 const AdminDash = () => {
   let navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectStudent, setSelectStudent] = useState(false);
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
@@ -91,6 +82,60 @@ const AdminDash = () => {
       fetchAllTeachers();
     }
   }, [activePage]);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [activePage, subActivePage]);
+
+  const pageTitle = useMemo(() => {
+    if (activePage === "home") return "Dashboard";
+    if (activePage === "student") return subActivePage ? `Students • ${subActivePage}` : "Students";
+    if (activePage === "teacher") return subActivePage ? `Teachers • ${subActivePage}` : "Teachers";
+    if (activePage === "payment") return subActivePage ? `Payments • ${subActivePage}` : "Payments";
+    if (activePage === "expenses") return "Expenses";
+    if (activePage === "subjects") return "Subjects";
+    if (activePage === "notice") return "Notice";
+    if (activePage === "message") return "Message";
+    return "Admin";
+  }, [activePage, subActivePage]);
+
+  const handleNav = (page, subPage) => {
+    setActivePage(page);
+    if (subPage !== undefined) setSubActivePage(subPage);
+    setMobileNavOpen(false);
+  };
+
+  const NavItem = ({ active, icon: Icon, label, onClick, right, showLabel = sidebarOpen }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+        active ? "bg-slate-800 text-white" : "text-slate-200 hover:bg-slate-800/70 hover:text-white"
+      }`}
+    >
+      <span className="shrink-0">
+        <Icon />
+      </span>
+      {showLabel && <span className="flex-1 text-left">{label}</span>}
+      {showLabel && right}
+    </button>
+  );
+
+  const SubItem = ({ active, label, onClick }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full rounded-md px-3 py-2 text-left text-sm transition ${
+        active ? "bg-slate-800/60 text-white" : "text-slate-300 hover:bg-slate-800/40 hover:text-white"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
+  const Card = ({ children, className = "" }) => (
+    <div className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>{children}</div>
+  );
 
   // Fetch all students
   const fetchAllStudents = async () => {
@@ -378,312 +423,346 @@ const AdminDash = () => {
   };
 
   return (
-    <>
-      <div className="adminDashboard h-full w-full flex flex-col">
-        <div className="h-[100%] flex w-full items-center justify-center">
-          <div className="AdminPannel bg-gray-600 pt-4 w-[300px] text-white h-[100%] shadow-lg rounded-r-lg">
-            <p className="font-bold text-xl opacity-75 p-2 text-grey-400 ">
-              Admin
-            </p>
-            <ul className="flex flex-col gap-2">
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "home" && "bg-blue-300"}`}
-                onClick={() => setActivePage("home")}
-              >
-                {" "}
-                <FaHome /> Home
-              </li>
-              <li>
-                <div
-                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "student" && "bg-blue-300"}`}
-                  onClick={() => {
-                    setActivePage("student");
-                    setSubActivePage("all Student");
-                  }}
-                >
-                  {" "}
-                  <PiStudent /> Student
+    <div className="min-h-screen bg-slate-50">
+      {/* Mobile sidebar */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            className="absolute inset-0 bg-black/40"
+            aria-label="Close navigation"
+          />
+          <aside className="absolute left-0 top-0 h-full w-72 bg-slate-900 text-slate-100 border-r border-slate-800 p-3">
+            <div className="flex items-center justify-between px-2 py-2">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">A</div>
+                <div>
+                  <div className="font-semibold leading-5">Admin Panel</div>
+                  <div className="text-xs text-slate-400">ERP Dashboard</div>
                 </div>
-                {activePage === "student" && (
-                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("all Student")}
-                    >
-                      {" "}
-                      Student Record
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "add Student" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("add Student")}
-                    >
-                      {" "}
-                      Add Student
-                    </li>
-                   
-                
-                  </ul>
-                )}
-              </li>
-
-              {/* Teacher Option */}
-              <li>
-                <div
-                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "teacher" && "bg-blue-300"}`}
-                  onClick={() => {
-                    setActivePage("teacher");
-                    setSubActivePage("all Teacher");
-                  }}
-                >
-                  {" "}
-                  <FaUserGraduate /> Teacher
-                </div>
-
-                {activePage === "teacher" && (
-                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "all Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("all Teacher")}
-                    >
-                      {" "}
-                      All Teachers
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "add Teacher" && "text-yellow-400"}`}
-                      onClick={() => setSubActivePage("add Teacher")}
-                    >
-                      {" "}
-                      Add Teacher
-                    </li>
-                  
-                  </ul>
-                )}
-              </li>
-              {/* Payment Option */}
-              <li>
-                <div
-                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "payment" && "bg-blue-300"}`}
-                  onClick={() => {
-                    setActivePage("payment");
-                    setSubActivePage("Dashboard");
-                  }}
-                >
-                  {" "}
-                  <FaMoneyBillWave /> Payment
-                </div>
-                {activePage === "payment" && (
-                  <ul className="pl-6 mt-2 flex flex-col gap-2 text-sm">
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Dashboard" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Dashboard")}
-                    >
-                      {" "}
-                      Dashboard
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "Pay Fees" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("Pay Fees")}
-                    >
-                      {" "}
-                      Pay Fees
-                    </li>
-
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "received Payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("received Payments")}
-                    >
-                      {" "}
-                      Payment History
-                    </li>
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending payments" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("pending payments")}
-                    >
-                      {" "}
-                      Pending Payments
-                    </li>
-                   
-                    <li
-                      className={`cursor-pointer hover:text-yellow-400 ${subActivePage === "pending requests" ? "text-yellow-400" : ""}`}
-                      onClick={() => setSubActivePage("pending requests")}
-                    >
-                      {" "}
-                      Pending Payments Request
-                    </li>
-                  </ul>
-                )}
-              </li>
-              {/* Expense option */}
-              <li>
-                <div
-                  className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "expenses" && "bg-blue-300"}`}
-                  onClick={() => {
-                    setActivePage("expenses");
-    
-                  }}
-                >
-                  {" "}
-                  <FaMoneyBillWave /> Expenses{" "}
-                </div>
-
-                
-              </li>
-
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "subjects" && "bg-blue-300"}`}
-                onClick={() => setActivePage("subjects")}
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(false)}
+                className="p-2 rounded-lg hover:bg-slate-800"
+                aria-label="Close"
               >
-                {" "}
-                <FaBook /> Subjects
-              </li>
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "notice" && "bg-blue-300"}`}
-                onClick={() => setActivePage("notice")}
-              >
-                {" "}
-                <FaBell /> Notice
-              </li>
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg ${activePage === "message" && "bg-blue-300"}`}
-                onClick={() => setActivePage("message")}
-              >
-                {" "}
-                <FaBell /> Send Message
-              </li>
+                <FaChevronLeft />
+              </button>
+            </div>
+            <div className="mt-3 space-y-1">
+              <NavItem showLabel active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
 
-              <li
-                className={`hover:bg-blue-300 flex text-center items-center gap-2 p-2 rounded-l-lg font-bold text-red-400`}
-                onClick={() => navigate("/")}
-              >
-                {" "}
-                <CiLogout /> Logout
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex-1 flex flex-col transition-all duration-300 w-full h-[100%]">
-            {/* Message Alert */}
-
-            {/* ================= Right Side Content ================= */}
-            <div
-              className={`flex-1 flex flex-col transition-all duration-300 w-full overflow-scroll`}
-            >
-              {/* Message Alert */}
-              {/* {message && (
-                <div className="bg-blue-500 text-white p-3 text-center sticky top-0 z-10">
-                  {message}
+              <NavItem
+                showLabel
+                active={activePage === "student"}
+                icon={PiStudent}
+                label="Students"
+                onClick={() => handleNav("student", "all Student")}
+                right={
+                  studentInCollege ? (
+                    <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{studentInCollege}</span>
+                  ) : null
+                }
+              />
+              {activePage === "student" && (
+                <div className="ml-8 space-y-1">
+                  <SubItem active={subActivePage === "all Student"} label="Student Record" onClick={() => handleNav("student", "all Student")} />
+                  <SubItem active={subActivePage === "add Student"} label="Add Student" onClick={() => handleNav("student", "add Student")} />
                 </div>
-              )} */}
+              )}
 
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-2  w-full">
-                {activePage === "home" && (
-                  <div className="h-full w-full flex flex-col gap-4">
-                    <div className="bg-white rounded shadow">
-                      <FinanceGraph />
-                    </div>
-                       <div className="bg-white rounded shadow">
-                      < Dashboard/>
-                    </div>
-                    <div className="bg-white rounded shadow">
-                      <Expense />
-                    </div>
-                    
-                  </div>
-                )}
+              <NavItem
+                showLabel
+                active={activePage === "teacher"}
+                icon={FaUserGraduate}
+                label="Teachers"
+                onClick={() => handleNav("teacher", "all Teacher")}
+                right={
+                  totalTeacherInCollege ? (
+                    <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{totalTeacherInCollege}</span>
+                  ) : null
+                }
+              />
+              {activePage === "teacher" && (
+                <div className="ml-8 space-y-1">
+                  <SubItem active={subActivePage === "all Teacher"} label="Teacher Record" onClick={() => handleNav("teacher", "all Teacher")} />
+                  <SubItem active={subActivePage === "add Teacher"} label="Add Teacher" onClick={() => handleNav("teacher", "add Teacher")} />
+                </div>
+              )}
 
-                {/* ========== STUDENT PAGES ========== */}
-                {activePage === "student" &&
-                  subActivePage === "all Student" && (
-                    
-                    <StudentDash/>
-                    
-                  )}
+              <NavItem showLabel active={activePage === "payment"} icon={FaMoneyBillWave} label="Payments" onClick={() => handleNav("payment", "Dashboard")} />
+              {activePage === "payment" && (
+                <div className="ml-8 space-y-1">
+                  <SubItem active={subActivePage === "Dashboard"} label="Dashboard" onClick={() => handleNav("payment", "Dashboard")} />
+                  <SubItem active={subActivePage === "Pay Fees"} label="Pay Fees" onClick={() => handleNav("payment", "Pay Fees")} />
+                  <SubItem active={subActivePage === "received Payments"} label="Payment History" onClick={() => handleNav("payment", "received Payments")} />
+                  <SubItem active={subActivePage === "pending payments"} label="Pending Payments" onClick={() => handleNav("payment", "pending payments")} />
+                  <SubItem active={subActivePage === "pending requests"} label="Pending Requests" onClick={() => handleNav("payment", "pending requests")} />
+                </div>
+              )}
 
-                {activePage === "student" &&
-                  subActivePage === "add Student" && (
-                    <div className="w-full">
-                      <StudentRegister
-                        onSuccess={() => {
-                          setActivePage("all Student");
-                          fetchAllStudents();
-                        }}
-                      />
-                    </div>
-                  )}
+              <NavItem showLabel active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
+              <NavItem showLabel active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
+              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => handleNav("notice")} />
+              <NavItem showLabel active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
 
-               
-
-                {/* ========== TEACHER PAGES ========== */}
-                {activePage === "teacher" &&
-                  subActivePage === "all Teacher" && (
-                    <TeacherDash/>
-                  )}
-{/* add teacher */}
-                {activePage === "teacher" &&
-                  subActivePage === "add Teacher" && (
-                    <div className="w-full">
-                      <TeacherRegister
-                        onSuccess={() => {
-                          setActivePage("all Teacher");
-                          fetchAllTeachers();
-                        }}
-                      />
-                    </div>
-                  )}
- 
-
-                {/* ========== PAYMENT MANAGEMENT ========== */}
-                {activePage === "payment" && subActivePage === "Dashboard" && (
-                  <div className="bg-white p-4 rounded-lg shadow-md w-full">
-                    {loading ? <p>Loading payments...</p> : <Dashboard />}
-                  </div>
-                )}
-
-                {activePage === "payment" &&
-                  subActivePage === "pending requests" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <PendingRequest />
-                    </div>
-                  )}
-
-                {activePage === "payment" &&
-                  subActivePage === "received Payments" && (
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <History />
-                    </div>
-                  )}
-
-                {activePage === "payment" &&
-                  subActivePage === "pending payments" && <PendingPayment />}
-
-                {activePage === "payment" && subActivePage === "Pay Fees" && (
-                  <All_Payment />
-                )}
-
-              
-
-                {activePage === "subjects" && <SubjectManagement />}
-
-                {activePage === "expenses" && (
-                  <div className="ml-[250px] gap-4 flex flex-col  ">
-                    <Expense />
-                      <All/>
-                  </div>
-                )}
-
-         
-
-                {activePage === "notice" && <NoticeManagement />}
-                {activePage === "message" && <SendMessage />}
+              <div className="pt-2 mt-2 border-t border-slate-800">
+                <NavItem showLabel active={false} icon={CiLogout} label="Logout" onClick={() => navigate("/")} />
               </div>
             </div>
+          </aside>
+        </div>
+      )}
 
-           
+      <div className="flex min-h-screen">
+        {/* Desktop sidebar */}
+        <aside
+          className={`hidden md:flex flex-col bg-slate-900 text-slate-100 border-r border-slate-800 transition-all duration-200 ${
+            sidebarOpen ? "w-72" : "w-20"
+          }`}
+        >
+          <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">A</div>
+              {sidebarOpen && (
+                <div className="min-w-0">
+                  <div className="font-semibold leading-5 truncate">Admin Panel</div>
+                  <div className="text-xs text-slate-400 truncate">ERP Dashboard</div>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((v) => !v)}
+              className="p-2 rounded-lg hover:bg-slate-800"
+              aria-label="Toggle sidebar"
+            >
+              <FaChevronLeft className={`${sidebarOpen ? "" : "rotate-180"} transition`} />
+            </button>
           </div>
+
+          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+            <NavItem active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
+
+            <NavItem
+              active={activePage === "student"}
+              icon={PiStudent}
+              label="Students"
+              onClick={() => handleNav("student", "all Student")}
+              right={
+                studentInCollege ? (
+                  <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{studentInCollege}</span>
+                ) : null
+              }
+            />
+            {sidebarOpen && activePage === "student" && (
+              <div className="ml-8 space-y-1">
+                <SubItem active={subActivePage === "all Student"} label="Student Record" onClick={() => handleNav("student", "all Student")} />
+                <SubItem active={subActivePage === "add Student"} label="Add Student" onClick={() => handleNav("student", "add Student")} />
+              </div>
+            )}
+
+            <NavItem
+              active={activePage === "teacher"}
+              icon={FaUserGraduate}
+              label="Teachers"
+              onClick={() => handleNav("teacher", "all Teacher")}
+              right={
+                totalTeacherInCollege ? (
+                  <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{totalTeacherInCollege}</span>
+                ) : null
+              }
+            />
+            {sidebarOpen && activePage === "teacher" && (
+              <div className="ml-8 space-y-1">
+                <SubItem active={subActivePage === "all Teacher"} label="Teacher Record" onClick={() => handleNav("teacher", "all Teacher")} />
+                <SubItem active={subActivePage === "add Teacher"} label="Add Teacher" onClick={() => handleNav("teacher", "add Teacher")} />
+              </div>
+            )}
+
+            <NavItem active={activePage === "payment"} icon={FaMoneyBillWave} label="Payments" onClick={() => handleNav("payment", "Dashboard")} />
+            {sidebarOpen && activePage === "payment" && (
+              <div className="ml-8 space-y-1">
+                <SubItem active={subActivePage === "Dashboard"} label="Dashboard" onClick={() => handleNav("payment", "Dashboard")} />
+                <SubItem active={subActivePage === "Pay Fees"} label="Pay Fees" onClick={() => handleNav("payment", "Pay Fees")} />
+                <SubItem active={subActivePage === "received Payments"} label="Payment History" onClick={() => handleNav("payment", "received Payments")} />
+                <SubItem active={subActivePage === "pending payments"} label="Pending Payments" onClick={() => handleNav("payment", "pending payments")} />
+                <SubItem active={subActivePage === "pending requests"} label="Pending Requests" onClick={() => handleNav("payment", "pending requests")} />
+              </div>
+            )}
+
+            <NavItem active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
+            <NavItem active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
+            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => handleNav("notice")} />
+            <NavItem active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
+          </nav>
+
+          <div className="p-3 border-t border-slate-800">
+            <NavItem active={false} icon={CiLogout} label="Logout" onClick={() => navigate("/")} />
+          </div>
+        </aside>
+
+        {/* Main */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-20">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+                aria-label="Open navigation"
+              >
+                <FaBars />
+              </button>
+              <div className="min-w-0">
+                <h1 className="text-lg font-semibold text-slate-900 truncate">{pageTitle}</h1>
+                <p className="text-xs text-slate-500 truncate">Manage students, teachers, payments and notices</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleNav("home")}
+                className="hidden sm:inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
+              >
+                <FaHome />
+                Home
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 text-red-600"
+              >
+                <CiLogout />
+                Logout
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 p-4">
+            <div className="max-w-7xl mx-auto space-y-4">
+              {message && (
+                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 flex items-start justify-between gap-4">
+                  <span className="leading-5">{message}</span>
+                  <button type="button" onClick={() => setMessage("")} className="text-blue-900/70 hover:text-blue-900">
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              {activePage === "home" && (
+                <div className="flex flex-col">
+                  {/* <Card className="xl:col-span-2 p-3"> */}
+                    <FinanceGraph />
+                  {/* </Card> */}
+                  {/* <Card className="p-3"> */}
+                    <Dashboard />
+                  {/* </Card> */}
+                  {/* <Card className="p-3"> */}
+                    <Expense />
+                  {/* </Card> */}
+                </div>
+              )}
+
+              {activePage === "student" && subActivePage === "all Student" && (
+                <Card className="p-3">
+                  <StudentDash />
+                </Card>
+              )}
+
+              {activePage === "student" && subActivePage === "add Student" && (
+                <Card className="p-3">
+                  <StudentRegister
+                    onSuccess={() => {
+                      handleNav("student", "all Student");
+                      fetchAllStudents();
+                    }}
+                  />
+                </Card>
+              )}
+
+              {activePage === "teacher" && subActivePage === "all Teacher" && (
+                <Card className="p-3">
+                  <TeacherDash />
+                </Card>
+              )}
+
+              {activePage === "teacher" && subActivePage === "add Teacher" && (
+                <Card className="p-3">
+                  <TeacherRegister
+                    onSuccess={() => {
+                      handleNav("teacher", "all Teacher");
+                      fetchAllTeachers();
+                    }}
+                  />
+                </Card>
+              )}
+
+              {activePage === "payment" && subActivePage === "Dashboard" && (
+                <Card className="p-3">
+                  {loading ? <p className="text-sm text-slate-600">Loading payments...</p> : <Dashboard />}
+                </Card>
+              )}
+
+              {activePage === "payment" && subActivePage === "pending requests" && (
+                <Card className="p-3">
+                  <PendingRequest />
+                </Card>
+              )}
+
+              {activePage === "payment" && subActivePage === "received Payments" && (
+                <Card className="p-3">
+                  <History />
+                </Card>
+              )}
+
+              {activePage === "payment" && subActivePage === "pending payments" && (
+                <Card className="p-3">
+                  <PendingPayment />
+                </Card>
+              )}
+
+              {activePage === "payment" && subActivePage === "Pay Fees" && (
+                <Card className="p-3">
+                  <All_Payment />
+                </Card>
+              )}
+
+              {activePage === "subjects" && (
+                <Card className="p-3">
+                  <SubjectManagement />
+                </Card>
+              )}
+
+              {activePage === "expenses" && (
+                <div className="grid grid-cols-1 gap-4">
+                  <Card className="p-3">
+                    <Expense />
+                  </Card>
+                  <Card className="p-3">
+                    <All />
+                  </Card>
+                </div>
+              )}
+
+              {activePage === "notice" && (
+                <Card className="p-3">
+                  <NoticeManagement />
+                </Card>
+              )}
+
+              {activePage === "message" && (
+                <Card className="p-3">
+                  <SendMessage />
+                </Card>
+              )}
+            </div>
+          </main>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
