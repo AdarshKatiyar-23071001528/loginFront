@@ -653,16 +653,16 @@ const AdminDash = () => {
               )}
 
               {activePage === "home" && (
-                <div className="flex flex-col">
-                  {/* <Card className="xl:col-span-2 p-3"> */}
+                <div className="flex flex-col gap-4">
+                  <Card className="xl:col-span-2 p-3">
                     <FinanceGraph />
-                  {/* </Card> */}
-                  {/* <Card className="p-3"> */}
+                  </Card>
+                  <Card className="p-3">
                     <Dashboard />
-                  {/* </Card> */}
-                  {/* <Card className="p-3"> */}
+                  </Card>
+                  <Card className="p-3">
                     <Expense />
-                  {/* </Card> */}
+                  </Card>
                 </div>
               )}
 

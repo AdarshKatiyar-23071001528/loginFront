@@ -96,16 +96,16 @@ const Dashboard = () => {
 
   return (
 
-    <div className="p-4 bg-white h-full w-full flex flex-col gap-6 rounded shadow  ">
+    <div className="p-4 bg-white h-full w-full flex flex-col gap-6 rounded shadow-xl  ">
 
       {/* Top Section */}
 
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex justify-between items-center flex-wrap p-3 rounded shadow-md flex-col md:flex-row gap-5 md:gap-0">
 
-        <h1 className="text-2xl font-bold">Fees</h1>
+        <h1 className="text-2xl font-bold text-left md:text-center w-full md:w-fit">Fees</h1>
 
         {/* Filter */}
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-3 flex-wrap w-full justify-end md:w-fit">
 
           <select
             value={type}

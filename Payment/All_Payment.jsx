@@ -109,6 +109,7 @@ try {
   });
 
   if (res.data.success) {
+    console.log(res);
 
     alert("Payment Successful");
 
@@ -331,7 +332,7 @@ return (
 
   {pay && (
 
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center">
 
       <div className="bg-white p-4 rounded-lg w-[450px] relative">
 

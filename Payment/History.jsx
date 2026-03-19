@@ -14,6 +14,7 @@ const History = () => {
   const fetchPayments = async () => {
     try {
       const res = await api.get("/payment/received");
+      console.log(res);
 
       if (res.data.success) {
         setPayments(res.data.data);
@@ -64,6 +65,10 @@ const History = () => {
     (acc, item) => acc + (item.payment?.amount || 0),
     0
   );
+
+
+  
+  
 
   return (
     <div className="bg-gray-100 min-h-screen p-4">
@@ -124,6 +129,7 @@ const History = () => {
                 <th className="p-3 text-left">Payment Method</th>
                 <th className="p-3 text-left">Transaction Id</th>
                 <th className="p-3 text-left">Date</th>
+                
               </tr>
             </thead>
 
@@ -142,11 +148,13 @@ const History = () => {
 
                       <td className="p-3">{item.payment?.paymentMethod}</td>
 
-                      <td className="p-3">{item.payment?.transactionId}</td>
+                      <td className="p-3">{item.payment?._id}</td>
 
                       <td className="p-3">
                         {new Date(item.payment?.paidAt).toLocaleDateString("en-IN")}
                       </td>
+
+                      
                     </tr>
                   )
                 

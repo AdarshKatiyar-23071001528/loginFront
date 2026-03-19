@@ -86,15 +86,15 @@ const FinanceGraph = () => {
 
   return (
     <div className="shadow p-4 rounded relative flex justify-around h-full flex-col w-full  ">
-      <div >
-       <h2 className="text-xl font-semibold mb-4 p-3">
+      <div className="flex justify-between items-center flex-wrap p-3 rounded shadow-md flex-col md:flex-row gap-5 md:gap-0">
+       <h2 className="text-2xl font-bold text-left md:text-center w-full md:w-fit">
         Finance Overview
       </h2>
-      <div className="flex gap-4 mb-4 absolute right-6 top-10">
+      <div className="flex gap-3 flex-wrap w-full justify-end md:w-fit">
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded "
           >
             <option value="month">Month Wise</option>
             <option value="year">Year Wise</option>
@@ -104,7 +104,7 @@ const FinanceGraph = () => {
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="border p-2 rounded"
+              className="border rounded p-2"
             >
               {monthNames.map((m, i) => (
                 <option key={i + 1} value={i + 1}>
@@ -125,12 +125,15 @@ const FinanceGraph = () => {
               </option>
             ))}
           </select>
-        </div>
       </div>
+      </div>
+
+
+      
       <div>
-        <div className="flex justify-between w-[80%] h-full   gap-9 ">
-        <Bar data={chartData} className="w-[80%] pt-4 " />
-        <div className="flex flex-col gap-4 pt-4 ">
+        <div className="flex justify-between md:w-[80%] h-full gap-9 flex-col md:flex-row">
+        <Bar data={chartData} className="md:w-[80%] pt-4 " />
+        <div className="flex  md:flex-col gap-4 pt-4 ">
           <Box name={"Fees Collection"} value={totalFees} />
           <Box name={"Expense"} value={totalExpense} />
           <Box name={"Profit"} value={totalProfit} />

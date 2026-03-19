@@ -86,58 +86,91 @@ const Expense = () => {
     }
   }
 
-  const chartData = {
-    labels: graph.labels,
-    datasets:[
-      {
-        label:"Daily Expense",
-        data: graph.values,
-        backgroundColor:"rgba(200,00,0,0.6)",
-        borderRadius:0,
-      }
-    ]
-  };
+  // const chartData = {
+  //   labels: graph.labels,
+  //   datasets:[
+  //     {
+  //       label:"Daily Expense",
+  //       data: graph.values,
+  //       backgroundColor:"rgba(200,00,0,0.6)",
+  //       borderRadius:6,
+  //     }
+  //   ]
+  // };
+
+  // const chartOptions = {
+  //   responsive:true,
+  //   maintainAspectRatio:false,
+  //   plugins:{
+  //     legend:{
+  //       position:"top"
+  //     }
+  //   }
+  // };
+
 
   const chartOptions = {
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{
-      legend:{
-        position:"top"
-      }
-    }
-  };
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: "top",
+    },
+  },
+  scales: {
+    x: {
+      // categoryPercentage: 0.1, // Makes bars thinner
+      // barPercentage: 0.8, // Makes bars thinner
+    },
+    y: {
+      // Configure y-axis if necessary
+    },
+  },
+};
+
+const chartData = {
+  labels: graph.labels,
+  datasets: [
+    {
+      label: "Daily Expense",
+      data: graph.values,
+      backgroundColor: "rgba(200,0,0,0.6)",
+      borderRadius: 0,
+
+      barThickness:50,
+    },
+  ],
+};
 
   if(loading){
     return <p className="p-4 text-lg">Loading...</p>
   }
 
   return (
-    <div className="shadow p-4 rounded relative flex justify-around h-full flex-col">
+   <div className="">
 
-      {/* heading */}
+  {/* heading */}
+  <h1 className="text-2xl font-bold mb-4 p-2">
+    Expense Overview
+  </h1>
 
-      <h1 className="text-2xl font-bold mb-4 p-2">
-        Expense Overview
-      </h1>
+  <div className="h-full flex flex-col md:flex-row gap-9">
 
+    {/* Chart section */}
+    <div className="md:w-4/3 w-full mb-4 md:mb-0">
+      <Bar data={chartData} options={chartOptions} />
+    </div>
 
-     
-     
+    {/* Box section */}
+    <div className="flex md:flex-col md:w-1/3 w-full space-y-4 md:space-y-0 md:ml-4 gap-4">
+      <Box title="Month Expense" value={`${monthExpense}`} name={"Month Expense"} />
+      <Box title="Today Expense" value={`${todayExpense}`} name={"Today Expense"} />
+    </div>
 
-
-          <div>
-        <div className="flex justify-between w-[80%] h-full   gap-9 ">
-        <Bar data={chartData} options={chartOptions} className="w-[80%] pt-4 " />
-        <div className="flex flex-col gap-4 pt-4 ">
-           <Box title="Month Expense" value={`${monthExpense}`} name={"Month Expense"}/>
-          <Box title="Today Expense" value={`${todayExpense}`} name={"Today Expense"}/>
-        </div>
-      </div>
-      </div>
+  </div>
+</div>
         
 
-      </div>
 
    
   )
