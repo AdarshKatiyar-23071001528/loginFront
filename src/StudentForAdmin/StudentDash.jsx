@@ -218,7 +218,7 @@ const handlePrintStudent = (student) => {
       <img class="logo" src="${logoUrl}" />
 
       <div class="college">
-        <h1>Shakuntala Krishan Institute of Technology</h1>
+        <h1>Shakuntala Krishana Institute of Technology</h1>
         <p>Affiliated to CSJMU University</p>
         <p>Kanpur Dehat, Uttar Pradesh</p>
       </div>
