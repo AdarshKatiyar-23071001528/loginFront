@@ -32,6 +32,7 @@ const History = () => {
   // 🔎 Filter Logic
   const filteredPayment = payments.filter((item) => {
     const payment = item.payment;
+    const paymentId = String(payment?.transactionId || payment?._id || "");
 
     const nameMatch =
       !search ||
@@ -39,8 +40,8 @@ const History = () => {
 
     const idMatch =
       !transactionFilter ||
-      payment?.transactionId
-        ?.toLowerCase()
+      paymentId
+        .toLowerCase()
         .includes(transactionFilter.toLowerCase());
 
     const itemDate = new Date(payment?.paidAt);
@@ -148,7 +149,9 @@ const History = () => {
 
                       <td className="p-3">{item.payment?.paymentMethod}</td>
 
-                      <td className="p-3">{item.payment?._id}</td>
+                      <td className="p-3">
+                        {item.payment?.transactionId || item.payment?._id}
+                      </td>
 
                       <td className="p-3">
                         {new Date(item.payment?.paidAt).toLocaleDateString("en-IN")}
