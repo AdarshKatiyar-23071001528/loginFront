@@ -3,24 +3,26 @@ import AppContext from './AppContext'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../api/axios';
-import { useLocation } from 'react-router-dom';
+import { setAuthToken, clearAuthToken } from "../utils/auth";
 
 const AppState = (props) => {
 
     // const url = 'http://localhost:1000/api/user'
     const[Users,setUsers] = useState([])
     const [userLogin, setUserLogin] = useState(false)
-    const data = 10;
     useEffect(()=>{
         const fetchUser = async() =>{
-            const res = await api.get(`user/allUser`,{
-                headers:{
-                    "Content-Type":"Application/json"
-                },
-                withCredentials: true
-            })
-            console.log(res.data.alluser);
-            setUsers(res.data.alluser);
+            try {
+                const res = await api.get(`user/allUser`,{
+                    headers:{
+                        "Content-Type":"Application/json"
+                    },
+                    withCredentials: true
+                })
+                setUsers(res.data.alluser || []);
+            } catch (error) {
+                console.log(error.message);
+            }
         }
         fetchUser();
     },[])
@@ -45,6 +47,11 @@ const AppState = (props) => {
                 },
                 withCredentials: true
             })
+            if (res.data.success && res.data.token) {
+                setAuthToken(res.data.token);
+            } else {
+                clearAuthToken();
+            }
             setUserLogin(res.data.success);
           alert(res.data.message);
           return res.data;
@@ -67,6 +74,11 @@ const AppState = (props) => {
         },
         withCredentials: true
     })
+    if (res.data.success && res.data.token) {
+        setAuthToken(res.data.token);
+    } else {
+        clearAuthToken();
+    }
     alert(res.data.message);
     return res.data;
     }
@@ -76,6 +88,11 @@ const AppState = (props) => {
         headers:{ 'Content-Type': "Application/json" },
         withCredentials: true
       });
+      if (res.data.success && res.data.token) {
+        setAuthToken(res.data.token);
+      } else {
+        clearAuthToken();
+      }
       alert(res.data.message);
       return res.data;
     }

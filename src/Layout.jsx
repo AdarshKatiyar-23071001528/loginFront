@@ -1,25 +1,21 @@
-import React from 'react'
-import AppContext from './Context/AppContext';
-import { useContext } from 'react';
-import AllUsers from '../Users/AllUsers';
-import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
-import Register from '../Users/Register';
+import React, { Suspense, lazy } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Nav from '../Nav/Nav';
-import Login from '../Users/Login';
-import Home from '../Home/Home';
-import Course from '../Parts/Course';
-import Carrer from '../Parts/Carrer';
-import Contact from '../Parts/Contact';
-import MultiLogin from '../Users/MultiLogin';
-import Adminlog from '../Users/Adminlog';
-import Teacherlog from '../Users/Teacherlog';
-import Studentlog from '../Users/Studentlog';
-import StudentRegister from './Student/StudentRegister';
-import StudentLogin from './Student/StudentLogin';
-import AdminDash from '../Users/AdminDash';
-import TeacherDash from '../Users/TeacherDash';
-import StudentDash from './Student/StudentDash';
-import TeacherDashboard from './Teacher/TeacherDashboard';
+
+const Home = lazy(() => import('../Home/Home'));
+const AllUsers = lazy(() => import('../Users/AllUsers'));
+const Register = lazy(() => import('../Users/Register'));
+const Course = lazy(() => import('../Parts/Course'));
+const Carrer = lazy(() => import('../Parts/Carrer'));
+const Contact = lazy(() => import('../Parts/Contact'));
+const MultiLogin = lazy(() => import('../Users/MultiLogin'));
+const Login = lazy(() => import('../Users/Login'));
+const Teacherlog = lazy(() => import('../Users/Teacherlog'));
+const StudentRegister = lazy(() => import('./Student/StudentRegister'));
+const StudentLogin = lazy(() => import('./Student/StudentLogin'));
+const AdminDash = lazy(() => import('../Users/AdminDash'));
+const StudentDash = lazy(() => import('./Student/StudentDash'));
+const TeacherDashboard = lazy(() => import('./Teacher/TeacherDashboard'));
 
 
 const Layout = () => {
@@ -35,23 +31,25 @@ const Layout = () => {
     <>
       {!hideNav && <Nav />}
 
-      <Routes>
-        <Route path='/' element={<Home/>} />
-        <Route path='/users' element={<AllUsers/>}/>
-        <Route path='/register' element={<Register/>}/>
-        <Route path='/course' element={<Course/>} />
-        <Route path='/carrer' element={<Carrer/>} />
-        <Route path='/contact' element={<Contact/>} />
-        <Route path='/login' element={<MultiLogin/>} />
-        <Route path='/admin/login' element={<Login/>} />
-        <Route path='/faculty/login' element={<Teacherlog/>} />
-        <Route path='/student/login' element={<StudentLogin/>} />
-        <Route path='/student/register' element={<StudentRegister/>} /> 
-        <Route path="/admin/dash" element={<AdminDash/>} />
-        <Route path="/student/dash" element={<StudentDash/>} />
-        <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
-        <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
-      </Routes>
+      <Suspense fallback={<div className='min-h-[40vh] flex items-center justify-center text-lg font-medium text-slate-600'>Loading...</div>}>
+        <Routes>
+          <Route path='/' element={<Home/>} />
+          <Route path='/users' element={<AllUsers/>}/>
+          <Route path='/register' element={<Register/>}/>
+          <Route path='/course' element={<Course/>} />
+          <Route path='/carrer' element={<Carrer/>} />
+          <Route path='/contact' element={<Contact/>} />
+          <Route path='/login' element={<MultiLogin/>} />
+          <Route path='/admin/login' element={<Login/>} />
+          <Route path='/faculty/login' element={<Teacherlog/>} />
+          <Route path='/student/login' element={<StudentLogin/>} />
+          <Route path='/student/register' element={<StudentRegister/>} /> 
+          <Route path="/admin/dash" element={<AdminDash/>} />
+          <Route path="/student/dash" element={<StudentDash/>} />
+          <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
+          <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
+        </Routes>
+      </Suspense>
     </>
   );
 };

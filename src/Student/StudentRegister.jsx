@@ -32,9 +32,11 @@ const StudentRegister = () => {
     post: '',
     district: '',
     landmark: '',
-    totalfees: '',
+
     branch:'',
-    reference:""
+    reference:"",
+    fees:"",
+    discount:""
   })
 
   const handleChange = (e) => {
@@ -138,7 +140,9 @@ const StudentRegister = () => {
         landmark: formData.landmark,
         branch : formData.branch,
         reference: formData.reference,
-        totalfees: formData.totalfees ? parseInt(formData.totalfees) : undefined,
+        // totalfees: formData.totalfees ? parseInt(formData.totalfees) : undefined,
+        fees:formData.fees,
+        discount:formData.discount,
       })
 
       if (response.data.success) {
@@ -167,13 +171,12 @@ const StudentRegister = () => {
           post: '',
           district: '',
           landmark: '',
-          totalfees: '',
+          fees:"",
+          discout:"",
           branch:"",
           reference:""
         })
-        setTimeout(() => {
-          navigate('/login')
-        }, 2000)
+       setMessage("Registration Successful");
       } else {
         setMessage(response.data.message || 'Registration failed')
         setMessageType('error')
@@ -410,7 +413,7 @@ const StudentRegister = () => {
                 </div>
               </div>
 
-              <div>
+              {/* <div>
                   <label className='block text-gray-800 font-bold mb-3 text-sm uppercase tracking-wide'>Total Fees</label>
                   <input
                     type='Number'
@@ -421,10 +424,45 @@ const StudentRegister = () => {
                     onBlur={() => setFocusedField(null)}
                     className={inputClasses('totalfees')}
                     placeholder='Total Fees'
-                    // maxLength='10'
+        
                     required
                   />
-                </div>
+              </div> */}
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                <div>
+                  <label className='block text-gray-800 font-semibold mb-2 text-sm'>Fees</label>
+                  <input
+                    type='Number'
+                    name='fees'
+                    value={formData.fees}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('fees')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('fees')}
+                    placeholder='Fees'    
+                    required
+                  />
+              </div>
+
+
+              <div>
+                  <label className='block text-gray-800 font-semibold mb-2 text-sm'>Discount</label>
+                  <input
+                    type='Number'
+                    name='discount'
+                    value={formData.discount}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('discount')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('discount')}
+                    placeholder='Discount'    
+                    required
+                  />
+              </div>
+
+
+              </div>
 
 
               
@@ -554,7 +592,7 @@ const StudentRegister = () => {
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-5 mb-5'>
                 {/* Branch */}
-                <div>
+                {/* <div>
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Branch</label>
                   <input
                     type='text'
@@ -566,6 +604,22 @@ const StudentRegister = () => {
                     className={inputClasses('branch')}
                     placeholder='Branch'
                   />
+                </div> */}
+
+
+                 <div>
+                  <label className='block text-gray-800 font-semibold mb-2 text-sm'>Branch</label>
+                  <select
+                    name='branch'
+                    value={formData.branch}
+                    onChange={handleChange}
+                    className={inputClasses('branch')}
+                  >
+                    <option value='Campus'>Campus</option>
+                    <option value='City'>City</option>
+                    <option value='Vendor'>Vendor</option>
+                    <option value='Other'>Other</option>
+                  </select>
                 </div>
 
                 {/* Refernece */}
@@ -573,7 +627,7 @@ const StudentRegister = () => {
                   <label className='block text-gray-800 font-semibold mb-2 text-sm'>Reference</label>
                   <input
                     type='text'
-                    name='mothername'
+                    name='reference'
                     value={formData.reference}
                     onChange={handleChange}
                     onFocus={() => setFocusedField('reference')}

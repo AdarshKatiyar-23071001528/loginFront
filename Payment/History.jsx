@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import api from "../src/api/axios.js";
+import { printPaymentReceipt } from "./PaymentReceipt";
 
 const History = () => {
   const [payments, setPayments] = useState([]);
-
   const [search, setSearch] = useState("");
   const [transactionFilter, setTransactionFilter] = useState("");
-
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  // Fetch Data
   const fetchPayments = async () => {
     try {
       const res = await api.get("/payment/received");
-      console.log(res);
 
       if (res.data.success) {
-        setPayments(res.data.data);
+        setPayments(res.data.data || []);
       }
     } catch (error) {
       console.log(error.message);
@@ -27,27 +24,24 @@ const History = () => {
   useEffect(() => {
     fetchPayments();
   }, []);
-  const [data, setNewData] = useState([])
 
-  // 🔎 Filter Logic
   const filteredPayment = payments.filter((item) => {
     const payment = item.payment;
     const paymentId = String(payment?.transactionId || payment?._id || "");
 
     const nameMatch =
       !search ||
-      payment?.studentName?.toLowerCase().includes(search.toLowerCase());
+      String(payment?.studentName || item.student?.name || "")
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
     const idMatch =
       !transactionFilter ||
-      paymentId
-        .toLowerCase()
-        .includes(transactionFilter.toLowerCase());
+      paymentId.toLowerCase().includes(transactionFilter.toLowerCase());
 
     const itemDate = new Date(payment?.paidAt);
-
-    let from = fromDate ? new Date(fromDate) : null;
-    let to = toDate ? new Date(toDate) : null;
+    const from = fromDate ? new Date(fromDate) : null;
+    const to = toDate ? new Date(toDate) : null;
 
     if (to) {
       to.setHours(23, 59, 59, 999);
@@ -59,17 +53,19 @@ const History = () => {
     return nameMatch && idMatch && fromMatch && toMatch;
   });
 
-
-
-  // 💰 Total Collection
   const totalAmount = filteredPayment.reduce(
     (acc, item) => acc + (item.payment?.amount || 0),
     0
   );
 
-
-  
-  
+  const handlePrintReceipt = (item) => {
+    printPaymentReceipt({
+      ...item.student,
+      ...item.payment,
+      paymentId: item.payment?.transactionId || item.payment?._id,
+      studentName: item.payment?.studentName || item.student?.name,
+    });
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen p-4">
@@ -78,7 +74,6 @@ const History = () => {
           Received Payments
         </h1>
 
-        {/* Filters */}
         <div className="grid md:grid-cols-4 gap-4 mb-6">
           <input
             type="text"
@@ -111,16 +106,13 @@ const History = () => {
           />
         </div>
 
-        {/* Total Collection */}
         <div className="bg-white shadow rounded p-4 mb-6 flex justify-between items-center">
           <h2 className="text-xl font-semibold">Total Collection</h2>
-
           <span className="text-2xl font-bold text-green-600">
-            ₹ {totalAmount}
+            Rs. {totalAmount}
           </span>
         </div>
 
-        {/* Table */}
         <div className="bg-white shadow rounded overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-200">
@@ -130,37 +122,49 @@ const History = () => {
                 <th className="p-3 text-left">Payment Method</th>
                 <th className="p-3 text-left">Transaction Id</th>
                 <th className="p-3 text-left">Date</th>
-                
+                <th className="p-3 text-left">Receipt</th>
               </tr>
             </thead>
 
             <tbody>
-              {
-                filteredPayment.map((item,index) => (
-                
+              {filteredPayment.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="p-6 text-center">
+                    No Data Found
+                  </td>
+                </tr>
+              ) : (
+                filteredPayment.map((item, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-100">
+                    <td className="p-3">
+                      {item.payment?.studentName || item.student?.name}
+                    </td>
 
-                 
-                    <tr key={index} className="border-b hover:bg-gray-100">
-                      <td className="p-3">{item.payment?.studentName}</td>
+                    <td className="p-3 text-green-600 font-semibold">
+                      Rs. {item.payment?.amount}
+                    </td>
 
-                      <td className="p-3 text-green-600 font-semibold">
-                        ₹ {item.payment?.amount}
-                      </td>
+                    <td className="p-3">{item.payment?.paymentMethod}</td>
 
-                      <td className="p-3">{item.payment?.paymentMethod}</td>
+                    <td className="p-3">
+                      {item.payment?.transactionId || item.payment?._id}
+                    </td>
 
-                      <td className="p-3">
-                        {item.payment?.transactionId || item.payment?._id}
-                      </td>
+                    <td className="p-3">
+                      {new Date(item.payment?.paidAt).toLocaleDateString("en-IN")}
+                    </td>
 
-                      <td className="p-3">
-                        {new Date(item.payment?.paidAt).toLocaleDateString("en-IN")}
-                      </td>
-
-                      
-                    </tr>
-                  )
-                
+                    <td className="p-3">
+                      <button
+                        type="button"
+                        onClick={() => handlePrintReceipt(item)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                      >
+                        Print Receipt
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
