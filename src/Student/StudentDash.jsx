@@ -2,11 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaCalendarAlt, FaFileUpload, FaIdCard, FaMoneyBillWave, FaPhoneAlt } from "react-icons/fa";
 import api from "../api/axios";
+import { CiLogout } from "react-icons/ci";
+import { clearAuthToken } from "../utils/auth";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: FaIdCard },
   { id: "attendance", label: "Attendance", icon: FaCalendarAlt },
   { id: "fees", label: "Fees", icon: FaMoneyBillWave },
+   { id: "logout", label: "Logout", icon: CiLogout },
 ];
 
 const formatDate = (value) => {
@@ -151,7 +154,7 @@ const StudentDash = () => {
           <h1 className="mt-3 text-3xl font-black">Unable to load dashboard</h1>
           <p className="mt-3 text-slate-300">{error}</p>
           <button
-            onClick={() => navigate("/student/login")}
+            onClick={() => navigate("/login")}
             className="mt-6 rounded-xl bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-slate-100"
           >
             Go to Login
@@ -215,11 +218,11 @@ const StudentDash = () => {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                     onClick={ tab.id === "logout" ? () => {clearAuthToken(),navigate('/login')} : () => setActiveTab(tab.id)}
                       className={`flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${
                         active
                           ? "border-cyan-300/40 bg-cyan-400/15 text-white shadow-lg"
-                          : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                          : tab.id === "logout" ? "border-white/10 bg-white/5 text-red-400 hover:bg-white/10" :"border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                       }`}
                     >
                       <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? "bg-cyan-300 text-slate-950" : "bg-white/10 text-white"}`}>
@@ -228,7 +231,7 @@ const StudentDash = () => {
                       <span>
                         <span className="block font-semibold">{tab.label}</span>
                         <span className="block text-xs text-slate-400">
-                          {tab.id === "overview" ? "Profile details" : tab.id === "attendance" ? "Presence records" : "Fee payment"}
+                          {tab.id === "overview" ? "Profile details" : tab.id === "attendance" ? "Presence records" : tab.id === 'logout' ?"Logout From Device" :"Fee payment"}
                         </span>
                       </span>
                     </button>

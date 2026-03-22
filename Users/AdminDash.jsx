@@ -10,7 +10,7 @@ import {
   FaUserGraduate,
 } from "react-icons/fa";
 import { PiStudent } from "react-icons/pi";
-
+import { FaRegMessage } from "react-icons/fa6";
 import api from "../src/api/axios";
 import StudentRegister from "../src/Student/StudentRegister";
 import SubjectManagement from "./SubjectManagement";
@@ -95,6 +95,8 @@ useEffect(()=>{
 },[adminId])
 
 
+
+
   useEffect(() => {
     setMobileNavOpen(false);
   }, [activePage, subActivePage]);
@@ -158,14 +160,15 @@ useEffect(()=>{
       const response = await api.get(`/student/allStudents`);
       console.log("Students response:", response.data);
       if (response.data.success) {
-        setStudents(response.data.students);
+        // setStudents(response.data.students);
         setStudentInCollege(response.data.students.length);
         console.log("Students set in state:", response.data.students);
       }
     } catch (error) {
       setError(response.data?.message || "Failed to load Student");
-      console.log("$$$$$$$4", response.data?.message)
+     
       setMessage("Error fetching students: " + error.message);
+     
     } finally {
       setLoading(false);
     }
@@ -176,10 +179,10 @@ useEffect(()=>{
     try {
       setLoading(true);
       console.log("Fetching teachers from /teacher/allteacher");
-      const response = await api.get(`/teacher/allteacher`);
+      let response = await api.get(`/teacher/allteacher`);
       console.log("Teachers response:", response.data);
       if (response.data.success) {
-        setTeachers(response.data.teachers);
+        // setTeachers(response.data.teachers);
         setTotalTeacherInCollege(response.data.teachers.length);
       }
     } catch (error) {
@@ -213,7 +216,7 @@ useEffect(()=>{
           <h1 className="mt-3 text-3xl font-black">Unable to load dashboard</h1>
           <p className="mt-3 text-slate-300">{error}</p>
           <button
-            onClick={() => navigate("/student/login")}
+            onClick={() => navigate("/login")}
             className="mt-6 rounded-xl bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-slate-100"
           >
             Go to Login
@@ -223,7 +226,7 @@ useEffect(()=>{
     );
   }
 
-  
+
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -310,11 +313,11 @@ useEffect(()=>{
 
               <NavItem showLabel active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
               <NavItem showLabel active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice"), clearAuthToken()} }/>
-              <NavItem showLabel active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
+              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
+              <NavItem showLabel active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
 
               <div className="pt-2 mt-2 border-t border-slate-800">
-                <NavItem showLabel active={false} icon={CiLogout} label="Logout1" onClick={() => 
+                <NavItem showLabel active={false} icon={CiLogout} label="Logout" onClick={() => 
                   {navigate("/"),clearAuthToken()} } />
               </div>
             </div>
@@ -350,8 +353,9 @@ useEffect(()=>{
           </div>
 
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+           
             <NavItem active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
-
+          
             <NavItem
               active={activePage === "student"}
               icon={PiStudent}
@@ -401,8 +405,8 @@ useEffect(()=>{
 
             <NavItem active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
             <NavItem active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice"),clearAuthToken()} }/>
-            <NavItem active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
+            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
+            <NavItem active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
           </nav>
 
           <div className="p-3 border-t border-slate-800">
