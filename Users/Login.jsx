@@ -17,7 +17,8 @@ const Login = () => {
     e.preventDefault();
     const result = await login(formData.email, formData.password);
     if (result.success) {
-      navigate("/admin/dash");
+      console.log(result)
+      navigate(`/admin/dash?id=${result.user._id}`);
     }
   };
 

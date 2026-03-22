@@ -15,7 +15,7 @@ import api from "../src/api/axios";
 import StudentRegister from "../src/Student/StudentRegister";
 import SubjectManagement from "./SubjectManagement";
 import TeacherRegister from "../src/Teacher/TeacherRegister";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CiLogout } from "react-icons/ci";
 import Expense from "../src/Expenses/Expense";
 import All from "../src/Expenses/All";
@@ -29,59 +29,71 @@ import SendMessage from "../Message/SendMessage";
 import NoticeManagement from "../Notice/NoticeManagement";
 import StudentDash from "../src/StudentForAdmin/StudentDash";
 import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
+import { clearAuthToken } from "../src/utils/auth.js";
 
 
 // using configured api instance from src/api/axios
 
 const AdminDash = () => {
   let navigate = useNavigate();
+  const location = useLocation();
+  const {id: paramId} = useParams();  
+  const queryId = useMemo(() => new URLSearchParams(location.search).get("id"), [location.search]);
+  const adminId = paramId || queryId;
+
+
+
+
+
+
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [selectStudent, setSelectStudent] = useState(false);
+
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
-  const [teacher, setTeacher] = useState(false);
-
-  const [editTeacher, setEditTeacher] = useState(null);
+ 
   const [studentInCollege, setStudentInCollege] = useState(0);
   const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
 
   // Student management states
-  const [students, setStudents] = useState([]);
-  const [teachers, setTeachers] = useState([]);
-  const [pendingPayments, setPendingPayments] = useState([]);
-  const [loading, setLoading] = useState(false);
+
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [profile, setProfile] = useState(null);
 
-  //
-  const [pendingPaymentStudent, setPendingPaymentStudent] = useState([]);
-  const [receivedPayments, setReceivedPayments] = useState([]);
-  const [rejectPaymentStudents, setRejectPaymentStudents] = useState([]);
 
-  // Modal states for edit
-  const [showStudentEditModal, setShowStudentEditModal] = useState(false);
-  const [showTeacherEditModal, setShowTeacherEditModal] = useState(false);
-  const [editStudentForm, setEditStudentForm] = useState({});
-  const [editTeacherForm, setEditTeacherForm] = useState({});
+// authentication
+useEffect(()=>{
+  if(!adminId){
+    setLoading(false);
+    setError("Not A vaild Authentication Please Login first");
+    return;
+  }
+  const fetchAdmin = async() =>{
+    setLoading(true);
+    try{
+         const admin = await api.get(`/user/profile/${adminId}`);
 
-  // Load students on mount
-  useEffect(() => {
-    if (activePage === "student") {
-      fetchAllStudents();
-    } else if (activePage === "teacher") {
-      fetchAllTeachers();
-    } else if (activePage === "payment") {
-      fetchPendingPayments();
-      receivedPayment();
-      pendingPayment();
-      rejectPayment();
-    } else if (activePage === "home") {
-      totalPaidPayment();
-      totalPendingPayment();
-      fetchAllStudents();
-      fetchAllTeachers();
+         if(admin.data?.success) setProfile(admin.data.admin);
+         else setError(admin.data?.message || "Failed to Load Profile");
+        
     }
-  }, [activePage]);
+  catch(error){
+    setError(error.response?.data?.message || "Error fetching dashboard data")
+  }
+  finally{
+    setLoading(false);
+  }
+   
+  }
+  
+  fetchAdmin();
+  fetchAllStudents();
+  fetchAllTeachers();
+},[adminId])
+
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -151,7 +163,8 @@ const AdminDash = () => {
         console.log("Students set in state:", response.data.students);
       }
     } catch (error) {
-      console.error("Error fetching students:", error);
+      setError(response.data?.message || "Failed to load Student");
+      console.log("$$$$$$$4", response.data?.message)
       setMessage("Error fetching students: " + error.message);
     } finally {
       setLoading(false);
@@ -170,257 +183,47 @@ const AdminDash = () => {
         setTotalTeacherInCollege(response.data.teachers.length);
       }
     } catch (error) {
-      console.error("Error fetching teachers:", error);
+      setError(response.data?.message || "Failed to Load Teacher");
       setMessage("Error fetching teachers: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch pending payments
-  const fetchPendingPayments = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/student/pendingPayments`);
-      // backend returns { success: true, pending: [...] }
-      const data = response.data;
-      if (data.success && Array.isArray(data.pending)) {
-        const payments = [];
-        data.pending.forEach((student) => {
-          if (student.payments && Array.isArray(student.payments)) {
-            student.payments.forEach((p) => {
-              if (p.status === "pending") {
-                payments.push({
-                  ...p,
-                  studentName: student.name,
-                  studentId: student._id,
-                });
-              }
-            });
-          }
-        });
-        setPendingPayments(payments);
-      } else if (Array.isArray(data)) {
-        // fallback for older response format as array
-        const payments = [];
-        data.forEach((student) => {
-          if (student.payments && Array.isArray(student.payments)) {
-            student.payments.forEach((p) => {
-              if (p.status === "pending") {
-                payments.push({
-                  ...p,
-                  studentName: student.name,
-                  studentId: student._id,
-                });
-              }
-            });
-          }
-        });
-        setPendingPayments(payments);
-      } else if (response.data && response.data.payments) {
-        // fallback for older shape
-        setPendingPayments(response.data.payments);
-      }
-    } catch (error) {
-      setMessage("Error fetching payments: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // Delete student
-  const handleDeleteStudent = async (studentId) => {
-    if (window.confirm("Are you sure you want to delete this student?")) {
-      try {
-        const response = await api.delete(
-          `/student/profile/delete/${studentId}`,
-        );
-        if (response.data.success) {
-          setMessage("Student deleted successfully");
-          setStudents(students.filter((s) => s._id !== studentId));
-          setTimeout(() => setMessage(""), 3000);
-        }
-      } catch (error) {
-        setMessage("Error deleting student: " + error.message);
-      }
-    }
-  };
+   if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4">
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-medium backdrop-blur">
+            Loading Admin  dashboard...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Delete teacher
-  const handleDeleteTeacher = async (teacherId) => {
-    if (window.confirm("Are you sure you want to delete this teacher?")) {
-      try {
-        const response = await api.delete(`/teacher/delete/${teacherId}`);
-        if (response.data.success) {
-          setMessage("Teacher deleted successfully");
-          setTeachers(teachers.filter((t) => t._id !== teacherId));
-          setTimeout(() => setMessage(""), 3000);
-        }
-      } catch (error) {
-        setMessage("Error deleting teacher: " + error.message);
-      }
-    }
-  };
-
-  // Start editing student
-  const handleEditStudent = (student) => {
-    setEditStudent(student);
-    setEditStudentForm(student);
-    setShowStudentEditModal(true);
-  };
-
-  // Start editing teacher
-  const handleEditTeacher = (teacherData) => {
-    setEditTeacher(teacherData);
-    setEditTeacherForm(teacherData);
-    setShowTeacherEditModal(true);
-  };
-
-  // Update student
-  const handleUpdateStudent = async () => {
-    try {
-      const response = await api.put(
-        `/student/profile/update/${editStudentForm._id}`,
-        editStudentForm,
-      );
-      if (response.data.success) {
-        setMessage("Student updated successfully");
-        setShowStudentEditModal(false);
-        fetchAllStudents();
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (error) {
-      setMessage("Error updating student: " + error.message);
-    }
-  };
-
-  // Update teacher
-  const handleUpdateTeacher = async () => {
-    try {
-      const response = await api.put(
-        `/teacher/profile/${editTeacherForm._id}`,
-        editTeacherForm,
-      );
-      if (response.data.success) {
-        setMessage("Teacher updated successfully");
-        setShowTeacherEditModal(false);
-        fetchAllTeachers();
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (error) {
-      setMessage("Error updating teacher: " + error.message);
-    }
-  };
-
-  // Approve payment
-  const handleApprovePayment = async (studentId, paymentId) => {
-    try {
-      const response = await api.put(`/student/approve/payment`, {
-        studentId,
-        paymentId,
-      });
-      if (response.data.success) {
-        setMessage("Payment approved successfully");
-        fetchPendingPayments();
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (error) {
-      setMessage("Error approving payment: " + error.message);
-    }
-  };
-
-  // Reject payment
-  const handleRejectPayment = async (studentId, paymentId) => {
-    try {
-      const response = await api.put(`/student/reject/payment`, {
-        studentId,
-        paymentId,
-      });
-      if (response.data.success) {
-        setMessage("Payment rejected");
-        fetchPendingPayments();
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (error) {
-      setMessage("Error rejecting payment: " + error.message);
-    }
-  };
 
   // all receive payment
-  const receivedPayment = async () => {
-    try {
-      const receive = await api.get(`/payment/received`);
-      if (receive.data.success) {
-        // Handle the received payments data
-        setMessage("All Received payments");
-        setReceivedPayments(receive.data.data);
-        console.log("Received payments:", receive.data.data);
-      } else {
-        setMessage("Failed to fetch received payments");
-      }
-    } catch (err) {
-      setMessage("Error fetching received payments: " + err.message);
-    }
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 px-4 py-10 text-white">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-300">Admin Portal</p>
+          <h1 className="mt-3 text-3xl font-black">Unable to load dashboard</h1>
+          <p className="mt-3 text-slate-300">{error}</p>
+          <button
+            onClick={() => navigate("/student/login")}
+            className="mt-6 rounded-xl bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-slate-100"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const rejectPayment = async () => {
-    try {
-      const reject = await api.get(`/payment/rejected`);
-      if (reject.data.success) {
-        // Handle the pending payments data
-        setMessage("All Reject payments");
-        setRejectPaymentStudents(reject.data.data);
-        console.log("Rejected payments:", reject.data.data);
-      } else {
-        setMessage("Failed to fetch rejected payments");
-      }
-    } catch (err) {
-      setMessage("Error fetching rejected payments: " + err.message);
-    }
-  };
-  const pendingPayment = async () => {
-    try {
-      const pending = await api.get(`/payment/pending`);
-      if (pending.data.success) {
-        // Handle the pending payments data
-        setMessage("All Pending payments");
-        setPendingPaymentStudent(pending.data.pending);
-        console.log("Pending payments:", pending.data);
-      } else {
-        setMessage("Failed to fetch pending payments");
-      }
-    } catch (err) {
-      setMessage("Error fetching pending payments: " + err.message);
-    }
-  };
-
-  let [totalPaid, setTotalPaid] = useState(0);
-  let [totalPending, setTotalPending] = useState(0);
-  const totalPaidPayment = async () => {
-    try {
-      const totalPaidResponse = await api.get(`/payment/totalpaid`);
-      if (totalPaidResponse.data.success) {
-        setTotalPaid(totalPaidResponse.data.totalPaid);
-      } else {
-        setMessage("Failed to fetch total paid payments");
-      }
-    } catch (err) {
-      setMessage("Error fetching total paid payments: " + err.message);
-    }
-  };
-
-  const totalPendingPayment = async () => {
-    try {
-      const totalPending = await api.get(`/payment/totalpending`);
-      if (totalPending.data.success) {
-        setTotalPending(totalPending.data.totalPending);
-      } else {
-        setMessage("Failed to pending payment");
-      }
-    } catch (error) {
-      setMessage(error.message);
-    }
-  };
+  
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -433,6 +236,7 @@ const AdminDash = () => {
             className="absolute inset-0 bg-black/40"
             aria-label="Close navigation"
           />
+          {/* notice131 */}
           <aside className="absolute left-0 top-0 h-full w-72 bg-slate-900 text-slate-100 border-r border-slate-800 p-3">
             <div className="flex items-center justify-between px-2 py-2">
               <div className="flex items-center gap-3">
@@ -472,7 +276,7 @@ const AdminDash = () => {
                   <SubItem active={subActivePage === "add Student"} label="Add Student" onClick={() => handleNav("student", "add Student")} />
                 </div>
               )}
-
+{/* teacher */}
               <NavItem
                 showLabel
                 active={activePage === "teacher"}
@@ -491,7 +295,8 @@ const AdminDash = () => {
                   <SubItem active={subActivePage === "add Teacher"} label="Add Teacher" onClick={() => handleNav("teacher", "add Teacher")} />
                 </div>
               )}
-
+{/* teacher */}
+{/* Payment */}
               <NavItem showLabel active={activePage === "payment"} icon={FaMoneyBillWave} label="Payments" onClick={() => handleNav("payment", "Dashboard")} />
               {activePage === "payment" && (
                 <div className="ml-8 space-y-1">
@@ -505,11 +310,12 @@ const AdminDash = () => {
 
               <NavItem showLabel active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
               <NavItem showLabel active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => handleNav("notice")} />
+              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice"), clearAuthToken()} }/>
               <NavItem showLabel active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
 
               <div className="pt-2 mt-2 border-t border-slate-800">
-                <NavItem showLabel active={false} icon={CiLogout} label="Logout" onClick={() => navigate("/")} />
+                <NavItem showLabel active={false} icon={CiLogout} label="Logout1" onClick={() => 
+                  {navigate("/"),clearAuthToken()} } />
               </div>
             </div>
           </aside>
@@ -595,12 +401,13 @@ const AdminDash = () => {
 
             <NavItem active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
             <NavItem active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => handleNav("notice")} />
+            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice"),clearAuthToken()} }/>
             <NavItem active={activePage === "message"} icon={FaBell} label="Message" onClick={() => handleNav("message")} />
           </nav>
 
           <div className="p-3 border-t border-slate-800">
-            <NavItem active={false} icon={CiLogout} label="Logout" onClick={() => navigate("/")} />
+            <NavItem active={false} icon={CiLogout} label="Logout"  onClick={() => 
+                  {navigate("/"),clearAuthToken()} } />
           </div>
         </aside>
 
@@ -632,7 +439,8 @@ const AdminDash = () => {
               </button>
               <button
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={() => 
+                  {navigate("/"),clearAuthToken()} }
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 text-red-600"
               >
                 <CiLogout />
