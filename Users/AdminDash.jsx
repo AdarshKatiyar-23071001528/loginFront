@@ -8,6 +8,7 @@ import {
   FaBook,
   FaBell,
   FaUserGraduate,
+  FaCog,
 } from "react-icons/fa";
 import { PiStudent } from "react-icons/pi";
 import { FaRegMessage } from "react-icons/fa6";
@@ -30,6 +31,7 @@ import NoticeManagement from "../Notice/NoticeManagement";
 import StudentDash from "../src/StudentForAdmin/StudentDash";
 import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 import { clearAuthToken } from "../src/utils/auth.js";
+import StaffSettings from "../src/Settings/StaffSettings.jsx";
 
 
 // using configured api instance from src/api/axios
@@ -61,7 +63,7 @@ const AdminDash = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [profile, setProfile] = useState(null);
+  const [staffRefreshKey, setStaffRefreshKey] = useState(0);
 
 
 // authentication
@@ -76,8 +78,7 @@ useEffect(()=>{
     try{
          const admin = await api.get(`/user/profile/${adminId}`);
 
-         if(admin.data?.success) setProfile(admin.data.admin);
-         else setError(admin.data?.message || "Failed to Load Profile");
+         if(!admin.data?.success) setError(admin.data?.message || "Failed to Load Profile");
         
     }
   catch(error){
@@ -110,6 +111,7 @@ useEffect(()=>{
     if (activePage === "subjects") return "Subjects";
     if (activePage === "notice") return "Notice";
     if (activePage === "message") return "Message";
+    if (activePage === "settings") return subActivePage ? `Settings • ${subActivePage}` : "Settings";
     return "Admin";
   }, [activePage, subActivePage]);
 
@@ -119,7 +121,9 @@ useEffect(()=>{
     setMobileNavOpen(false);
   };
 
-  const NavItem = ({ active, icon: Icon, label, onClick, right, showLabel = sidebarOpen }) => (
+  const NavItem = ({ active, icon, label, onClick, right, showLabel = sidebarOpen }) => {
+    const IconComponent = icon;
+    return (
     <button
       type="button"
       onClick={onClick}
@@ -127,13 +131,12 @@ useEffect(()=>{
         active ? "bg-slate-800 text-white" : "text-slate-200 hover:bg-slate-800/70 hover:text-white"
       }`}
     >
-      <span className="shrink-0">
-        <Icon />
-      </span>
+      <span className="shrink-0"><IconComponent /></span>
       {showLabel && <span className="flex-1 text-left">{label}</span>}
       {showLabel && right}
     </button>
-  );
+    );
+  };
 
   const SubItem = ({ active, label, onClick }) => (
     <button
@@ -165,7 +168,7 @@ useEffect(()=>{
         console.log("Students set in state:", response.data.students);
       }
     } catch (error) {
-      setError(response.data?.message || "Failed to load Student");
+      setError(error.response?.data?.message || "Failed to load Student");
      
       setMessage("Error fetching students: " + error.message);
      
@@ -186,7 +189,7 @@ useEffect(()=>{
         setTotalTeacherInCollege(response.data.teachers.length);
       }
     } catch (error) {
-      setError(response.data?.message || "Failed to Load Teacher");
+      setError(error.response?.data?.message || "Failed to Load Teacher");
       setMessage("Error fetching teachers: " + error.message);
     } finally {
       setLoading(false);
@@ -315,6 +318,12 @@ useEffect(()=>{
               <NavItem showLabel active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
               <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
               <NavItem showLabel active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
+              <NavItem showLabel active={activePage === "settings"} icon={FaCog} label="Settings" onClick={() => handleNav("settings", "staff access")} />
+              {activePage === "settings" && (
+                <div className="ml-8 space-y-1">
+                  <SubItem active={subActivePage === "staff access"} label="Staff Access" onClick={() => handleNav("settings", "staff access")} />
+                </div>
+              )}
 
               <div className="pt-2 mt-2 border-t border-slate-800">
                 <NavItem showLabel active={false} icon={CiLogout} label="Logout" onClick={() => 
@@ -407,6 +416,12 @@ useEffect(()=>{
             <NavItem active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
             <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
             <NavItem active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
+            <NavItem active={activePage === "settings"} icon={FaCog} label="Settings" onClick={() => handleNav("settings", "staff access")} />
+            {sidebarOpen && activePage === "settings" && (
+              <div className="ml-8 space-y-1">
+                <SubItem active={subActivePage === "staff access"} label="Staff Access" onClick={() => handleNav("settings", "staff access")} />
+              </div>
+            )}
           </nav>
 
           <div className="p-3 border-t border-slate-800">
@@ -507,6 +522,7 @@ useEffect(()=>{
                     onSuccess={() => {
                       handleNav("teacher", "all Teacher");
                       fetchAllTeachers();
+                      setStaffRefreshKey((value) => value + 1);
                     }}
                   />
                 </Card>
@@ -568,6 +584,12 @@ useEffect(()=>{
               {activePage === "message" && (
                 <Card className="p-3">
                   <SendMessage />
+                </Card>
+              )}
+
+              {activePage === "settings" && subActivePage === "staff access" && (
+                <Card className="p-3">
+                  <StaffSettings refreshKey={staffRefreshKey} />
                 </Card>
               )}
             </div>

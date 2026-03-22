@@ -1,48 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios';
-import {
-  FaHome,
-  FaMoneyBillAlt,
-  FaTrash,
-  FaEdit,
-  FaMoneyBillWave,
-  FaBook,
-  FaBell,
-  FaUserGraduate,
-} from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
 
 const TeacherDash = () => {
-    const [teacher, setTeacher] = useState(false);
-    const [editTeacher, setEditTeacher] = useState(null);
-    const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
     const [teachers, setTeachers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
     const [showTeacherEditModal, setShowTeacherEditModal] = useState(false);
     const [editTeacherForm, setEditTeacherForm] = useState({});
 
-    useEffect(()=>{
-        fetchAllTeachers();
-    },[])
-
-    // Fetch all teachers
-      const fetchAllTeachers = async () => {
-        try {
-          setLoading(true);
-          console.log("Fetching teachers from /teacher/allteacher");
-          const response = await api.get(`/teacher/allteacher`);
-          console.log("Teachers response:", response.data);
-          if (response.data.success) {
-            setTeachers(response.data.teachers);
-            setTotalTeacherInCollege(response.data.teachers.length);
-          }
-        } catch (error) {
-          console.error("Error fetching teachers:", error);
-          setMessage("Error fetching teachers: " + error.message);
-        } finally {
-          setLoading(false);
+    const fetchAllTeachers = async () => {
+      try {
+        console.log("Fetching teachers from /teacher/allteacher");
+        const response = await api.get(`/teacher/allteacher`);
+        console.log("Teachers response:", response.data);
+        if (response.data.success) {
+          setTeachers(response.data.teachers);
         }
-      };
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      }
+    };
+
+    useEffect(()=>{
+        const timer = setTimeout(() => {
+          fetchAllTeachers();
+        }, 0);
+        return () => clearTimeout(timer);
+    },[])
 
 
        const handleDeleteTeacher = async (teacherId) => {
@@ -50,12 +33,10 @@ const TeacherDash = () => {
             try {
               const response = await api.delete(`/teacher/delete/${teacherId}`);
               if (response.data.success) {
-                setMessage("Teacher deleted successfully");
                 setTeachers(teachers.filter((t) => t._id !== teacherId));
-                setTimeout(() => setMessage(""), 3000);
               }
             } catch (error) {
-              setMessage("Error deleting teacher: " + error.message);
+              console.error("Error deleting teacher:", error);
             }
           }
         };
@@ -63,7 +44,6 @@ const TeacherDash = () => {
         
          // Start editing teacher
   const handleEditTeacher = (teacherData) => {
-    setEditTeacher(teacherData);
     setEditTeacherForm(teacherData);
     setShowTeacherEditModal(true);
   };
@@ -76,13 +56,11 @@ const TeacherDash = () => {
           editTeacherForm,
         );
         if (response.data.success) {
-          setMessage("Teacher updated successfully");
           setShowTeacherEditModal(false);
           fetchAllTeachers();
-          setTimeout(() => setMessage(""), 3000);
         }
       } catch (error) {
-        setMessage("Error updating teacher: " + error.message);
+        console.error("Error updating teacher:", error);
       }
     };
   return (
@@ -109,7 +87,7 @@ const TeacherDash = () => {
                                          <td className="border p-3">
                                            {teacher.email}
                                          </td>
-                                         <td className="border p-3">{teacher.post}</td>
+                                         <td className="border p-3">{teacher.post || teacher.role}</td>
                                          <td className="border p-3">
                                            {teacher.mobile}
                                          </td>

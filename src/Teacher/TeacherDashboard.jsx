@@ -1,17 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaChartLine, FaClipboardList, FaSave, FaUserTie } from "react-icons/fa";
-import api from "../api/axios";
-import { clearAuthToken } from "../utils/auth";
 import { CiLogout } from "react-icons/ci";
-
-const tabs = [
-  { id: "attendance", label: "Attendance", icon: FaCalendarAlt },
-  { id: "marks", label: "Marks", icon: FaBook },
-  { id: "logout", label: "Logout", icon: CiLogout },
-
- 
-];
+import api from "../api/axios";
+import { clearAuthToken, getAuthUser } from "../utils/auth";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -29,38 +21,49 @@ const subjectTitle = (subject) => {
 const TeacherDashboard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const authUser = getAuthUser();
+  const permissions = authUser?.permissions || [];
+  const canManageAttendance = permissions.includes("attendance.manage");
+  const canManageMarks = permissions.includes("marks.manage");
+  const canReadStudents = permissions.includes("students.read");
+  const canReadSubjects = permissions.includes("subjects.read");
 
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("attendance");
+  const [activeTab, setActiveTab] = useState(canManageAttendance ? "attendance" : canManageMarks ? "marks" : "logout");
   const [attendance, setAttendance] = useState([]);
   const [marks, setMarks] = useState([]);
   const [students, setStudents] = useState([]);
   const [subjects, setSubjects] = useState([]);
-
   const [attendanceForm, setAttendanceForm] = useState({ subjectId: "", date: "" });
   const [subjectStudents, setSubjectStudents] = useState([]);
   const [studentStatus, setStudentStatus] = useState({});
   const [studentsLoading, setStudentsLoading] = useState(false);
-
   const [markForm, setMarkForm] = useState({ subjectId: "", date: "" });
   const [marksStudents, setMarksStudents] = useState([]);
   const [marksByStudent, setMarksByStudent] = useState({});
   const [marksStudentsLoading, setMarksStudentsLoading] = useState(false);
 
+  const tabs = [
+    ...(canManageAttendance ? [{ id: "attendance", label: "Attendance", icon: FaCalendarAlt }] : []),
+    ...(canManageMarks ? [{ id: "marks", label: "Marks", icon: FaBook }] : []),
+    { id: "logout", label: "Logout", icon: CiLogout },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [teacherRes, attendanceRes, studentsRes, marksRes, subjectsRes] = await Promise.all([
+        const requests = [
           api.get(`/teacher/profile/${id}`),
-          api.get(`/attendance/teacher/${id}`),
-          api.get("/student/allStudents"),
-          api.get(`/marks/teacher/${id}`),
-          api.get(`/subject/teacher/${id}`),
-        ]);
+          canManageAttendance ? api.get(`/attendance/teacher/${id}`) : Promise.resolve({ data: { records: [] } }),
+          canReadStudents ? api.get("/student/allStudents") : Promise.resolve({ data: { students: [] } }),
+          canManageMarks ? api.get(`/marks/teacher/${id}`) : Promise.resolve({ data: { marks: [] } }),
+          canReadSubjects ? api.get(`/subject/teacher/${id}`) : Promise.resolve({ data: { subjects: [] } }),
+        ];
 
+        const [teacherRes, attendanceRes, studentsRes, marksRes, subjectsRes] = await Promise.all(requests);
         setTeacher(teacherRes.data.teacher || null);
         setAttendance(attendanceRes.data.records || []);
         setStudents(studentsRes.data.students || []);
@@ -74,11 +77,11 @@ const TeacherDashboard = () => {
     };
 
     if (id) fetchData();
-  }, [id]);
+  }, [id, canManageAttendance, canManageMarks, canReadStudents, canReadSubjects]);
 
   useEffect(() => {
     const loadStudents = async () => {
-      if (!attendanceForm.subjectId) {
+      if (!attendanceForm.subjectId || !canReadStudents) {
         setSubjectStudents([]);
         setStudentStatus({});
         return;
@@ -96,7 +99,7 @@ const TeacherDashboard = () => {
           }
           return next;
         });
-      } catch (_err) {
+      } catch {
         setSubjectStudents([]);
         setStudentStatus({});
       } finally {
@@ -105,11 +108,11 @@ const TeacherDashboard = () => {
     };
 
     loadStudents();
-  }, [attendanceForm.subjectId]);
+  }, [attendanceForm.subjectId, canReadStudents]);
 
   useEffect(() => {
     const loadMarksStudents = async () => {
-      if (!markForm.subjectId) {
+      if (!markForm.subjectId || !canReadStudents) {
         setMarksStudents([]);
         setMarksByStudent({});
         return;
@@ -127,7 +130,7 @@ const TeacherDashboard = () => {
           }
           return next;
         });
-      } catch (_err) {
+      } catch {
         setMarksStudents([]);
         setMarksByStudent({});
       } finally {
@@ -136,14 +139,14 @@ const TeacherDashboard = () => {
     };
 
     loadMarksStudents();
-  }, [markForm.subjectId]);
+  }, [markForm.subjectId, canReadStudents]);
 
   const stats = useMemo(
     () => [
-      { label: "Subjects", value: subjects.length, icon: FaBook, tone: "indigo" },
-      { label: "Attendance Entries", value: attendance.length, icon: FaClipboardList, tone: "emerald" },
-      { label: "Marks Entries", value: marks.length, icon: FaChartLine, tone: "amber" },
-      { label: "Students", value: students.length, icon: FaUserTie, tone: "rose" },
+      { label: "Subjects", value: subjects.length, icon: FaBook },
+      { label: "Attendance Entries", value: attendance.length, icon: FaClipboardList },
+      { label: "Marks Entries", value: marks.length, icon: FaChartLine },
+      { label: "Students", value: students.length, icon: FaUserTie },
     ],
     [attendance.length, marks.length, students.length, subjects.length]
   );
@@ -156,7 +159,7 @@ const TeacherDashboard = () => {
 
   const handleAttendanceSubmit = async (e) => {
     e.preventDefault();
-    if (!attendanceForm.subjectId || !attendanceForm.date) return;
+    if (!attendanceForm.subjectId || !attendanceForm.date || !canManageAttendance) return;
 
     try {
       const records = subjectStudents.map((student) => ({
@@ -174,14 +177,14 @@ const TeacherDashboard = () => {
       const refreshed = await api.get(`/attendance/teacher/${id}`);
       setAttendance(refreshed.data.records || []);
       setAttendanceForm((prev) => ({ ...prev, date: "" }));
-    } catch (_err) {
+    } catch {
       alert("Attendance mark failed");
     }
   };
 
   const handleMarkSubmit = async (e) => {
     e.preventDefault();
-    if (!markForm.subjectId) return;
+    if (!markForm.subjectId || !canManageMarks) return;
 
     try {
       const records = marksStudents
@@ -204,7 +207,7 @@ const TeacherDashboard = () => {
       setMarks(refreshed.data.marks || []);
       setMarkForm((prev) => ({ ...prev, date: "" }));
       setMarksByStudent({});
-    } catch (_err) {
+    } catch {
       alert("Marks entry failed");
     }
   };
@@ -213,9 +216,7 @@ const TeacherDashboard = () => {
     return (
       <div className="min-h-screen bg-slate-950 text-white">
         <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4">
-          <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-medium backdrop-blur">
-            Loading teacher dashboard...
-          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-medium backdrop-blur">Loading teacher dashboard...</div>
         </div>
       </div>
     );
@@ -228,10 +229,7 @@ const TeacherDashboard = () => {
           <p className="text-xs uppercase tracking-[0.3em] text-slate-300">Teacher Portal</p>
           <h1 className="mt-3 text-3xl font-black">Unable to load dashboard</h1>
           <p className="mt-3 text-slate-300">{error}</p>
-          <button
-            onClick={() => navigate("/login")}
-            className="mt-6 rounded-xl bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-slate-100"
-          >
+          <button onClick={() => navigate("/login")} className="mt-6 rounded-xl bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-slate-100">
             Go to Login
           </button>
         </div>
@@ -241,6 +239,7 @@ const TeacherDashboard = () => {
 
   const teacherName = teacher?.name || "Teacher";
   const teacherMeta = [teacher?.destination, teacher?.email, teacher?.mobile].filter(Boolean).join(" - ");
+  const noFeatureAccess = !canManageAttendance && !canManageMarks;
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.16),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] text-white">
@@ -249,11 +248,9 @@ const TeacherDashboard = () => {
           <div className="border-b border-white/10 bg-white/5 px-6 py-6 sm:px-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-200">Teacher Portal</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-200">Staff Portal</p>
                 <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Welcome, {teacherName}</h1>
-                <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
-                  {teacherMeta || "Manage attendance and marks from one professional workspace."}
-                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">{teacherMeta || "Manage your assigned academic work from one workspace."}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {stats.map((item) => {
@@ -284,16 +281,16 @@ const TeacherDashboard = () => {
                     {teacherName.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Faculty</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Staff</p>
                     <h2 className="text-xl font-black">{teacherName}</h2>
-                    <p className="text-sm text-slate-600">{teacher?.destination || "Department"}</p>
+                    <p className="text-sm text-slate-600">{teacher?.role || teacher?.destination || "Department"}</p>
                   </div>
                 </div>
 
                 <div className="mt-5 space-y-3">
                   <Line label="Email" value={teacher?.email || "-"} />
                   <Line label="Mobile" value={teacher?.mobile || "-"} />
-                  <Line label="Salary" value={teacher?.salary ? `Rs. ${teacher.salary}` : "-"} />
+                  <Line label="Role" value={teacher?.role || "-"} />
                   <Line label="Joining" value={formatDate(teacher?.joiningDate)} />
                 </div>
               </div>
@@ -305,12 +302,9 @@ const TeacherDashboard = () => {
                   return (
                     <button
                       key={tab.id}
-
-                      onClick={ tab.id === "logout" ? () => {clearAuthToken(),navigate('/login')} : () => setActiveTab(tab.id)}
+                      onClick={tab.id === "logout" ? () => { clearAuthToken(); navigate("/login"); } : () => setActiveTab(tab.id)}
                       className={`flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${
-                        active
-                          ? "border-emerald-300/40 bg-emerald-400/15 text-white shadow-lg"
-                          : tab.id === "logout" ? "border-white/10 bg-white/5 text-red-400 hover:bg-white/10" :"border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                        active ? "border-emerald-300/40 bg-emerald-400/15 text-white shadow-lg" : tab.id === "logout" ? "border-white/10 bg-white/5 text-red-400 hover:bg-white/10" : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                       }`}
                     >
                       <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? "bg-emerald-300 text-slate-950" : "bg-white/10 text-white"}`}>
@@ -318,28 +312,29 @@ const TeacherDashboard = () => {
                       </span>
                       <span>
                         <span className="block font-semibold">{tab.label}</span>
-                        <span className={`block text-xs text-slate-400`}>
-                          {tab.id === "attendance" ? "Mark presence" : tab.id ==="marks" ? "Enter Marks" : "Logout From Device"}
+                        <span className="block text-xs text-slate-400">
+                          {tab.id === "attendance" ? "Mark presence" : tab.id === "marks" ? "Enter marks" : "Logout from device"}
                         </span>
                       </span>
                     </button>
                   );
                 })}
-
-               
               </div>
             </aside>
 
             <main className="space-y-6">
-              {activeTab === "attendance" && (
+              {noFeatureAccess ? (
+                <Panel title="Access Required" subtitle="No staff authority assigned">
+                  <div className="mt-6 rounded-3xl border border-dashed border-slate-300 px-5 py-10 text-center text-sm text-slate-500">
+                    Admin ne abhi is account ko attendance ya marks authority assign nahi ki hai.
+                  </div>
+                </Panel>
+              ) : null}
+
+              {activeTab === "attendance" && canManageAttendance ? (
                 <Panel title="Attendance" subtitle="Daily attendance workspace">
                   <div className="mt-6 grid gap-4 md:grid-cols-3">
-                    <Field
-                      label="Subject"
-                      as="select"
-                      value={attendanceForm.subjectId}
-                      onChange={(e) => setAttendanceForm((prev) => ({ ...prev, subjectId: e.target.value }))}
-                    >
+                    <Field label="Subject" as="select" value={attendanceForm.subjectId} onChange={(e) => setAttendanceForm((prev) => ({ ...prev, subjectId: e.target.value }))}>
                       <option value="">Select subject</option>
                       {subjects.map((subject) => (
                         <option key={subject._id} value={subject._id}>
@@ -347,25 +342,12 @@ const TeacherDashboard = () => {
                         </option>
                       ))}
                     </Field>
-                    <Field
-                      label="Date"
-                      type="date"
-                      value={attendanceForm.date}
-                      onChange={(e) => setAttendanceForm((prev) => ({ ...prev, date: e.target.value }))}
-                    />
+                    <Field label="Date" type="date" value={attendanceForm.date} onChange={(e) => setAttendanceForm((prev) => ({ ...prev, date: e.target.value }))} />
                     <div className="flex items-end gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setAllStudentStatus("present")}
-                        className="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500"
-                      >
+                      <button type="button" onClick={() => setAllStudentStatus("present")} className="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500">
                         Present All
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setAllStudentStatus("absent")}
-                        className="flex-1 rounded-2xl bg-rose-600 px-4 py-3 font-semibold text-white transition hover:bg-rose-500"
-                      >
+                      <button type="button" onClick={() => setAllStudentStatus("absent")} className="flex-1 rounded-2xl bg-rose-600 px-4 py-3 font-semibold text-white transition hover:bg-rose-500">
                         Absent All
                       </button>
                     </div>
@@ -396,11 +378,7 @@ const TeacherDashboard = () => {
                                     type="button"
                                     onClick={() => setStudentStatus((prev) => ({ ...prev, [student._id]: status }))}
                                     className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
-                                      studentStatus[student._id] === status
-                                        ? status === "present"
-                                          ? "bg-emerald-600 text-white"
-                                          : "bg-rose-600 text-white"
-                                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                      studentStatus[student._id] === status ? status === "present" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                     }`}
                                   >
                                     {status}
@@ -411,57 +389,22 @@ const TeacherDashboard = () => {
                           </div>
                         ))
                       ) : (
-                        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
-                          Select a subject to load students.
-                        </div>
+                        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">Select a subject to load students.</div>
                       )}
                     </div>
                   </div>
 
-                  <button
-                    onClick={handleAttendanceSubmit}
-                    className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
-                  >
+                  <button onClick={handleAttendanceSubmit} className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800">
                     <FaSave />
                     Save Attendance
                   </button>
-
-                  <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200">
-                    <div className="grid grid-cols-12 bg-slate-100 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      <div className="col-span-4">Date</div>
-                      <div className="col-span-4">Subject</div>
-                      <div className="col-span-4">Status</div>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                      {attendance.length ? (
-                        attendance.slice(0, 8).map((item, index) => (
-                          <div key={item?._id || index} className="grid grid-cols-12 px-4 py-4 text-sm text-slate-900">
-                            <div className="col-span-4 font-medium">{formatDate(item?.date || item?.createdAt)}</div>
-                            <div className="col-span-4 text-slate-600">{subjectTitle(item?.subjectId || item?.subject)}</div>
-                            <div className="col-span-4">
-                              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${String(item?.status || "").toLowerCase() === "present" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
-                                {item?.status || "-"}
-                              </span>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-4 py-8 text-sm text-slate-500">No attendance records yet.</div>
-                      )}
-                    </div>
-                  </div>
                 </Panel>
-              )}
+              ) : null}
 
-              {activeTab === "marks" && (
+              {activeTab === "marks" && canManageMarks ? (
                 <Panel title="Marks" subtitle="Marks entry workspace">
                   <div className="mt-6 grid gap-4 md:grid-cols-3">
-                    <Field
-                      label="Subject"
-                      as="select"
-                      value={markForm.subjectId}
-                      onChange={(e) => setMarkForm((prev) => ({ ...prev, subjectId: e.target.value }))}
-                    >
+                    <Field label="Subject" as="select" value={markForm.subjectId} onChange={(e) => setMarkForm((prev) => ({ ...prev, subjectId: e.target.value }))}>
                       <option value="">Select subject</option>
                       {subjects.map((subject) => (
                         <option key={subject._id} value={subject._id}>
@@ -469,18 +412,9 @@ const TeacherDashboard = () => {
                         </option>
                       ))}
                     </Field>
-                    <Field
-                      label="Date"
-                      type="date"
-                      value={markForm.date}
-                      onChange={(e) => setMarkForm((prev) => ({ ...prev, date: e.target.value }))}
-                    />
+                    <Field label="Date" type="date" value={markForm.date} onChange={(e) => setMarkForm((prev) => ({ ...prev, date: e.target.value }))} />
                     <div className="flex items-end">
-                      <button
-                        type="button"
-                        onClick={handleMarkSubmit}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
-                      >
+                      <button type="button" onClick={handleMarkSubmit} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800">
                         <FaSave />
                         Save Marks
                       </button>
@@ -518,35 +452,12 @@ const TeacherDashboard = () => {
                           </div>
                         ))
                       ) : (
-                        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
-                          Select a subject to load students.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200">
-                    <div className="grid grid-cols-12 bg-slate-100 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      <div className="col-span-4">Date</div>
-                      <div className="col-span-4">Subject</div>
-                      <div className="col-span-4">Records</div>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                      {marks.length ? (
-                        marks.slice(0, 8).map((item, index) => (
-                          <div key={item?._id || index} className="grid grid-cols-12 px-4 py-4 text-sm text-slate-900">
-                            <div className="col-span-4 font-medium">{formatDate(item?.date || item?.createdAt)}</div>
-                            <div className="col-span-4 text-slate-600">{subjectTitle(item?.subjectId || item?.subject)}</div>
-                            <div className="col-span-4 text-slate-600">{item?.records?.length || item?.students?.length || 0}</div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="px-4 py-8 text-sm text-slate-500">No marks records yet.</div>
+                        <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">Select a subject to load students.</div>
                       )}
                     </div>
                   </div>
                 </Panel>
-              )}
+              ) : null}
             </main>
           </div>
         </div>
@@ -570,10 +481,7 @@ const Field = ({ label, as = "input", children, ...props }) => {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-slate-700">{label}</label>
-      <Component
-        {...props}
-        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
-      >
+      <Component {...props} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white">
         {children}
       </Component>
     </div>
@@ -586,23 +494,5 @@ const Line = ({ label, value }) => (
     <span className="max-w-[60%] truncate text-sm font-semibold text-slate-900">{value}</span>
   </div>
 );
-
-const Metric = ({ label, value, tone = "slate" }) => {
-  const styles = {
-    slate: "bg-slate-100 text-slate-700",
-    emerald: "bg-emerald-100 text-emerald-700",
-    amber: "bg-amber-100 text-amber-700",
-    indigo: "bg-indigo-100 text-indigo-700",
-    rose: "bg-rose-100 text-rose-700",
-    blue: "bg-blue-100 text-blue-700",
-  };
-
-  return (
-    <div className={`rounded-2xl px-4 py-3 ${styles[tone]}`}>
-      <p className="text-[11px] uppercase tracking-[0.2em] opacity-70">{label}</p>
-      <p className="mt-1 text-lg font-black">{value}</p>
-    </div>
-  );
-};
 
 export default TeacherDashboard;

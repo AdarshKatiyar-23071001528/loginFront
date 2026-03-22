@@ -3,7 +3,7 @@ import AppContext from './AppContext'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../api/axios';
-import { setAuthToken, clearAuthToken } from "../utils/auth";
+import { setAuthToken, clearAuthToken, setAuthUser } from "../utils/auth";
 
 const AppState = (props) => {
 
@@ -49,6 +49,7 @@ const AppState = (props) => {
             })
             if (res.data.success && res.data.token) {
                 setAuthToken(res.data.token);
+                setAuthUser(res.data.user);
             } else {
                 clearAuthToken();
             }
@@ -76,6 +77,7 @@ const AppState = (props) => {
     })
     if (res.data.success && res.data.token) {
         setAuthToken(res.data.token);
+        setAuthUser(res.data.student);
     } else {
         clearAuthToken();
     }
@@ -90,6 +92,7 @@ const AppState = (props) => {
       });
       if (res.data.success && res.data.token) {
         setAuthToken(res.data.token);
+        setAuthUser(res.data.teacher);
       } else {
         clearAuthToken();
       }
