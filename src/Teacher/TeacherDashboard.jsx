@@ -1,9 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaBook, FaCalendarAlt, FaChartLine, FaClipboardList, FaSave, FaUserTie } from "react-icons/fa";
+import { FaBook, FaCalendarAlt, FaChartLine, FaClipboardList, FaMoneyBillWave, FaRegMessage, FaSave, FaUserTie, FaBell, FaWallet } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import api from "../api/axios";
 import { clearAuthToken, getAuthUser, setAuthUser } from "../utils/auth";
+import NoticeManagement from "../../Notice/NoticeManagement";
+import SendMessage from "../../Message/SendMessage";
+import Dashboard from "../../Payment/Dashboard";
+import All_Payment from "../../Payment/All_Payment";
+import Expense from "../Expenses/Expense";
 
 const permissionLabels = {
   "attendance.manage": "Attendance Management",
@@ -43,6 +48,11 @@ const TeacherDashboard = () => {
   const canManageMarks = permissions.includes("marks.manage");
   const canReadStudents = permissions.includes("students.read");
   const canReadSubjects = permissions.includes("subjects.read");
+  const canReadPayments = permissions.includes("payments.read");
+  const canManagePayments = permissions.includes("payments.manage");
+  const canManageExpenses = permissions.includes("expenses.manage");
+  const canManageNotices = permissions.includes("notices.manage");
+  const canManageMessages = permissions.includes("messages.manage");
   const [activeTab, setActiveTab] = useState(canManageAttendance ? "attendance" : canManageMarks ? "marks" : "logout");
   const [attendance, setAttendance] = useState([]);
   const [marks, setMarks] = useState([]);
@@ -57,11 +67,25 @@ const TeacherDashboard = () => {
   const [marksByStudent, setMarksByStudent] = useState({});
   const [marksStudentsLoading, setMarksStudentsLoading] = useState(false);
 
-  const tabs = [
-    ...(canManageAttendance ? [{ id: "attendance", label: "Attendance", icon: FaCalendarAlt }] : []),
-    ...(canManageMarks ? [{ id: "marks", label: "Marks", icon: FaBook }] : []),
-    { id: "logout", label: "Logout", icon: CiLogout },
-  ];
+  const tabs = useMemo(
+    () => [
+      ...(canManageAttendance ? [{ id: "attendance", label: "Attendance", icon: FaCalendarAlt }] : []),
+      ...(canManageMarks ? [{ id: "marks", label: "Marks", icon: FaBook }] : []),
+      ...(canReadSubjects ? [{ id: "subjects", label: "Subjects", icon: FaClipboardList }] : []),
+      ...(canReadPayments || canManagePayments ? [{ id: "payments", label: "Payments", icon: FaMoneyBillWave }] : []),
+      ...(canManageExpenses ? [{ id: "expenses", label: "Expenses", icon: FaWallet }] : []),
+      ...(canManageNotices ? [{ id: "notices", label: "Notices", icon: FaBell }] : []),
+      ...(canManageMessages ? [{ id: "messages", label: "Messages", icon: FaRegMessage }] : []),
+      { id: "logout", label: "Logout", icon: CiLogout },
+    ],
+    [canManageAttendance, canManageMarks, canReadSubjects, canReadPayments, canManagePayments, canManageExpenses, canManageNotices, canManageMessages]
+  );
+
+  useEffect(() => {
+    if (tabs.some((tab) => tab.id === activeTab)) return;
+    const firstAvailable = tabs.find((tab) => tab.id !== "logout");
+    setActiveTab(firstAvailable?.id || "logout");
+  }, [activeTab, tabs]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -255,7 +279,15 @@ const TeacherDashboard = () => {
 
   const teacherName = teacher?.name || "Teacher";
   const teacherMeta = [teacher?.destination, teacher?.email, teacher?.mobile].filter(Boolean).join(" - ");
-  const noFeatureAccess = !canManageAttendance && !canManageMarks;
+  const noFeatureAccess =
+    !canManageAttendance &&
+    !canManageMarks &&
+    !canReadSubjects &&
+    !canReadPayments &&
+    !canManagePayments &&
+    !canManageExpenses &&
+    !canManageNotices &&
+    !canManageMessages;
   const permissionBadges = permissions.map((permission) => permissionLabels[permission] || permission);
 
   return (
@@ -345,7 +377,21 @@ const TeacherDashboard = () => {
                       <span>
                         <span className="block font-semibold">{tab.label}</span>
                         <span className="block text-xs text-slate-400">
-                          {tab.id === "attendance" ? "Mark presence" : tab.id === "marks" ? "Enter marks" : "Logout from device"}
+                          {tab.id === "attendance"
+                            ? "Mark presence"
+                            : tab.id === "marks"
+                              ? "Enter marks"
+                              : tab.id === "subjects"
+                                ? "View assigned subjects"
+                                : tab.id === "payments"
+                                  ? "Payment workspace"
+                                  : tab.id === "expenses"
+                                    ? "Expense overview"
+                                    : tab.id === "notices"
+                                      ? "Manage notices"
+                                      : tab.id === "messages"
+                                        ? "Send messages"
+                                        : "Logout from device"}
                         </span>
                       </span>
                     </button>
@@ -488,6 +534,66 @@ const TeacherDashboard = () => {
                       )}
                     </div>
                   </div>
+                </Panel>
+              ) : null}
+
+              {activeTab === "subjects" && canReadSubjects ? (
+                <Panel title="Subjects" subtitle="Assigned subject list">
+                  <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200">
+                    <div className="grid grid-cols-12 bg-slate-100 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                      <div className="col-span-4">Subject</div>
+                      <div className="col-span-3">Course</div>
+                      <div className="col-span-2">Semester</div>
+                      <div className="col-span-3">Section</div>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {subjects.length ? (
+                        subjects.map((subject) => (
+                          <div key={subject._id} className="grid grid-cols-12 px-4 py-4 text-sm text-slate-900">
+                            <div className="col-span-4 font-medium">{subject.name || "-"}</div>
+                            <div className="col-span-3 text-slate-600">{subject.course || "-"}</div>
+                            <div className="col-span-2 text-slate-600">{subject.semester || "-"}</div>
+                            <div className="col-span-3 text-slate-600">{subject.section || "-"}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-8 text-sm text-slate-500">No assigned subjects.</div>
+                      )}
+                    </div>
+                  </div>
+                </Panel>
+              ) : null}
+
+              {activeTab === "payments" && (canReadPayments || canManagePayments) ? (
+                <Panel title="Payments" subtitle="Payment access workspace">
+                  <div className="space-y-6">
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                      <Dashboard />
+                    </div>
+                    {canManagePayments ? (
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                        <All_Payment />
+                      </div>
+                    ) : null}
+                  </div>
+                </Panel>
+              ) : null}
+
+              {activeTab === "expenses" && canManageExpenses ? (
+                <Panel title="Expenses" subtitle="Expense overview">
+                  <Expense />
+                </Panel>
+              ) : null}
+
+              {activeTab === "notices" && canManageNotices ? (
+                <Panel title="Notices" subtitle="Notice management">
+                  <NoticeManagement />
+                </Panel>
+              ) : null}
+
+              {activeTab === "messages" && canManageMessages ? (
+                <Panel title="Messages" subtitle="Communication workspace">
+                  <SendMessage />
                 </Panel>
               ) : null}
             </main>
