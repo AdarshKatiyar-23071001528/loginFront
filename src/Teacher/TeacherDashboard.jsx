@@ -3,7 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaChartLine, FaClipboardList, FaSave, FaUserTie } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import api from "../api/axios";
-import { clearAuthToken, getAuthUser } from "../utils/auth";
+import { clearAuthToken, getAuthUser, setAuthUser } from "../utils/auth";
+
+const permissionLabels = {
+  "attendance.manage": "Attendance Management",
+  "marks.manage": "Marks Management",
+  "subjects.read": "Subjects Access",
+  "students.read": "Students Access",
+  "payments.read": "Payments Read",
+  "payments.manage": "Payments Management",
+  "expenses.manage": "Expenses Management",
+  "notices.manage": "Notice Management",
+  "messages.manage": "Message Management",
+};
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -22,15 +34,15 @@ const TeacherDashboard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const authUser = getAuthUser();
-  const permissions = authUser?.permissions || [];
-  const canManageAttendance = permissions.includes("attendance.manage");
-  const canManageMarks = permissions.includes("marks.manage");
-  const canReadStudents = permissions.includes("students.read");
-  const canReadSubjects = permissions.includes("subjects.read");
 
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const permissions = teacher?.permissions || authUser?.permissions || [];
+  const canManageAttendance = permissions.includes("attendance.manage");
+  const canManageMarks = permissions.includes("marks.manage");
+  const canReadStudents = permissions.includes("students.read");
+  const canReadSubjects = permissions.includes("subjects.read");
   const [activeTab, setActiveTab] = useState(canManageAttendance ? "attendance" : canManageMarks ? "marks" : "logout");
   const [attendance, setAttendance] = useState([]);
   const [marks, setMarks] = useState([]);
@@ -64,7 +76,11 @@ const TeacherDashboard = () => {
         ];
 
         const [teacherRes, attendanceRes, studentsRes, marksRes, subjectsRes] = await Promise.all(requests);
-        setTeacher(teacherRes.data.teacher || null);
+        const teacherProfile = teacherRes.data.teacher || null;
+        setTeacher(teacherProfile);
+        if (teacherProfile) {
+          setAuthUser(teacherProfile);
+        }
         setAttendance(attendanceRes.data.records || []);
         setStudents(studentsRes.data.students || []);
         setMarks(marksRes.data.marks || []);
@@ -240,6 +256,7 @@ const TeacherDashboard = () => {
   const teacherName = teacher?.name || "Teacher";
   const teacherMeta = [teacher?.destination, teacher?.email, teacher?.mobile].filter(Boolean).join(" - ");
   const noFeatureAccess = !canManageAttendance && !canManageMarks;
+  const permissionBadges = permissions.map((permission) => permissionLabels[permission] || permission);
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.16),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] text-white">
@@ -292,6 +309,21 @@ const TeacherDashboard = () => {
                   <Line label="Mobile" value={teacher?.mobile || "-"} />
                   <Line label="Role" value={teacher?.role || "-"} />
                   <Line label="Joining" value={formatDate(teacher?.joiningDate)} />
+                </div>
+
+                <div className="mt-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Assigned Permissions</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {permissionBadges.length ? (
+                      permissionBadges.map((permission) => (
+                        <span key={permission} className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          {permission}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">No permissions assigned</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
