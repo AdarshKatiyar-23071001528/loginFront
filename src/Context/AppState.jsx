@@ -86,18 +86,28 @@ const AppState = (props) => {
     }
 
     const teacherLogin = async(email,password) => {
-      const res = await api.post('/teacher/login', {email,password},{
-        headers:{ 'Content-Type': "Application/json" },
-        withCredentials: true
-      });
-      if (res.data.success && res.data.token) {
-        setAuthToken(res.data.token);
-        setAuthUser(res.data.teacher);
-      } else {
+      try {
+        const res = await api.post('/teacher/login', {email,password},{
+          headers:{ 'Content-Type': "Application/json" },
+          withCredentials: true
+        });
+        if (res.data.success && res.data.token) {
+          setAuthToken(res.data.token);
+          setAuthUser(res.data.teacher);
+        } else {
+          clearAuthToken();
+        }
+        alert(res.data.message);
+        return res.data;
+      } catch (error) {
         clearAuthToken();
+        const payload = {
+          success: false,
+          message: error.response?.data?.message || "Teacher login failed",
+        };
+        alert(payload.message);
+        return payload;
       }
-      alert(res.data.message);
-      return res.data;
     }
 
     // subject and attendance APIs

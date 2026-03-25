@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../src/api/axios.js";
 import { printPaymentReceipt } from "./PaymentReceipt";
+import { FEE_TYPE_OPTIONS } from "../src/utils/studentFees";
 
 const History = () => {
   const [payments, setPayments] = useState([]);
@@ -118,6 +119,7 @@ const History = () => {
             <thead className="bg-gray-200">
               <tr>
                 <th className="p-3 text-left">Student Name</th>
+                <th className="p-3 text-left">Fee Type</th>
                 <th className="p-3 text-left">Amount</th>
                 <th className="p-3 text-left">Payment Method</th>
                 <th className="p-3 text-left">Transaction Id</th>
@@ -129,7 +131,7 @@ const History = () => {
             <tbody>
               {filteredPayment.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="p-6 text-center">
+                  <td colSpan="7" className="p-6 text-center">
                     No Data Found
                   </td>
                 </tr>
@@ -138,6 +140,10 @@ const History = () => {
                   <tr key={index} className="border-b hover:bg-gray-100">
                     <td className="p-3">
                       {item.payment?.studentName || item.student?.name}
+                    </td>
+
+                    <td className="p-3">
+                      {FEE_TYPE_OPTIONS.find((fee) => fee.value === item.payment?.feeType)?.label || "Tuition Fees"}
                     </td>
 
                     <td className="p-3 text-green-600 font-semibold">

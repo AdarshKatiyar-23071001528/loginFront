@@ -1,5 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { FEE_TYPE_OPTIONS } from "../src/utils/studentFees";
 
 const receiptStyles = `
   * { box-sizing: border-box; }
@@ -140,6 +141,9 @@ const normalizeReceiptData = (receipt = {}) => ({
   course: readValue(receipt.course),
   semester: readValue(receipt.semester),
   enrollment: readValue(receipt.enrollment),
+  feeType: readValue(
+    FEE_TYPE_OPTIONS.find((item) => item.value === receipt.feeType)?.label || "Tuition Fees",
+  ),
   paymentMethod: readValue(receipt.paymentMethod),
 });
 
@@ -179,6 +183,10 @@ const ReceiptCopy = ({ receipt, copyName }) => (
       <div className="field">
         <span className="label">Enrollment</span>
         <span className="value">{receipt.enrollment}</span>
+      </div>
+      <div className="field">
+        <span className="label">Fee Type</span>
+        <span className="value">{receipt.feeType}</span>
       </div>
       <div className="field">
         <span className="label">Payment Method</span>

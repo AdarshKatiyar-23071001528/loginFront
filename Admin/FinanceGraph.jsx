@@ -10,7 +10,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import Box from "../Users/Box.jsx";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -44,12 +43,9 @@ const FinanceGraph = () => {
     fetchGraph();
   }, [type, month, year]);
 
-  // cards
   const totalFees = graph.fees.reduce((sum, val) => sum + val, 0);
   const totalExpense = graph.expenses.reduce((sum, val) => sum + val, 0);
   const totalProfit = totalFees - totalExpense;
-
-  console.log(totalFees);
 
   const fetchGraph = async () => {
     try {
@@ -84,17 +80,71 @@ const FinanceGraph = () => {
     ],
   };
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          usePointStyle: true,
+          boxWidth: 10,
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `Rs. ${value}`,
+        },
+      },
+    },
+  };
+
+  const summaryCards = [
+    {
+      name: "Fees Collection",
+      value: totalFees,
+      accent: "border-emerald-500 bg-emerald-50 text-emerald-700",
+    },
+    {
+      name: "Expense",
+      value: totalExpense,
+      accent: "border-rose-500 bg-rose-50 text-rose-700",
+    },
+    {
+      name: "Profit",
+      value: totalProfit,
+      accent: "border-sky-500 bg-sky-50 text-sky-700",
+    },
+  ];
+
   return (
-    <div className="shadow p-4 rounded relative flex justify-around h-full flex-col w-full  ">
-      <div className="flex justify-between items-center flex-wrap p-3 rounded shadow-md flex-col md:flex-row gap-5 md:gap-0">
-       <h2 className="text-2xl font-bold text-left md:text-center w-full md:w-fit">
-        Finance Overview
-      </h2>
-      <div className="flex gap-3 flex-wrap w-full justify-end md:w-fit">
+    <section className="w-full rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+            Finance Graph
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+            Finance Overview
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Compare fee collection, expenses, and profit by month or across the year.
+          </p>
+        </div>
+
+        <div className="grid w-full gap-3 sm:grid-cols-3 lg:w-auto">
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="border p-2 rounded "
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
           >
             <option value="month">Month Wise</option>
             <option value="year">Year Wise</option>
@@ -104,7 +154,7 @@ const FinanceGraph = () => {
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="border rounded p-2"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
             >
               {monthNames.map((m, i) => (
                 <option key={i + 1} value={i + 1}>
@@ -117,7 +167,7 @@ const FinanceGraph = () => {
           <select
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="border p-2 rounded"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
           >
             {[2023, 2024, 2025, 2026, 2027].map((y) => (
               <option key={y} value={y}>
@@ -125,28 +175,41 @@ const FinanceGraph = () => {
               </option>
             ))}
           </select>
-      </div>
-      </div>
-
-
-      
-      <div>
-        <div className="flex justify-between md:w-[80%] h-full gap-9 flex-col md:flex-row">
-        <Bar data={chartData} className="md:w-[80%] pt-4 " />
-        <div className="flex  md:flex-col gap-4 pt-4 ">
-          <Box name={"Fees Collection"} value={totalFees} />
-          <Box name={"Expense"} value={totalExpense} />
-          <Box name={"Profit"} value={totalProfit} />
         </div>
       </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(260px,0.8fr)]">
+        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Performance Chart</p>
+              <p className="text-xs text-slate-500">
+                {type === "year" ? "Yearly performance view" : "Selected month performance view"}
+              </p>
+            </div>
+          </div>
+          <div className="h-[320px] sm:h-[380px] lg:h-[420px]">
+            <Bar data={chartData} options={chartOptions} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+          {summaryCards.map((card) => (
+            <article
+              key={card.name}
+              className={`rounded-3xl border-l-4 p-4 shadow-sm ${card.accent}`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.18em]">
+                {card.name}
+              </p>
+              <p className="mt-3 text-2xl font-black sm:text-3xl">
+                Rs. {Number(card.value || 0).toLocaleString("en-IN")}
+              </p>
+            </article>
+          ))}
+        </div>
       </div>
-
-
-
-
-
-      
-    </div>
+    </section>
   );
 };
 

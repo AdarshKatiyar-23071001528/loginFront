@@ -554,7 +554,7 @@ useEffect(()=>{
 
               {activePage === "payment" && subActivePage === "Pay Fees" && (
                 <Card className="p-3">
-                  <All_Payment />
+                  <All_Payment notshow={true}/>
                 </Card>
               )}
 

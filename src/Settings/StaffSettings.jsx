@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
-import { STAFF_PERMISSION_OPTIONS, STAFF_ROLES } from "../constants/staff";
+import { ALL_STAFF_PERMISSIONS, STAFF_PERMISSION_OPTIONS, STAFF_ROLES } from "../constants/staff";
 
 const roleMap = Object.fromEntries(STAFF_ROLES.map((item) => [item.value, item.label]));
 const permissionMap = Object.fromEntries(STAFF_PERMISSION_OPTIONS.map((item) => [item.value, item.label]));
@@ -113,7 +113,16 @@ const StaffSettings = ({ refreshKey = 0 }) => {
                       <span>Role</span>
                       <select
                         value={draft.role}
-                        onChange={(e) => setDrafts((prev) => ({ ...prev, [staff._id]: { ...draft, role: e.target.value } }))}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [staff._id]: {
+                              ...draft,
+                              role: e.target.value,
+                              permissions: e.target.value === "admin_staff" ? [...ALL_STAFF_PERMISSIONS] : draft.permissions,
+                            },
+                          }))
+                        }
                         className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-slate-400"
                       >
                         {STAFF_ROLES.map((role) => (

@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { FaCalendarAlt, FaFileUpload, FaIdCard, FaMoneyBillWave, FaPhoneAlt } from "react-icons/fa";
+import { FaBell, FaCalendarAlt, FaFileUpload, FaIdCard, FaMoneyBillWave, FaPhoneAlt } from "react-icons/fa";
 import api from "../api/axios";
 import { CiLogout } from "react-icons/ci";
 import { clearAuthToken } from "../utils/auth";
+import { FEE_TYPE_OPTIONS, getFeeTotals } from "../utils/studentFees";
+import StudentNotice from "./StudentNotice";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: FaIdCard },
   { id: "attendance", label: "Attendance", icon: FaCalendarAlt },
   { id: "fees", label: "Fees", icon: FaMoneyBillWave },
+  {id: "notice", label:"Notice", icon: FaBell},
    { id: "logout", label: "Logout", icon: CiLogout },
 ];
 
@@ -45,6 +48,7 @@ const StudentDash = () => {
   const [attendance, setAttendance] = useState([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
+    feeType: "tuition",
     amount: "",
     transactionId: "",
     paymentMethod: "UPI",
@@ -81,7 +85,9 @@ const StudentDash = () => {
     fetchData();
   }, [studentId]);
 
-  const feeDue = Number(profile?.totalfees || 0) - Number(profile?.paidfees || 0);
+  const feeTotals = useMemo(() => getFeeTotals(profile || {}), [profile]);
+  const feeDue = feeTotals.pending;
+  const selectedFeePending = feeTotals.summary?.[paymentForm.feeType || "tuition"]?.pending || 0;
   const attendancePresent = attendance.filter((item) => String(item?.status || "").toLowerCase() === "present").length;
 
   const handlePaymentChange = async (e) => {
@@ -111,12 +117,17 @@ const StudentDash = () => {
       alert("Please fill all required fields");
       return;
     }
+    if (Number(paymentForm.amount) > Number(selectedFeePending)) {
+      alert("Amount cannot be greater than pending fees of selected fee type");
+      return;
+    }
 
     setPaymentLoading(true);
     try {
       const res = await api.put("/student/uploadPayment", {
         studentId,
         amount: Number(paymentForm.amount),
+        feeType: paymentForm.feeType || "tuition",
         transactionId: paymentForm.transactionId,
         paymentMethod: paymentForm.paymentMethod || "UPI",
         screenshot: paymentForm.screenshot || null,
@@ -124,7 +135,7 @@ const StudentDash = () => {
 
       if (res.data?.message) {
         alert("Payment uploaded successfully. Waiting for admin approval.");
-        setPaymentForm({ amount: "", transactionId: "", paymentMethod: "UPI", screenshot: "", screenshotName: "" });
+        setPaymentForm({ feeType: "tuition", amount: "", transactionId: "", paymentMethod: "UPI", screenshot: "", screenshotName: "" });
         await refreshProfile();
       }
     } catch (err) {
@@ -181,7 +192,7 @@ const StudentDash = () => {
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 <MiniStat label="Due Fees" value={formatAmount(feeDue)} />
-                <MiniStat label="Paid Fees" value={formatAmount(profile?.paidfees)} />
+                <MiniStat label="Paid Fees" value={formatAmount(feeTotals.paid)} />
                 <MiniStat label="Present Days" value={attendancePresent} />
               </div>
             </div>
@@ -312,13 +323,50 @@ const StudentDash = () => {
                 <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
                   <Panel title="Fee Summary" subtitle="Current fee overview">
                     <div className="mt-6 grid gap-4 md:grid-cols-3">
-                      <Metric label="Total Fees" value={formatAmount(profile?.totalfees)} tone="blue" />
-                      <Metric label="Paid Fees" value={formatAmount(profile?.paidfees)} tone="emerald" />
+                      <Metric label="Total Fees" value={formatAmount(feeTotals.total)} tone="blue" />
+                      <Metric label="Paid Fees" value={formatAmount(feeTotals.paid)} tone="emerald" />
                       <Metric label="Balance Due" value={formatAmount(feeDue)} tone="rose" />
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      {feeTotals.list.map((item) => (
+                        <div key={item.key} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
+                          <div className="mt-3 space-y-2 text-sm text-slate-700">
+                            <div className="flex items-center justify-between gap-3">
+                              <span>Total</span>
+                              <span className="font-semibold">{formatAmount(item.total)}</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span>Paid</span>
+                              <span className="font-semibold text-emerald-700">{formatAmount(item.paid)}</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span>Pending</span>
+                              <span className="font-semibold text-rose-700">{formatAmount(item.pending)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <form onSubmit={handlePaymentSubmit} className="mt-6 space-y-4">
                       <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-slate-700">Fee Type</label>
+                          <select
+                            name="feeType"
+                            value={paymentForm.feeType}
+                            onChange={handlePaymentChange}
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+                          >
+                            {FEE_TYPE_OPTIONS.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                         <Field label="Amount" name="amount" type="number" value={paymentForm.amount} onChange={handlePaymentChange} placeholder="Enter amount" />
                         <Field label="Transaction ID" name="transactionId" type="text" value={paymentForm.transactionId} onChange={handlePaymentChange} placeholder="UPI / Bank reference" />
                         <Field label="Payment Method" name="paymentMethod" type="text" value={paymentForm.paymentMethod} onChange={handlePaymentChange} placeholder="UPI / Cash / Bank" />
@@ -333,6 +381,10 @@ const StudentDash = () => {
                           </label>
                         </div>
                       </div>
+
+                      <p className="text-sm text-slate-500">
+                        Pending for selected fee type: {formatAmount(selectedFeePending)}
+                      </p>
 
                       <button
                         type="submit"
@@ -352,7 +404,9 @@ const StudentDash = () => {
                             <div className="flex items-center justify-between gap-4">
                               <div>
                                 <p className="text-lg font-black">{formatAmount(payment?.amount)}</p>
-                                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{payment?.paymentMethod || "UPI"}</p>
+                                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                                  {FEE_TYPE_OPTIONS.find((item) => item.value === payment?.feeType)?.label || "Tuition Fees"} • {payment?.paymentMethod || "UPI"}
+                                </p>
                               </div>
                               <span
                                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -380,6 +434,13 @@ const StudentDash = () => {
                     </div>
                   </Panel>
                 </div>
+              )}
+
+
+              {activeTab === "notice" && (
+                <Panel title="Notice" subtitle="Send By Administrator">
+                    <StudentNotice forWhich = "student"/>
+                </Panel>
               )}
             </main>
           </div>

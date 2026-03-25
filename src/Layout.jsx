@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Nav from '../Nav/Nav';
+import NetworkStatus from './NetworkStatus';
 
 const Home = lazy(() => import('../Home/Home'));
 const AllUsers = lazy(() => import('../Users/AllUsers'));
@@ -29,8 +30,8 @@ const Layout = () => {
 
   return (
     <>
+      {/* <NetworkStatus/> */}
       {!hideNav && <Nav />}
-
       <Suspense fallback={<div className='min-h-[40vh] flex items-center justify-center text-lg font-medium text-slate-600'>Loading...</div>}>
         <Routes>
           <Route path='/' element={<Home/>} />

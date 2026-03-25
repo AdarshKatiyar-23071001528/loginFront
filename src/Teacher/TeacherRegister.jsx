@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { STAFF_PERMISSION_OPTIONS, STAFF_ROLES } from "../constants/staff";
+import { ALL_STAFF_PERMISSIONS, STAFF_PERMISSION_OPTIONS, STAFF_ROLES } from "../constants/staff";
 
 const defaultPermissions = ["attendance.manage", "marks.manage", "subjects.read", "students.read"];
 
@@ -33,6 +33,10 @@ const TeacherRegister = ({ onSuccess }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+      permissions:
+        name === "role" && value === "admin_staff"
+          ? [...ALL_STAFF_PERMISSIONS]
+          : prev.permissions,
     }));
   };
 
@@ -129,7 +133,8 @@ const TeacherRegister = ({ onSuccess }) => {
           onSuccess(response.data.teacher);
         } else {
           setTimeout(() => {
-            navigate("/login");
+            // navigate("/login");
+            alert("Successfull register");
           }, 1200);
         }
       } else {
