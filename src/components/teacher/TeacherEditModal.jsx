@@ -1,92 +1,66 @@
 import React, { useMemo, useState } from "react";
 import api from "../../api/axios";
-import StudentDocumentFields from "./StudentDocumentFields";
+import StudentDocumentFields from "../student/StudentDocumentFields";
 import {
   createDocumentItem,
   normalizeStudentDocuments,
   resolveDocumentType,
 } from "../../utils/studentDocuments";
-import { getSafeAssetUrl } from "./StudentProfileSheet";
+import { getSafeAssetUrl } from "../student/StudentProfileSheet";
 
 const FIELD_GROUPS = [
   {
     title: "Basic Details",
     fields: [
       ["name", "Full Name"],
-      ["email", "Email"],
+      ["email", "Email", "email"],
       ["password", "Password", "password"],
-      ["wrn", "WRN"],
-      ["rollno", "Roll No"],
-      ["enrollment", "Enrollment"],
-      ["course", "Course"],
-      ["semester", "Semester", "number"],
-      ["section", "Section"],
-      ["branch", "Branch"],
-      ["reference", "Reference"],
+      ["mobile", "Mobile"],
+      ["role", "Role"],
     ],
   },
-  {
-    title: "Personal Details",
-    fields: [
-      ["fathername", "Father Name"],
-      ["mothername", "Mother Name"],
-      ["mobile1", "Mobile 1"],
-      ["mobile2", "Mobile 2"],
-      ["mobile3", "Mobile 3"],
-      ["dob", "Date of Birth", "date"],
-      ["doa", "Date of Admission", "date"],
-      ["adhaar", "Aadhaar"],
-    ],
-  },
+  // {
+  //   title: "Professional Details",
+  //   fields: [
+  //     ["post", "Post / Designation"],
+  //     ["destination", "Department / Specialization"],
+  //     ["salary", "Salary", "number"],
+  //     ["joiningDate", "Joining Date", "date"],
+  //   ],
+  // },
   {
     title: "Address Details",
     fields: [
       ["address", "Address"],
       ["landmark", "Landmark"],
-      ["post", "Post"],
       ["district", "District"],
       ["pincode", "Pincode"],
     ],
   },
-  {
-    title: "Fee Details",
-    fields: [
-      ["fees", "Tuition Fees", "number"],
-      ["convenienceFees", "Convenience Fees", "number"],
-      ["hostelFees", "Hostel Fees", "number"],
-      ["documentFees", "Documents Fees", "number"],
-      ["otherFees", "Other Fees", "number"],
-      ["discount", "Discount", "number"],
-    ],
-  },
 ];
 
-const EDITABLE_KEYS = FIELD_GROUPS.flatMap((group) =>
-  group.fields.map(([key]) => key),
-);
+const EDITABLE_KEYS = [...new Set(FIELD_GROUPS.flatMap((group) => group.fields.map(([key]) => key)))];
 
-const StudentEditModal = ({ student, onClose, onSaved }) => {
+const TeacherEditModal = ({ teacher, onClose, onSaved }) => {
   const [formData, setFormData] = useState(() => ({
-    ...student,
+    ...teacher,
     password: "",
+    joiningDate: teacher?.joiningDate ? String(teacher.joiningDate).slice(0, 10) : "",
   }));
   const [documents, setDocuments] = useState(() =>
-    normalizeStudentDocuments(student?.documents),
+    normalizeStudentDocuments(teacher?.documents),
   );
   const [imageFile, setImageFile] = useState(null);
   const [signatureFile, setSignatureFile] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const imagePreview = useMemo(
-    () => (imageFile ? URL.createObjectURL(imageFile) : getSafeAssetUrl(student?.imgSrc)),
-    [imageFile, student?.imgSrc],
+    () => (imageFile ? URL.createObjectURL(imageFile) : getSafeAssetUrl(teacher?.imgSrc)),
+    [imageFile, teacher?.imgSrc],
   );
   const signaturePreview = useMemo(
-    () =>
-      signatureFile
-        ? URL.createObjectURL(signatureFile)
-        : getSafeAssetUrl(student?.signature),
-    [signatureFile, student?.signature],
+    () => (signatureFile ? URL.createObjectURL(signatureFile) : getSafeAssetUrl(teacher?.signature)),
+    [signatureFile, teacher?.signature],
   );
 
   const updateDocument = (index, field, value) => {
@@ -100,7 +74,6 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const payload = new FormData();
 
@@ -111,6 +84,12 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
         }
       });
 
+      if (Array.isArray(formData.permissions)) {
+        formData.permissions.forEach((permission) => payload.append("permissions", permission));
+      }
+      if (typeof formData.isActive === "boolean") {
+        payload.append("isActive", formData.isActive);
+      }
       if (imageFile) payload.append("imgSrc", imageFile);
       if (signatureFile) payload.append("signature", signatureFile);
 
@@ -133,20 +112,12 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
           payload.append("docTypes", documentType);
         });
 
-      const response = await api.put(
-        `/student/profile/update/${student._id}`,
-        payload,
-      );
-
+      const response = await api.put(`/teacher/profile/${teacher._id}`, payload);
       if (response.data?.success) {
-        const updatedStudent = response.data.student || {
-          ...student,
-          ...formData,
-        };
-        onSaved?.(updatedStudent);
+        onSaved?.(response.data.teacher);
       }
     } catch (error) {
-      window.alert(error.response?.data?.message || "Error updating student");
+      window.alert(error.response?.data?.message || "Error updating teacher");
     } finally {
       setSaving(false);
     }
@@ -158,10 +129,10 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-              Edit Student
+              Edit Teacher
             </p>
             <h2 className="mt-1 text-2xl font-black text-slate-900">
-              {student?.name || "Student"}
+              {teacher?.name || "Teacher"}
             </h2>
           </div>
 
@@ -180,11 +151,7 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
               <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <h3 className="text-lg font-bold text-slate-900">Photo</h3>
                 {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Student"
-                    className="mt-4 h-56 w-full rounded-2xl object-cover"
-                  />
+                  <img src={imagePreview} alt="Teacher" className="mt-4 h-56 w-full rounded-2xl object-cover" />
                 ) : null}
                 <input
                   type="file"
@@ -197,18 +164,12 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
               <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <h3 className="text-lg font-bold text-slate-900">Signature</h3>
                 {signaturePreview ? (
-                  <img
-                    src={signaturePreview}
-                    alt="Signature"
-                    className="mt-4 h-28 w-full rounded-2xl object-contain"
-                  />
+                  <img src={signaturePreview} alt="Signature" className="mt-4 h-28 w-full rounded-2xl object-contain" />
                 ) : null}
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
-                    setSignatureFile(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => setSignatureFile(e.target.files?.[0] || null)}
                   className="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-white"
                 />
               </section>
@@ -216,16 +177,11 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
 
             <div className="space-y-6">
               {FIELD_GROUPS.map((group) => (
-                <section
-                  key={group.title}
-                  className="rounded-3xl border border-slate-200 bg-slate-50 p-5"
-                >
-                  <h3 className="text-lg font-bold text-slate-900">
-                    {group.title}
-                  </h3>
+                <section key={group.title} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                  <h3 className="text-lg font-bold text-slate-900">{group.title}</h3>
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     {group.fields.map(([key, label, type = "text"]) => (
-                      <div key={key}>
+                      <div key={`${group.title}-${key}`}>
                         <label className="mb-2 block text-sm font-semibold text-slate-700">
                           {label}
                         </label>
@@ -238,7 +194,7 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
                               [key]: e.target.value,
                             }))
                           }
-                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 text-slate-600"
                         />
                       </div>
                     ))}
@@ -248,7 +204,7 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
 
               <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <h3 className="text-lg font-bold text-slate-900">Documents</h3>
-                <div className="mt-4">
+                <div className="mt-4 text-slate-700">
                   <StudentDocumentFields
                     documents={documents}
                     onDocumentChange={updateDocument}
@@ -290,4 +246,4 @@ const StudentEditModal = ({ student, onClose, onSaved }) => {
   );
 };
 
-export default StudentEditModal;
+export default TeacherEditModal;

@@ -1,154 +1,151 @@
 import React, { useState } from "react";
-import api from '../api/axios.js'
+import api from "../api/axios.js";
 
-const CreateExpense = () => {
+const inputClassName =
+  "w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-slate-400";
 
+const CreateExpense = ({ onCreated }) => {
   const [form, setForm] = useState({
     amount: "",
     name: "",
     paidTo: "",
     paidBy: "",
     mode: "",
-    remark: ""
+    remark: "",
   });
-
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
 
     try {
-
-      const res = await api.post(
-        "/expense/createExpense",form
-      );
-
-      setSuccess(res.data.message);
-
+      const res = await api.post("/expense/createExpense", form);
+      setMessage(res.data.message || "Expense added successfully");
+      setMessageType("success");
       setForm({
         amount: "",
         name: "",
         paidTo: "",
         paidBy: "",
         mode: "",
-        remark: ""
+        remark: "",
       });
-
+      onCreated?.();
     } catch (error) {
-      alert(error.message);
+      setMessage(error.response?.data?.message || error.message);
+      setMessageType("error");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="h-full flex  w-full">
-
-      <div className=" shadow-xl p-2 transform transition-all duration-300 w-full h-[100px] flex items-center justify-center rounded bg-white">
-
-
-        {success && (
-          <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-center">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className=" flex gap-2 ">
-
-          <div>
-            <input
-              type="number"
-              name="amount"
-              placeholder="Amount"
-              value={form.amount}
-              onChange={handleChange}
-              required
-              className="w-[100px] scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
-            />
-          </div>
-
-          <div>
-            <input
-              type="text"
-              name="name"
-              placeholder="Expense Name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
-            />
-          </div>
-
-          <div>
-            <input
-              type="text"
-              name="paidTo"
-              placeholder="Paid To"
-              value={form.paidTo}
-              onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border" 
-            />
-          </div>
-
-          <div>
-            <input
-              type="text"
-              name="paidBy"
-              placeholder="Paid By"
-              value={form.paidBy}
-              onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
-            />
-          </div>
-
-          <div>
-            <select
-              name="mode"
-              value={form.mode}
-              onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
-            >
-              <option value="">Payment Mode</option>
-              <option value="Cash">Cash</option>
-              <option value="UPI">UPI</option>
-              <option value="Card">Card</option>
-            </select>
-          </div>
-
-          <div>
-            <input
-              name="remark"
-              placeholder="Remark"
-              value={form.remark}
-              onChange={handleChange}
-              className="w-full scrollbar-none py-2 px-2 no-underline rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 border"
-            />
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full p-2 flex justify-center items-center bg-blue-600 text-white hover:bg-blue-700 focus:outline-none transition duration-200 rounded"
-            >
-              {loading ? "..." : "+"}
-            </button>
-          </div>
-
-        </form>
-
+    <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Entry
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-slate-900">
+            Add Expense
+          </h2>
+        </div>
+        <div className="rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+          Finance Outflow
+        </div>
       </div>
 
-    </div>
+      {message ? (
+        <div
+          className={`mt-5 rounded-2xl px-4 py-3 text-sm font-semibold ${
+            messageType === "success"
+              ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border border-rose-200 bg-rose-50 text-rose-700"
+          }`}
+        >
+          {message}
+        </div>
+      ) : null}
+
+      <form onSubmit={handleSubmit} className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <input
+          type="number"
+          name="amount"
+          placeholder="Amount"
+          value={form.amount}
+          onChange={handleChange}
+          required
+          className={inputClassName}
+        />
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Expense name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className={inputClassName}
+        />
+
+        <input
+          type="text"
+          name="paidTo"
+          placeholder="Paid to"
+          value={form.paidTo}
+          onChange={handleChange}
+          className={inputClassName}
+        />
+
+        <input
+          type="text"
+          name="paidBy"
+          placeholder="Paid by"
+          value={form.paidBy}
+          onChange={handleChange}
+          className={inputClassName}
+        />
+
+        <select
+          name="mode"
+          value={form.mode}
+          onChange={handleChange}
+          className={inputClassName}
+          required
+        >
+          <option value="">Payment mode</option>
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+        </select>
+
+        <input
+          name="remark"
+          placeholder="Remark"
+          value={form.remark}
+          onChange={handleChange}
+          className={inputClassName}
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 md:col-span-2 xl:col-span-3"
+        >
+          {loading ? "Saving..." : "Create Expense"}
+        </button>
+      </form>
+    </section>
   );
 };
 

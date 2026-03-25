@@ -12,6 +12,9 @@ const getSafeAssetValue = (value) => {
   return null;
 };
 
+const inputClassName =
+  "rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-slate-400";
+
 const All_Payment = ({ notshow }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -159,157 +162,233 @@ const All_Payment = ({ notshow }) => {
   );
 
   return (
-    <div className="bg-white shadow-lg overflow-hidden rounded-3xl">
-      <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-3xl font-bold text-red-600 ">Payments</h2>
-
-        {notshow ? (
-          <div className="bg-black/10 py-4 px-6 rounded-xl shadow-lg border border-gray-400/50">
-            <p className="flex justify-start items-left text-gray-500 ">Receive</p>
-            <p className="text-3xl font-bold text-green-600">₹ {totalPaid}</p>
+    <div className="space-y-6 bg-slate-100 p-4 md:p-6">
+      <section className="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-900 p-6 text-white shadow-xl">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">
+              Finance Admin
+            </p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight">
+              Fee Collection
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+              Search students, review pending balances, and collect fees with a
+              cleaner payment operations screen.
+            </p>
           </div>
-        ) : null}
 
-        <div className="bg-black/10 py-4 px-6 rounded-xl shadow-lg border border-gray-400/50">
-          <p className="flex justify-start items-left text-gray-500 ">Pending</p>
-          <p className="text-3xl font-bold text-red-600">₹ {totalPending}</p>
+          <div className={`grid gap-3 ${notshow ? "sm:grid-cols-2" : "sm:grid-cols-1"}`}>
+            {notshow ? (
+              <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                  Received
+                </p>
+                <p className="mt-1 text-2xl font-black">Rs. {totalPaid}</p>
+              </div>
+            ) : null}
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                Pending
+              </p>
+              <p className="mt-1 text-2xl font-black">Rs. {totalPending}</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="flex flex-wrap gap-3 py-4">
-        <input
-          type="text"
-          placeholder="Search Enrollment"
-          value={enrollFilter}
-          onChange={(e) => setEnrollFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <input
+            type="text"
+            placeholder="Search enrollment"
+            value={enrollFilter}
+            onChange={(e) => setEnrollFilter(e.target.value)}
+            className={inputClassName}
+          />
 
-        <input
-          type="text"
-          placeholder="Search Reference"
-          value={referenceFilter}
-          onChange={(e) => setReferenceFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
+          <input
+            type="text"
+            placeholder="Search reference"
+            value={referenceFilter}
+            onChange={(e) => setReferenceFilter(e.target.value)}
+            className={inputClassName}
+          />
 
-        <input
-          type="text"
-          placeholder="Search Branch"
-          value={branchFilter}
-          onChange={(e) => setBranchFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
+          <input
+            type="text"
+            placeholder="Search branch"
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+            className={inputClassName}
+          />
 
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="desc">Highest Pending</option>
-          <option value="asc">Lowest Pending</option>
-        </select>
-      </div>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className={inputClassName}
+          >
+            <option value="desc">Highest pending</option>
+            <option value="asc">Lowest pending</option>
+          </select>
+        </div>
+      </section>
 
-      {loading ? (
-        <p className="text-center p-6">Loading...</p>
-      ) : (
-        <table className="w-full">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="p-3 text-left">Enrollment</th>
-              <th className="p-3 text-left">Student Name</th>
-              <th className="p-3 text-left">Class</th>
-              {notshow ? (
-                <>
-                  <th className="p-3 text-left">Tuition Fees</th>
-                  <th className="p-3 text-left">Discount</th>
-                  <th className="px-5 py-3 text-left">Total Fees</th>
-                  <th className="p-3 text-left">Paid Fees</th>
-                </>
-              ) : null}
-              <th className="p-3 text-left">Pending Fees</th>
-              <th className="p-3 text-left">Branch</th>
-              <th className="p-3 text-left">Reference</th>
-              <th className="p-3 text-left">Action</th>
-            </tr>
-          </thead>
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Directory
+            </p>
+            <h2 className="mt-1 text-xl font-bold text-slate-900">
+              Student Payments
+            </h2>
+          </div>
+          <div className="rounded-2xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
+            {loading ? "Refreshing..." : `${filteredStudents.length} results`}
+          </div>
+        </div>
 
-          <tbody>
-            {filteredStudents.length === 0 ? (
-              <tr>
-                <td colSpan="11" className="text-center p-6">
-                  No Data Found
-                </td>
-              </tr>
-            ) : (
-              filteredStudents.map((item) => (
-                <tr key={item._id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-medium">{item.enrollment}</td>
-                  <td className="p-3 font-medium">{item.name}</td>
-                  <td className="p-3">
-                    {item.course}/{item.semester}
-                  </td>
-
+        {loading ? (
+          <div className="px-5 py-10 text-center text-sm text-slate-500">
+            Loading payment records...
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-slate-100">
+                <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <th className="px-5 py-4">Enrollment</th>
+                  <th className="px-5 py-4">Student</th>
+                  <th className="px-5 py-4">Class</th>
                   {notshow ? (
                     <>
-                      <td className="p-3 font-semibold">₹ {item.summary?.tuition?.total || 0}</td>
-                      <td className="p-3 font-semibold">₹ {item.discount}</td>
-                      <td className="p-3 font-semibold">₹ {item.total}</td>
-                      <td className="p-3 text-green-600 font-semibold">₹ {item.paid}</td>
+                      <th className="px-5 py-4">Tuition</th>
+                      <th className="px-5 py-4">Discount</th>
+                      <th className="px-5 py-4">Total</th>
+                      <th className="px-5 py-4">Paid</th>
                     </>
                   ) : null}
-
-                  <td className="p-3 text-red-600 font-semibold">₹ {item.pending}</td>
-                  <td className="p-3">{item.branch}</td>
-                  <td className="p-3">{item.reference}</td>
-                  <td className="p-3">
-                    {item.pending > 0 ? (
-                      <button
-                        onClick={() => payStudent(item)}
-                        className="bg-green-500 text-white px-4 py-1 rounded"
-                      >
-                        Pay
-                      </button>
-                    ) : (
-                      <button disabled>Fully Paid</button>
-                    )}
-                  </td>
+                  <th className="px-5 py-4">Pending</th>
+                  {/* <th className="px-5 py-4">Branch</th>
+                  <th className="px-5 py-4">Reference</th> */}
+                  <th className="px-5 py-4 text-center">Action</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+              </thead>
+
+              <tbody className="divide-y divide-slate-100">
+                {filteredStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan="11" className="px-5 py-10 text-center text-sm text-slate-500">
+                      No payment records found.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredStudents.map((item) => (
+                    <tr
+                      key={item._id}
+                      className="text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <td className="px-5 py-4 font-medium text-slate-900">
+                        {item.enrollment || "-"}
+                      </td>
+                      <td className="px-5 py-4 font-medium text-slate-900">
+                        {item.name || "-"}
+                      </td>
+                      <td className="px-5 py-4">
+                        {item.course || "-"}/{item.semester || "-"}
+                      </td>
+                      {notshow ? (
+                        <>
+                          <td className="px-5 py-4 font-semibold">
+                            Rs. {item.summary?.tuition?.total || 0}
+                          </td>
+                          <td className="px-5 py-4 font-semibold">
+                            Rs. {item.discount || 0}
+                          </td>
+                          <td className="px-5 py-4 font-semibold">
+                            Rs. {item.total || 0}
+                          </td>
+                          <td className="px-5 py-4 font-semibold text-emerald-700">
+                            Rs. {item.paid || 0}
+                          </td>
+                        </>
+                      ) : null}
+                      <td className="px-5 py-4 font-semibold text-rose-700">
+                        Rs. {item.pending || 0}
+                      </td>
+                      {/* <td className="px-5 py-4">{item.branch || "-"}</td> */}
+                      {/* <td className="px-5 py-4">{item.reference || "-"}</td> */}
+                      <td className="px-5 py-4">
+                        <div className="flex justify-center">
+                          {item.pending > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => payStudent(item)}
+                              className="rounded-2xl bg-cyan-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-800"
+                            >
+                              Pay
+                            </button>
+                          ) : (
+                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                              Fully Paid
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {pay ? (
-        <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg w-[450px] relative">
-            <button
-              onClick={() => setPay(false)}
-              className="absolute right-4 top-2 text-xl"
-            >
-              x
-            </button>
+        <div className="fixed inset-0 z-50 bg-slate-950/70 p-4 backdrop-blur-sm">
+          <div className="mx-auto max-w-xl rounded-[2rem] bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+                  Collect Payment
+                </p>
+                <h2 className="mt-2 text-2xl font-black text-slate-900">
+                  {paid?.name || "Student"}
+                </h2>
+                <p className="mt-2 text-sm font-semibold text-rose-600">
+                  Pending: Rs. {paid ? paid.pending : 0}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPay(false)}
+                className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Close
+              </button>
+            </div>
 
-            <h2 className="text-xl font-bold mb-2">{paid?.name}</h2>
-            <p className="text-red-500 mb-4">Pending : ₹ {paid ? paid.pending : 0}</p>
-
-            <div className="mb-4 rounded border border-slate-200 bg-slate-50 p-3 text-sm">
+            <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm">
               {(paid?.list || []).map((item) => (
-                <div key={item.key} className="flex items-center justify-between gap-3 py-1">
-                  <span>{item.label}</span>
-                  <span className="font-semibold text-red-600">₹ {item.pending}</span>
+                <div
+                  key={item.key}
+                  className="flex items-center justify-between gap-3 py-2"
+                >
+                  <span className="text-slate-700">{item.label}</span>
+                  <span className="font-semibold text-rose-700">
+                    Rs. {item.pending}
+                  </span>
                 </div>
               ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit} className="mt-5 grid gap-4">
               <select
                 name="feeType"
                 onChange={handleChange}
                 value={formData.feeType}
-                className="border p-2 rounded"
+                className={inputClassName}
               >
                 {FEE_TYPE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -321,22 +400,19 @@ const All_Payment = ({ notshow }) => {
               <input
                 type="number"
                 name="amount"
-                placeholder="Enter Amount"
+                placeholder="Enter amount"
                 value={formData.amount}
                 onChange={handleChange}
                 required
-                className="border p-2 rounded"
+                className={inputClassName}
               />
 
               <select
                 name="paymentMethod"
                 onChange={handleChange}
                 value={formData.paymentMethod}
-                className="border p-2 rounded"
+                className={inputClassName}
               >
-                <option value="" disabled>
-                  Payment Method
-                </option>
                 <option value="Cash">Cash</option>
                 <option value="UPI">UPI</option>
                 <option value="Bank">Bank</option>
@@ -344,7 +420,7 @@ const All_Payment = ({ notshow }) => {
 
               <button
                 type="submit"
-                className="bg-blue-600 text-white py-2 rounded"
+                className="rounded-2xl bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Submit Payment
               </button>

@@ -6,11 +6,14 @@ import { CiLogout } from "react-icons/ci";
 import { clearAuthToken } from "../utils/auth";
 import { FEE_TYPE_OPTIONS, getFeeTotals } from "../utils/studentFees";
 import StudentNotice from "./StudentNotice";
+import { getSafeAssetUrl } from "../components/student/StudentProfileSheet";
+import StudentDocumentsPanel from "../components/student/StudentDocumentsPanel";
 
 const tabs = [
   { id: "overview", label: "Overview", icon: FaIdCard },
   { id: "attendance", label: "Attendance", icon: FaCalendarAlt },
   { id: "fees", label: "Fees", icon: FaMoneyBillWave },
+  { id: "documents", label: "Documents", icon: FaFileUpload },
   {id: "notice", label:"Notice", icon: FaBell},
    { id: "logout", label: "Logout", icon: CiLogout },
 ];
@@ -47,6 +50,7 @@ const StudentDash = () => {
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     feeType: "tuition",
     amount: "",
@@ -89,6 +93,27 @@ const StudentDash = () => {
   const feeDue = feeTotals.pending;
   const selectedFeePending = feeTotals.summary?.[paymentForm.feeType || "tuition"]?.pending || 0;
   const attendancePresent = attendance.filter((item) => String(item?.status || "").toLowerCase() === "present").length;
+
+  const handleImageUpdate = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !studentId) return;
+
+    const payload = new FormData();
+    payload.append("imgSrc", file);
+
+    setImageUploading(true);
+    try {
+      const res = await api.put(`/student/profile/update/${studentId}`, payload);
+      if (res.data?.success) {
+        setProfile(res.data.student);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Image update failed");
+    } finally {
+      setImageUploading(false);
+      event.target.value = "";
+    }
+  };
 
   const handlePaymentChange = async (e) => {
     const { name, value, files } = e.target;
@@ -202,8 +227,18 @@ const StudentDash = () => {
             <aside className="space-y-4">
               <div className="rounded-3xl border border-white/10 bg-white/95 p-5 text-slate-900 shadow-lg">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-600 text-xl font-black text-white">
-                    {profile?.name ? profile.name.charAt(0) : "S"}
+                  <div className="h-16 w-16 overflow-hidden rounded-2xl">
+                    {getSafeAssetUrl(profile?.imgSrc) ? (
+                      <img
+                        src={getSafeAssetUrl(profile?.imgSrc)}
+                        alt={profile?.name || "Student"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xl font-black text-white">
+                        {profile?.name ? profile.name.charAt(0) : "S"}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Student</p>
@@ -220,6 +255,17 @@ const StudentDash = () => {
                   <Line label="Enrollment" value={profile?.enrollment || "-"} />
                   <Line label="Mobile" value={profile?.mobile1 || "-"} icon={FaPhoneAlt} />
                 </div>
+
+                <label className="mt-5 flex cursor-pointer items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                  <span>{imageUploading ? "Updating image..." : "Update profile image"}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpdate}
+                    className="hidden"
+                    disabled={imageUploading}
+                  />
+                </label>
               </div>
 
               <div className="grid gap-3">
@@ -242,7 +288,17 @@ const StudentDash = () => {
                       <span>
                         <span className="block font-semibold">{tab.label}</span>
                         <span className="block text-xs text-slate-400">
-                          {tab.id === "overview" ? "Profile details" : tab.id === "attendance" ? "Presence records" : tab.id === 'logout' ?"Logout From Device" :"Fee payment"}
+                          {tab.id === "overview"
+                            ? "Profile details"
+                            : tab.id === "attendance"
+                              ? "Presence records"
+                              : tab.id === "documents"
+                                ? "Upload your files"
+                                : tab.id === "notice"
+                                  ? "Announcements"
+                                  : tab.id === "logout"
+                                    ? "Logout From Device"
+                                    : "Fee payment"}
                         </span>
                       </span>
                     </button>
@@ -320,7 +376,7 @@ const StudentDash = () => {
               )}
 
               {activeTab === "fees" && (
-                <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                <div className="flex flex-col gap-5">
                   <Panel title="Fee Summary" subtitle="Current fee overview">
                     <div className="mt-6 grid gap-4 md:grid-cols-3">
                       <Metric label="Total Fees" value={formatAmount(feeTotals.total)} tone="blue" />
@@ -350,7 +406,7 @@ const StudentDash = () => {
                       ))}
                     </div>
 
-                    <form onSubmit={handlePaymentSubmit} className="mt-6 space-y-4">
+                    {/* <form onSubmit={handlePaymentSubmit} className="mt-6 space-y-4">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700">Fee Type</label>
@@ -393,7 +449,7 @@ const StudentDash = () => {
                       >
                         {paymentLoading ? "Uploading..." : "Upload Payment"}
                       </button>
-                    </form>
+                    </form> */}
                   </Panel>
 
                   <Panel title="Payment History" subtitle="Latest payment entries">
@@ -434,6 +490,14 @@ const StudentDash = () => {
                     </div>
                   </Panel>
                 </div>
+              )}
+
+              {activeTab === "documents" && (
+                <StudentDocumentsPanel
+                  student={profile}
+                  studentId={studentId}
+                  onSaved={(updatedStudent) => setProfile(updatedStudent)}
+                />
               )}
 
 

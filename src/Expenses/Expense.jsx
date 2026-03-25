@@ -1,179 +1,213 @@
-import React, { useEffect, useState } from "react";
-import api from "../api/axios.js";
+import React, { useEffect, useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
-
+import api from "../api/axios.js";
 import {
   Chart as ChartJS,
   BarElement,
   CategoryScale,
   LinearScale,
   Tooltip,
-  Legend
+  Legend,
 } from "chart.js";
-import Box from "../../Users/Box.jsx";
 
-ChartJS.register(
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const Expense = () => {
+  const [todayExpense, setTodayExpense] = useState(0);
+  const [monthExpense, setMonthExpense] = useState(0);
+  const [graph, setGraph] = useState({ labels: [], values: [] });
+  const [loading, setLoading] = useState(true);
 
-  const [todayExpense,setTodayExpense] = useState(0);
-  const [monthExpense,setMonthExpense] = useState(0);
-  const [graph,setGraph] = useState({labels:[],values:[]});
-  const [loading,setLoading] = useState(true);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  useEffect(()=>{
-    fetchData()
-  },[])
-
-  const fetchData = async ()=>{
-    try{
-      await fetchTodayExpense()
-      await fetchMonthExpense()
-      await fetchGraph()
-    }catch(err){
-      console.log(err)
-    }finally{
-      setLoading(false)
-    }
-  }
-
-  const fetchTodayExpense = async ()=>{
-    try{
-      const res = await api.get("/expense/today-expense");
-      setTodayExpense(res?.data?.totalExpense || 0);
-    }catch(err){
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([
+        fetchTodayExpense(),
+        fetchMonthExpense(),
+        fetchGraph(),
+      ]);
+    } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  const fetchMonthExpense = async ()=>{
-    try{
-      const res = await api.get("/expense/month-expense");
+  const fetchTodayExpense = async () => {
+    const res = await api.get("/expense/today-expense");
+    setTodayExpense(res?.data?.totalExpense || 0);
+  };
 
-      if(res?.data?.data?.length > 0){
-        setMonthExpense(res.data.data[0].totalExpense);
-      }else{
-        setMonthExpense(0);
-      }
-
-    }catch(err){
-      console.log(err);
+  const fetchMonthExpense = async () => {
+    const res = await api.get("/expense/month-expense");
+    if (res?.data?.data?.length > 0) {
+      setMonthExpense(res.data.data[0].totalExpense);
+    } else {
+      setMonthExpense(0);
     }
-  }
+  };
 
-  const fetchGraph = async ()=>{
-    try{
+  const fetchGraph = async () => {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
 
-      const today = new Date();
-      const month = today.getMonth() + 1;
-      const year = today.getFullYear();
+    const res = await api.get(
+      `/expense/expense-graph?type=daily&month=${month}&year=${year}`,
+    );
 
-      const res = await api.get(`/expense/expense-graph?type=daily&month=${month}&year=${year}`);
+    setGraph({
+      labels: res?.data?.labels || [],
+      values: res?.data?.values || [],
+    });
+  };
 
-      setGraph({
-        labels: res?.data?.labels || [],
-        values: res?.data?.values || []
-      });
-
-    }catch(err){
-      console.log(err);
-    }
-  }
-
-  // const chartData = {
-  //   labels: graph.labels,
-  //   datasets:[
-  //     {
-  //       label:"Daily Expense",
-  //       data: graph.values,
-  //       backgroundColor:"rgba(200,00,0,0.6)",
-  //       borderRadius:6,
-  //     }
-  //   ]
-  // };
-
-  // const chartOptions = {
-  //   responsive:true,
-  //   maintainAspectRatio:false,
-  //   plugins:{
-  //     legend:{
-  //       position:"top"
-  //     }
-  //   }
-  // };
-
+  const totalVisibleExpense = useMemo(
+    () => graph.values.reduce((sum, value) => sum + value, 0),
+    [graph.values],
+  );
 
   const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: "top",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+      },
     },
-  },
-  scales: {
-    x: {
-      // categoryPercentage: 0.1, // Makes bars thinner
-      // barPercentage: 0.8, // Makes bars thinner
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        ticks: {
+          precision: 0,
+        },
+      },
     },
-    y: {
-      // Configure y-axis if necessary
-    },
-  },
-};
+  };
 
-const chartData = {
-  labels: graph.labels,
-  datasets: [
-    {
-      label: "Daily Expense",
-      data: graph.values,
-      backgroundColor: "rgba(200,0,0,0.6)",
-      borderRadius: 0,
-
-      barThickness:50,
-    },
-  ],
-};
-
-  if(loading){
-    return <p className="p-4 text-lg">Loading...</p>
-  }
+  const chartData = {
+    labels: graph.labels,
+    datasets: [
+      {
+        label: "Daily Expense",
+        data: graph.values,
+        backgroundColor: "rgba(244, 63, 94, 0.75)",
+        borderRadius: 12,
+      },
+    ],
+  };
 
   return (
-   <div className="">
+    <div className="space-y-6 bg-slate-100 p-4 md:p-6">
+      <section className="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-900 p-6 text-white shadow-xl">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">
+              Finance Admin
+            </p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight">
+              Expense Overview
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+              Monitor daily spending, monthly outflow, and category trendlines
+              in the same cleaner admin layout.
+            </p>
+          </div>
 
-  {/* heading */}
-  <h1 className="text-2xl font-bold mb-4 p-2">
-    Expense Overview
-  </h1>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                Today Expense
+              </p>
+              <p className="mt-1 text-2xl font-black">Rs. {todayExpense}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                This Month
+              </p>
+              <p className="mt-1 text-2xl font-black">Rs. {monthExpense}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                Chart Total
+              </p>
+              <p className="mt-1 text-2xl font-black">Rs. {totalVisibleExpense}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <div className="h-full flex flex-col md:flex-row gap-9">
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Analytics
+            </p>
+            <h2 className="mt-1 text-xl font-bold text-slate-900">
+              Monthly Expense Graph
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={fetchData}
+            className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Refresh
+          </button>
+        </div>
 
-    {/* Chart section */}
-    <div className="md:w-4/3 w-full mb-4 md:mb-0">
-      <Bar data={chartData} options={chartOptions} />
+        <div className="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="h-[360px] rounded-3xl bg-slate-50 p-4">
+            {loading ? (
+              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+                Loading expenses...
+              </div>
+            ) : graph.labels.length > 0 ? (
+              <Bar data={chartData} options={chartOptions} />
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+                No expense graph data found.
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-4 content-start">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Report Scope
+              </p>
+              <p className="mt-3 text-lg font-black text-slate-900">
+                Current Month
+              </p>
+              <p className="mt-2 text-sm text-slate-600">
+                Daily expense totals for the active calendar month.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-rose-100 bg-rose-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+                Visible Spend
+              </p>
+              <p className="mt-3 text-3xl font-black text-rose-900">
+                Rs. {totalVisibleExpense}
+              </p>
+              <p className="mt-2 text-sm text-rose-800">
+                Sum of all bars currently rendered in the chart.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-
-    {/* Box section */}
-    <div className="flex md:flex-col md:w-1/3 w-full space-y-4 md:space-y-0 md:ml-4 gap-4">
-      <Box title="Month Expense" value={`${monthExpense}`} name={"Month Expense"} />
-      <Box title="Today Expense" value={`${todayExpense}`} name={"Today Expense"} />
-    </div>
-
-  </div>
-</div>
-        
-
-
-   
-  )
-}
+  );
+};
 
 export default Expense;

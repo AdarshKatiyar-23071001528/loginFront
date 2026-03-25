@@ -3,6 +3,7 @@ import {
   DOCUMENT_TYPE_OPTIONS,
   resolveDocumentType,
 } from "../../utils/studentDocuments";
+import { getSafeAssetUrl } from "./StudentProfileSheet";
 
 const StudentDocumentFields = ({
   documents,
@@ -24,7 +25,7 @@ const StudentDocumentFields = ({
             <select
               value={documentItem.type}
               onChange={(e) => onDocumentChange(index, "type", e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 text-slate-600"
             >
               <option value="">Select document</option>
               {DOCUMENT_TYPE_OPTIONS.map((option) => (
@@ -47,7 +48,7 @@ const StudentDocumentFields = ({
                   onDocumentChange(index, "customType", e.target.value)
                 }
                 placeholder="Enter document name"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-400 text-slate-600"
               />
             ) : (
               <input
@@ -56,7 +57,7 @@ const StudentDocumentFields = ({
                 onChange={(e) =>
                   onDocumentChange(index, "file", e.target.files?.[0] || null)
                 }
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-white"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-white text-slate-600"
               />
             )}
           </div>
@@ -97,7 +98,7 @@ const StudentDocumentFields = ({
 
         {documentItem.url ? (
           <a
-            href={documentItem.url}
+            href={getSafeAssetUrl(documentItem.url)}
             target="_blank"
             rel="noreferrer"
             className="mt-3 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-900"

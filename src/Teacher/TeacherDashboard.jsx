@@ -18,6 +18,7 @@ import { PiStudent } from "react-icons/pi";
 import { CiLogout } from "react-icons/ci";
 import api from "../api/axios";
 import { clearAuthToken, getAuthUser } from "../utils/auth";
+import TeacherProfilePanel from "../components/teacher/TeacherProfilePanel";
 
 
 const StudentRegister = lazy(() => import("../Student/StudentRegister"));
@@ -80,7 +81,7 @@ const Panel = ({ title, subtitle, children, scrollable = false }) => (
     </p>
     <h3 className="mt-1 pb-3 text-2xl font-black">{title}</h3>
     {scrollable ? (
-      <div className="max-h-[calc(100vh-18rem)] overflow-y-auto pr-2">
+      <div className="  pr-2">
         {children}
       </div>
     ) : (
@@ -212,6 +213,7 @@ const TeacherDashboard = () => {
     () =>
       [
         { key: "home", label: "Home", icon: FaHome },
+        { key: "profile", label: "My Profile", icon: FaUserTie },
         {
           key: "academic",
           label: "Academic",
@@ -546,8 +548,12 @@ const TeacherDashboard = () => {
     (permission) => permissionLabels[permission] || permission,
   );
   const noFeatureAccess =
-    navSections.filter((item) => item.key !== "home" && item.key !== "logout")
-      .length === 0;
+    navSections.filter(
+      (item) =>
+        item.key !== "home" &&
+        item.key !== "profile" &&
+        item.key !== "logout",
+    ).length === 0;
   const pageTitle =
     activePage === "home"
       ? "Dashboard"
@@ -609,8 +615,10 @@ const TeacherDashboard = () => {
           </div>
           <div className="mt-6 rounded-3xl border border-white/10 bg-white/10 p-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-300 text-xl font-black text-slate-950">
-                {teacherName.charAt(0)}
+              <div className={`flex h-14 w-14 items-center justify-center rounded-3xl ${!teacher.imgSrc ? "bg-cyan-300" : ''} text-3xl font-black text-slate-950`}>
+
+                { teacher.imgSrc ?  <img src={teacher.imgSrc } alt="" className="rounded-xl"/> : teacherName.charAt(0)}
+               
               </div>
               <div className="min-w-0">
                 <p className="truncate text-lg font-black text-white">
@@ -704,7 +712,7 @@ const TeacherDashboard = () => {
                   title="Access Required"
                   subtitle="No staff authority assigned"
                 >
-                  <EmptyBlock label="Admin ne abhi tak is staff account ko koi module authority assign nahi ki hai." />
+                  <EmptyBlock label="No Authority Provide By Admin" />
                 </Panel>
               ) : null}
               {activePage === "home" ? (
@@ -717,7 +725,9 @@ const TeacherDashboard = () => {
                       {navSections
                         .filter(
                           (section) =>
-                            section.key !== "home" && section.key !== "logout",
+                            section.key !== "home" &&
+                            section.key !== "profile" &&
+                            section.key !== "logout",
                         )
                         .map((section) => (
                           <div
@@ -774,6 +784,12 @@ const TeacherDashboard = () => {
                     </Panel>
                   </div>
                 </div>
+              ) : null}
+              {activePage === "profile" ? (
+                <TeacherProfilePanel
+                  teacher={teacher}
+                  onTeacherUpdated={(updatedTeacher) => setTeacher(updatedTeacher)}
+                />
               ) : null}
               {activePage === "academic" &&
               subActivePage === "attendance" &&
@@ -1171,14 +1187,11 @@ const TeacherDashboard = () => {
                   <Suspense
                     fallback={<PanelLoader label="Loading expenses..." />}
                   >
-                    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <Expense />
-                      </div>
+                    
                       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
                         <AllExpenses />
                       </div>
-                    </div>
+                    
                   </Suspense>
                 </Panel>
               ) : null}

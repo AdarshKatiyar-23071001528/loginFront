@@ -3,7 +3,7 @@ import StudentProfileSheet, {
   printStudentProfile,
 } from "../components/student/StudentProfileSheet";
 
-const ViewStudent = ({ student, onClose, onEdit }) => {
+const ViewStudent = ({ student, onClose, onEdit, onStudentUpdated }) => {
   if (!student) return null;
 
   return (
@@ -45,7 +45,10 @@ const ViewStudent = ({ student, onClose, onEdit }) => {
         </div>
 
         <div className="flex-1 overflow-auto">
-          <StudentProfileSheet student={student} />
+          <StudentProfileSheet
+            student={student}
+            onStudentUpdated={onStudentUpdated}
+          />
         </div>
       </div>
     </div>

@@ -37,7 +37,7 @@ const StudentDash = () => {
   }, []);
 
   const filteredStudents = useMemo(() => {
-    return students.filter((student) => {
+    return students.filter(Boolean).filter((student) => {
       const search = filters.search.toLowerCase();
       const matchesSearch =
         !search ||
@@ -251,6 +251,15 @@ const StudentDash = () => {
         <ViewStudent
           student={selectedStudent}
           onClose={() => setSelectedStudent(null)}
+          onStudentUpdated={(updatedStudent) => {
+            setStudents((prev) =>
+              prev.map((student) =>
+                student._id === updatedStudent._id ? updatedStudent : student,
+              ),
+            );
+            setSelectedStudent(updatedStudent);
+            setMessage("Document deleted successfully");
+          }}
           onEdit={(student) => {
             setSelectedStudent(null);
             setEditingStudent(student);
@@ -263,6 +272,13 @@ const StudentDash = () => {
           student={editingStudent}
           onClose={() => setEditingStudent(null)}
           onSaved={(updatedStudent) => {
+            if (!updatedStudent?._id) {
+              setEditingStudent(null);
+              setSelectedStudent(null);
+              setMessage("Student updated, but refreshed data was incomplete");
+              fetchAllStudents();
+              return;
+            }
             setStudents((prev) =>
               prev.map((student) =>
                 student._id === updatedStudent._id ? updatedStudent : student,
