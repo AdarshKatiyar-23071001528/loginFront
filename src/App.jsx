@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import Layout from "./layout";
+import Layout from "./Layout";
 import AppFeedbackProvider from "./components/system/AppFeedbackProvider";
 
 
