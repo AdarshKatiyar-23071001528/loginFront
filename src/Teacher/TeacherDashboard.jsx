@@ -454,6 +454,26 @@ const TeacherDashboard = () => {
     setMobileNavOpen(false);
   };
 
+  const handleSectionClick = (section) => {
+    if (section.key === "logout") {
+      handleNav("logout");
+      return;
+    }
+
+    const nextSubPage = section.items?.[0]?.key || "";
+    const isMobileViewport =
+      typeof window !== "undefined" && window.innerWidth < 1024;
+
+    setActivePage(section.key);
+    setSubActivePage((prev) =>
+      section.items?.some((item) => item.key === prev) ? prev : nextSubPage,
+    );
+
+    if (!isMobileViewport || !section.items?.length) {
+      setMobileNavOpen(false);
+    }
+  };
+
   const setAllStudentStatus = (status) => {
     const next = {};
     subjectStudents.forEach((student) => {
@@ -597,7 +617,7 @@ const TeacherDashboard = () => {
     <div className="min-h-screen bg-[linear-gradient(180deg,_#0f172a_0%,_#111827_45%,_#172554_100%)] text-white">
       <div className="mx-auto flex max-w-[120rem] gap-6 px-4 py-5 sm:px-6 lg:items-start lg:px-8">
         <aside
-          className={`fixed inset-y-0 left-0 z-40 flex h-screen w-[18.5rem] flex-shrink-0 flex-col border-r border-white/10 bg-slate-950/95 p-5 shadow-2xl transition-transform duration-300 lg:sticky lg:top-5 lg:h-auto lg:min-h-[calc(100vh-2.5rem)] lg:translate-x-0 lg:self-start lg:rounded-[2rem] lg:border lg:bg-white/10 ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`}
+          className={`fixed inset-y-0 left-0 z-40 flex h-screen w-[18.5rem] flex-shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-slate-950/95 p-5 shadow-2xl transition-transform duration-300 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-5 lg:h-auto lg:min-h-[calc(100vh-2.5rem)] lg:translate-x-0 lg:self-start lg:rounded-[2rem] lg:border lg:bg-white/10 ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -630,16 +650,14 @@ const TeacherDashboard = () => {
               </div>
             </div>
           </div>
-          <nav className="mt-6 space-y-3">
+          <nav className="mt-6 space-y-3 pb-6">
             {navSections.map((section) => {
               const Icon = section.icon;
               const isActive = activePage === section.key;
               return (
                 <div key={section.key} className="space-y-2">
                   <button
-                    onClick={() =>
-                      handleNav(section.key, section.items?.[0]?.key || "")
-                    }
+                    onClick={() => handleSectionClick(section)}
                     className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${isActive ? "border-cyan-300/50 bg-cyan-400/15 text-white" : section.key === "logout" ? "border-white/10 bg-white/5 text-rose-300 hover:bg-white/10" : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"}`}
                   >
                     <span

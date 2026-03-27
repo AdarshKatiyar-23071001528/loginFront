@@ -9,6 +9,7 @@ import {
   FaBell,
   FaUserGraduate,
   FaCog,
+  FaUserCircle,
 } from "react-icons/fa";
 import { PiStudent } from "react-icons/pi";
 import { FaRegMessage } from "react-icons/fa6";
@@ -32,6 +33,7 @@ import StudentDash from "../src/StudentForAdmin/StudentDash";
 import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 import { clearAuthToken } from "../src/utils/auth.js";
 import StaffSettings from "../src/Settings/StaffSettings.jsx";
+import AdminProfilePanel from "../src/components/admin/AdminProfilePanel.jsx";
 
 
 // using configured api instance from src/api/axios
@@ -54,6 +56,7 @@ const AdminDash = () => {
 
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
+  const [adminProfile, setAdminProfile] = useState(null);
  
   const [studentInCollege, setStudentInCollege] = useState(0);
   const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
@@ -79,6 +82,7 @@ useEffect(()=>{
          const admin = await api.get(`/user/profile/${adminId}`);
 
          if(!admin.data?.success) setError(admin.data?.message || "Failed to Load Profile");
+         else setAdminProfile(admin.data.admin || null);
         
     }
   catch(error){
@@ -104,6 +108,7 @@ useEffect(()=>{
 
   const pageTitle = useMemo(() => {
     if (activePage === "home") return "Dashboard";
+    if (activePage === "profile") return "My Profile";
     if (activePage === "student") return subActivePage ? `Students • ${subActivePage}` : "Students";
     if (activePage === "teacher") return subActivePage ? `Teachers • ${subActivePage}` : "Teachers";
     if (activePage === "payment") return subActivePage ? `Payments • ${subActivePage}` : "Payments";
@@ -263,6 +268,7 @@ useEffect(()=>{
             </div>
             <div className="mt-3 space-y-1">
               <NavItem showLabel active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
+              <NavItem showLabel active={activePage === "profile"} icon={FaUserCircle} label="My Profile" onClick={() => handleNav("profile")} />
 
               <NavItem
                 showLabel
@@ -364,6 +370,7 @@ useEffect(()=>{
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
            
             <NavItem active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
+            <NavItem active={activePage === "profile"} icon={FaUserCircle} label="My Profile" onClick={() => handleNav("profile")} />
           
             <NavItem
               active={activePage === "student"}
@@ -491,6 +498,15 @@ useEffect(()=>{
                     <Expense />
                   </Card>
                 </div>
+              )}
+
+              {activePage === "profile" && (
+                <Card className="p-3">
+                  <AdminProfilePanel
+                    admin={adminProfile}
+                    onSaved={(updatedAdmin) => setAdminProfile(updatedAdmin)}
+                  />
+                </Card>
               )}
 
               {activePage === "student" && subActivePage === "all Student" && (

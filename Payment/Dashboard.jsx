@@ -108,6 +108,13 @@ const Dashboard = () => {
     plugins: {
       legend: {
         display: true,
+        labels: {
+          boxWidth: 10,
+          padding: 12,
+          font: {
+            size: 11,
+          },
+        },
       },
     },
     scales: {
@@ -115,10 +122,21 @@ const Dashboard = () => {
         grid: {
           display: false,
         },
+        ticks: {
+          autoSkip: true,
+          maxRotation: 0,
+          minRotation: 0,
+          font: {
+            size: 10,
+          },
+        },
       },
       y: {
         ticks: {
           precision: 0,
+          font: {
+            size: 10,
+          },
         },
       },
     },
@@ -173,7 +191,7 @@ const Dashboard = () => {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="min-w-0 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -230,7 +248,7 @@ const Dashboard = () => {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="min-w-0 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -245,10 +263,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_260px]">
-          <div className="h-[360px] rounded-3xl bg-slate-50 p-4">
+        <div className="mt-5 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="min-w-0 overflow-hidden rounded-3xl bg-slate-50 p-3 sm:p-4">
             {graph.labels.length > 0 ? (
-              <Bar data={chartData} options={options} />
+              <div className="relative h-[280px] w-full sm:h-[360px]">
+                <Bar data={chartData} options={options} />
+              </div>
             ) : (
               <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
                 No payment graph data found.

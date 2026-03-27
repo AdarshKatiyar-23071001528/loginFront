@@ -77,6 +77,13 @@ const Expense = () => {
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          boxWidth: 10,
+          padding: 12,
+          font: {
+            size: 11,
+          },
+        },
       },
     },
     scales: {
@@ -84,10 +91,21 @@ const Expense = () => {
         grid: {
           display: false,
         },
+        ticks: {
+          autoSkip: true,
+          maxRotation: 0,
+          minRotation: 0,
+          font: {
+            size: 10,
+          },
+        },
       },
       y: {
         ticks: {
           precision: 0,
+          font: {
+            size: 10,
+          },
         },
       },
     },
@@ -145,7 +163,7 @@ const Expense = () => {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="min-w-0 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -164,16 +182,18 @@ const Expense = () => {
           </button>
         </div>
 
-        <div className="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_260px]">
-          <div className="h-[360px] rounded-3xl bg-slate-50 p-4">
+        <div className="mt-5 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="min-w-0 overflow-hidden rounded-3xl bg-slate-50 p-3 sm:p-4">
             {loading ? (
-              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+              <div className="flex h-[280px] items-center justify-center text-sm font-semibold text-slate-500 sm:h-[360px]">
                 Loading expenses...
               </div>
             ) : graph.labels.length > 0 ? (
-              <Bar data={chartData} options={chartOptions} />
+              <div className="relative h-[280px] w-full sm:h-[360px]">
+                <Bar data={chartData} options={chartOptions} />
+              </div>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-500">
+              <div className="flex h-[280px] items-center justify-center text-sm font-semibold text-slate-500 sm:h-[360px]">
                 No expense graph data found.
               </div>
             )}

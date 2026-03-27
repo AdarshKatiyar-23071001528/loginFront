@@ -7,6 +7,7 @@ const TeacherLogin = () => {
   const navigate = useNavigate();
   const { teacherLogin } = useContext(AppContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setloading] = useState(false);
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -15,9 +16,11 @@ const TeacherLogin = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setloading(true);
     const result = await teacherLogin(formData.email, formData.password);
     if (result?.success) {
       navigate(`/teacher/dash/${result.teacher._id}`);
+      setloading(false);
     }
   };
 
@@ -68,8 +71,9 @@ const TeacherLogin = () => {
         </div>
       </div>
 
-      <button type="submit" className="ui-btn ui-btn-primary w-full justify-center py-2.5">
-        Sign in
+
+       <button type="submit" disabled={loading} className="ui-btn ui-btn-primary w-full justify-center py-2.5 disabled:opacity-50 disabled:cursor-not-allowed">
+        {loading ? "Signing in ...." : "Sign in"}
       </button>
     </form>
   );

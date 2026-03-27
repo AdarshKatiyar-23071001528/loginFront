@@ -7,6 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AppContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading , setloading] = useState(false);
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -15,10 +16,12 @@ const Login = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setloading(true);
     const result = await login(formData.email, formData.password);
     if (result.success) {
       console.log(result)
       navigate(`/admin/dash?id=${result.user._id}`);
+      setloading(false);
     }
   };
 
@@ -69,8 +72,9 @@ const Login = () => {
         </div>
       </div>
 
-      <button type="submit" className="ui-btn ui-btn-primary w-full justify-center py-2.5">
-        Sign in
+
+      <button type="submit" disabled={loading} className="ui-btn ui-btn-primary w-full justify-center py-2.5 disabled:opacity-50 disabled:cursor-not-allowed">
+        {loading ? "Signing in ....." : "Sign in"}
       </button>
     </form>
   );

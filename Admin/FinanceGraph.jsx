@@ -89,6 +89,10 @@ const FinanceGraph = () => {
         labels: {
           usePointStyle: true,
           boxWidth: 10,
+          padding: 12,
+          font: {
+            size: 11,
+          },
         },
       },
     },
@@ -97,11 +101,22 @@ const FinanceGraph = () => {
         grid: {
           display: false,
         },
+        ticks: {
+          autoSkip: true,
+          maxRotation: 0,
+          minRotation: 0,
+          font: {
+            size: 10,
+          },
+        },
       },
       y: {
         beginAtZero: true,
         ticks: {
           callback: (value) => `Rs. ${value}`,
+          font: {
+            size: 10,
+          },
         },
       },
     },
@@ -178,8 +193,8 @@ const FinanceGraph = () => {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(260px,0.8fr)]">
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(260px,0.8fr)]">
+        <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900">Performance Chart</p>
@@ -188,8 +203,10 @@ const FinanceGraph = () => {
               </p>
             </div>
           </div>
-          <div className="h-[320px] sm:h-[380px] lg:h-[420px]">
-            <Bar data={chartData} options={chartOptions} />
+          <div className="min-w-0 overflow-hidden rounded-3xl bg-slate-50 p-3 sm:p-4">
+            <div className="relative h-[260px] w-full sm:h-[380px] lg:h-[420px]">
+              <Bar data={chartData} options={chartOptions} />
+            </div>
           </div>
         </div>
 
