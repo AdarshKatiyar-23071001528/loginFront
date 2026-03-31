@@ -1,9 +1,19 @@
 import axios from 'axios';
 import { getAuthToken } from "../utils/auth";
 
-// import.meta.env.VITE_API_URL|| "https://loginback.vercel.app/api" ||
+const isLocalHost = typeof window !== "undefined" && [
+    "localhost",
+    "127.0.0.1",
+].includes(window.location.hostname);
+
+const resolvedBaseUrl =
+    import.meta.env.VITE_API_URL ||
+    (isLocalHost
+        ? "http://localhost:1000/api"
+        : "https://loginback.vercel.app/api");
+
 const api = axios.create({
-    baseURL:  "https://loginback.vercel.app/api" 
+    baseURL: resolvedBaseUrl,
 });
 
 api.interceptors.request.use((config) => {
