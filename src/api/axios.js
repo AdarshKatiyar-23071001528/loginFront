@@ -3,7 +3,7 @@ import { getAuthToken } from "../utils/auth";
 
 // import.meta.env.VITE_API_URL|| "https://loginback.vercel.app/api" ||
 const api = axios.create({
-    baseURL:  "http://localhost:1000/api" 
+    baseURL:  "https://loginback.vercel.app/api" 
 });
 
 api.interceptors.request.use((config) => {
