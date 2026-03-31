@@ -12,6 +12,7 @@ const All = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [byName, setByName] = useState("");
 
   const fetchExpense = async () => {
     try {
@@ -30,12 +31,14 @@ const All = () => {
   const filteredExpenses = useMemo(() => {
     return expenses.filter((item) => {
       const searchValue = search.toLowerCase();
+      const searchByName = byName.toLowerCase();
       const searchMatch =
         !searchValue ||
         item.name?.toLowerCase().includes(searchValue) ||
         item.paidTo?.toLowerCase().includes(searchValue) ||
         item.paidBy?.toLowerCase().includes(searchValue);
-
+         
+      const expenseName = item.name?.toLowerCase().includes(searchByName);;
       const modeMatch = modeFilter === "All" || item.mode === modeFilter;
       const itemDate = new Date(item.paidAt);
       const from = fromDate ? new Date(fromDate) : null;
@@ -48,9 +51,9 @@ const All = () => {
       const fromMatch = from ? itemDate >= from : true;
       const toMatch = to ? itemDate <= to : true;
 
-      return searchMatch && modeMatch && fromMatch && toMatch;
+      return searchMatch && modeMatch && fromMatch && toMatch && expenseName;
     });
-  }, [expenses, search, modeFilter, fromDate, toDate]);
+  }, [expenses, search, modeFilter, fromDate, toDate, byName]);
 
   const totalExpense = useMemo(
     () => filteredExpenses.reduce((acc, item) => acc + Number(item.amount || 0), 0),
@@ -109,6 +112,8 @@ const All = () => {
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+
           <input
             type="text"
             placeholder="Search expense, paid to, paid by"
@@ -116,6 +121,21 @@ const All = () => {
             onChange={(e) => setSearch(e.target.value)}
             className={inputClassName}
           />
+
+          <select
+            value={byName}
+            onChange={(e) => setByName(e.target.value)}
+            className={inputClassName}
+          >
+            <option value="" >Search by Expense Type</option>
+           <option value="Salary">Salary</option>
+          <option value="Affiliation">Affiliation</option>
+          <option value="Challan">Challan</option>
+          <option value="Maintainence">Maintainence</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Lab">Lab</option>
+          <option value="Other">Other</option>
+          </select>
 
           <select
             value={modeFilter}

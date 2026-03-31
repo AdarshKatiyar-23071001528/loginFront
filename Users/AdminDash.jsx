@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 
 import {
   FaBars,
@@ -34,22 +34,21 @@ import TeacherDash from "../src/TeacherForAdmin/TeacherDash";
 import { clearAuthToken } from "../src/utils/auth.js";
 import StaffSettings from "../src/Settings/StaffSettings.jsx";
 import AdminProfilePanel from "../src/components/admin/AdminProfilePanel.jsx";
-
+import AppContext from "../src/Context/AppContext.jsx";
 
 // using configured api instance from src/api/axios
 
 const AdminDash = () => {
   let navigate = useNavigate();
   const location = useLocation();
-  const {id: paramId} = useParams();  
-  const queryId = useMemo(() => new URLSearchParams(location.search).get("id"), [location.search]);
+  const { id: paramId } = useParams();
+  const queryId = useMemo(
+    () => new URLSearchParams(location.search).get("id"),
+    [location.search],
+  );
   const adminId = paramId || queryId;
 
-
-
-
-
-
+  const { tutionFees, totalDiscount } = useContext(AppContext);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -57,9 +56,6 @@ const AdminDash = () => {
   const [activePage, setActivePage] = useState("home");
   const [subActivePage, setSubActivePage] = useState("");
   const [adminProfile, setAdminProfile] = useState(null);
- 
-  const [studentInCollege, setStudentInCollege] = useState(0);
-  const [totalTeacherInCollege, setTotalTeacherInCollege] = useState(0);
 
   // Student management states
 
@@ -67,40 +63,47 @@ const AdminDash = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [staffRefreshKey, setStaffRefreshKey] = useState(0);
+  const [totalFees, setTotalFees] = useState(0);
 
-
-// authentication
-useEffect(()=>{
-  if(!adminId){
-    setLoading(false);
-    setError("Not A vaild Authentication Please Login first");
-    return;
-  }
-  const fetchAdmin = async() =>{
-    setLoading(true);
-    try{
-         const admin = await api.get(`/user/profile/${adminId}`);
-
-         if(!admin.data?.success) setError(admin.data?.message || "Failed to Load Profile");
-         else setAdminProfile(admin.data.admin || null);
-        
+  const fetchAdminSummary = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/user/admin-summary");
+      if (res.data.success) {
+        setTotalFees(res.data?.totalFeesAfterDiscount);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || "Failed to Load Summary");
     }
-  catch(error){
-    setError(error.response?.data?.message || "Error fetching dashboard data")
-  }
-  finally{
-    setLoading(false);
-  }
-   
-  }
-  
-  fetchAdmin();
-  fetchAllStudents();
-  fetchAllTeachers();
-},[adminId])
+  };
 
+  // authentication
+  useEffect(() => {
+    if (!adminId) {
+      setLoading(false);
+      setError("Not A vaild Authentication Please Login first");
+      return;
+    }
+    const fetchAdmin = async () => {
+      setLoading(true);
+      try {
+        const admin = await api.get(`/user/profile/${adminId}`);
 
+        if (!admin.data?.success)
+          setError(admin.data?.message || "Failed to Load Profile");
+        else setAdminProfile(admin.data.admin || null);
+      } catch (error) {
+        setError(
+          error.response?.data?.message || "Error fetching dashboard data",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchAdmin();
+    fetchAdminSummary();
+  }, [adminId]);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -109,14 +112,18 @@ useEffect(()=>{
   const pageTitle = useMemo(() => {
     if (activePage === "home") return "Dashboard";
     if (activePage === "profile") return "My Profile";
-    if (activePage === "student") return subActivePage ? `Students • ${subActivePage}` : "Students";
-    if (activePage === "teacher") return subActivePage ? `Teachers • ${subActivePage}` : "Teachers";
-    if (activePage === "payment") return subActivePage ? `Payments • ${subActivePage}` : "Payments";
+    if (activePage === "student")
+      return subActivePage ? `Students • ${subActivePage}` : "Students";
+    if (activePage === "teacher")
+      return subActivePage ? `Teachers • ${subActivePage}` : "Teachers";
+    if (activePage === "payment")
+      return subActivePage ? `Payments • ${subActivePage}` : "Payments";
     if (activePage === "expenses") return "Expenses";
     if (activePage === "subjects") return "Subjects";
     if (activePage === "notice") return "Notice";
     if (activePage === "message") return "Message";
-    if (activePage === "settings") return subActivePage ? `Settings • ${subActivePage}` : "Settings";
+    if (activePage === "settings")
+      return subActivePage ? `Settings • ${subActivePage}` : "Settings";
     return "Admin";
   }, [activePage, subActivePage]);
 
@@ -126,20 +133,31 @@ useEffect(()=>{
     setMobileNavOpen(false);
   };
 
-  const NavItem = ({ active, icon, label, onClick, right, showLabel = sidebarOpen }) => {
+  const NavItem = ({
+    active,
+    icon,
+    label,
+    onClick,
+    right,
+    showLabel = sidebarOpen,
+  }) => {
     const IconComponent = icon;
     return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
-        active ? "bg-slate-800 text-white" : "text-slate-200 hover:bg-slate-800/70 hover:text-white"
-      }`}
-    >
-      <span className="shrink-0"><IconComponent /></span>
-      {showLabel && <span className="flex-1 text-left">{label}</span>}
-      {showLabel && right}
-    </button>
+      <button
+        type="button"
+        onClick={onClick}
+        className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+          active
+            ? "bg-slate-800 text-white"
+            : "text-slate-200 hover:bg-slate-800/70 hover:text-white"
+        }`}
+      >
+        <span className="shrink-0">
+          <IconComponent />
+        </span>
+        {showLabel && <span className="flex-1 text-left">{label}</span>}
+        {showLabel && right}
+      </button>
     );
   };
 
@@ -148,7 +166,9 @@ useEffect(()=>{
       type="button"
       onClick={onClick}
       className={`w-full rounded-md px-3 py-2 text-left text-sm transition ${
-        active ? "bg-slate-800/60 text-white" : "text-slate-300 hover:bg-slate-800/40 hover:text-white"
+        active
+          ? "bg-slate-800/60 text-white"
+          : "text-slate-300 hover:bg-slate-800/40 hover:text-white"
       }`}
     >
       {label}
@@ -156,71 +176,33 @@ useEffect(()=>{
   );
 
   const Card = ({ children, className = "" }) => (
-    <div className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>{children}</div>
+    <div
+      className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}
+    >
+      {children}
+    </div>
   );
 
-  // Fetch all students
-  const fetchAllStudents = async () => {
-    console.log("Fetching all students...");
-    try {
-      setLoading(true);
-      console.log("Fetching students from /student/allStudents");
-      const response = await api.get(`/student/allStudents`);
-      console.log("Students response:", response.data);
-      if (response.data.success) {
-        // setStudents(response.data.students);
-        setStudentInCollege(response.data.students.length);
-        console.log("Students set in state:", response.data.students);
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Failed to load Student");
-     
-      setMessage("Error fetching students: " + error.message);
-     
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch all teachers
-  const fetchAllTeachers = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching teachers from /teacher/allteacher");
-      let response = await api.get(`/teacher/allteacher`);
-      console.log("Teachers response:", response.data);
-      if (response.data.success) {
-        // setTeachers(response.data.teachers);
-        setTotalTeacherInCollege(response.data.teachers.length);
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Failed to Load Teacher");
-      setMessage("Error fetching teachers: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-   if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white">
         <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4">
           <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-medium backdrop-blur">
-            Loading Admin  dashboard...
+            Loading Admin dashboard...
           </div>
         </div>
       </div>
     );
   }
 
-
   // all receive payment
   if (error) {
     return (
       <div className="min-h-screen bg-slate-950 px-4 py-10 text-white">
         <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-300">Admin Portal</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
+            Admin Portal
+          </p>
           <h1 className="mt-3 text-3xl font-black">Unable to load dashboard</h1>
           <p className="mt-3 text-slate-300">{error}</p>
           <button
@@ -233,8 +215,6 @@ useEffect(()=>{
       </div>
     );
   }
-
-
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -251,7 +231,17 @@ useEffect(()=>{
           <aside className="absolute left-0 top-0 h-full w-72 bg-slate-900 text-slate-100 border-r border-slate-800 p-3">
             <div className="flex items-center justify-between px-2 py-2">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">A</div>
+                <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">
+                  {adminProfile?.imgSrc ? (
+                    <img
+                      src={adminProfile?.imgSrc}
+                      alt="Admin Profile"
+                      className="h-9 w-9 rounded-lg object-cover"
+                    />
+                  ) : (
+                    "A"
+                  )}
+                </div>
                 <div>
                   <div className="font-semibold leading-5">Admin Panel</div>
                   <div className="text-xs text-slate-400">ERP Dashboard</div>
@@ -267,8 +257,20 @@ useEffect(()=>{
               </button>
             </div>
             <div className="mt-3 space-y-1">
-              <NavItem showLabel active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
-              <NavItem showLabel active={activePage === "profile"} icon={FaUserCircle} label="My Profile" onClick={() => handleNav("profile")} />
+              <NavItem
+                showLabel
+                active={activePage === "home"}
+                icon={FaHome}
+                label="Home"
+                onClick={() => handleNav("home")}
+              />
+              <NavItem
+                showLabel
+                active={activePage === "profile"}
+                icon={FaUserCircle}
+                label="My Profile"
+                onClick={() => handleNav("profile")}
+              />
 
               <NavItem
                 showLabel
@@ -276,64 +278,140 @@ useEffect(()=>{
                 icon={PiStudent}
                 label="Students"
                 onClick={() => handleNav("student", "all Student")}
-                right={
-                  studentInCollege ? (
-                    <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{studentInCollege}</span>
-                  ) : null
-                }
               />
               {activePage === "student" && (
                 <div className="ml-8 space-y-1">
-                  <SubItem active={subActivePage === "all Student"} label="Student Record" onClick={() => handleNav("student", "all Student")} />
-                  <SubItem active={subActivePage === "add Student"} label="Add Student" onClick={() => handleNav("student", "add Student")} />
+                  <SubItem
+                    active={subActivePage === "all Student"}
+                    label="Student Record"
+                    onClick={() => handleNav("student", "all Student")}
+                  />
+                  <SubItem
+                    active={subActivePage === "add Student"}
+                    label="Add Student"
+                    onClick={() => handleNav("student", "add Student")}
+                  />
                 </div>
               )}
-{/* teacher */}
+              {/* teacher */}
               <NavItem
                 showLabel
                 active={activePage === "teacher"}
                 icon={FaUserGraduate}
                 label="Teachers"
                 onClick={() => handleNav("teacher", "all Teacher")}
-                right={
-                  totalTeacherInCollege ? (
-                    <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{totalTeacherInCollege}</span>
-                  ) : null
-                }
               />
+
               {activePage === "teacher" && (
                 <div className="ml-8 space-y-1">
-                  <SubItem active={subActivePage === "all Teacher"} label="Teacher Record" onClick={() => handleNav("teacher", "all Teacher")} />
-                  <SubItem active={subActivePage === "add Teacher"} label="Add Teacher" onClick={() => handleNav("teacher", "add Teacher")} />
+                  <SubItem
+                    active={subActivePage === "all Teacher"}
+                    label="Teacher Record"
+                    onClick={() => handleNav("teacher", "all Teacher")}
+                  />
+                  <SubItem
+                    active={subActivePage === "add Teacher"}
+                    label="Add Teacher"
+                    onClick={() => handleNav("teacher", "add Teacher")}
+                  />
                 </div>
               )}
-{/* teacher */}
-{/* Payment */}
-              <NavItem showLabel active={activePage === "payment"} icon={FaMoneyBillWave} label="Payments" onClick={() => handleNav("payment", "Dashboard")} />
+              {/* teacher */}
+              {/* Payment */}
+              <NavItem
+                showLabel
+                active={activePage === "payment"}
+                icon={FaMoneyBillWave}
+                label="Payments"
+                onClick={() => handleNav("payment", "Dashboard")}
+              />
               {activePage === "payment" && (
                 <div className="ml-8 space-y-1">
-                  <SubItem active={subActivePage === "Dashboard"} label="Dashboard" onClick={() => handleNav("payment", "Dashboard")} />
-                  <SubItem active={subActivePage === "Pay Fees"} label="Pay Fees" onClick={() => handleNav("payment", "Pay Fees")} />
-                  <SubItem active={subActivePage === "received Payments"} label="Payment History" onClick={() => handleNav("payment", "received Payments")} />
-                  <SubItem active={subActivePage === "pending payments"} label="Pending Payments" onClick={() => handleNav("payment", "pending payments")} />
-                  <SubItem active={subActivePage === "pending requests"} label="Pending Requests" onClick={() => handleNav("payment", "pending requests")} />
+                  <SubItem
+                    active={subActivePage === "Dashboard"}
+                    label="Dashboard"
+                    onClick={() => handleNav("payment", "Dashboard")}
+                  />
+                  <SubItem
+                    active={subActivePage === "Pay Fees"}
+                    label="Pay Fees"
+                    onClick={() => handleNav("payment", "Pay Fees")}
+                  />
+                  <SubItem
+                    active={subActivePage === "received Payments"}
+                    label="Payment History"
+                    onClick={() => handleNav("payment", "received Payments")}
+                  />
+                  <SubItem
+                    active={subActivePage === "pending payments"}
+                    label="Pending Payments"
+                    onClick={() => handleNav("payment", "pending payments")}
+                  />
+                  <SubItem
+                    active={subActivePage === "pending requests"}
+                    label="Pending Requests"
+                    onClick={() => handleNav("payment", "pending requests")}
+                  />
                 </div>
               )}
 
-              <NavItem showLabel active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
-              <NavItem showLabel active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-              <NavItem showLabel active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
-              <NavItem showLabel active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
-              <NavItem showLabel active={activePage === "settings"} icon={FaCog} label="Settings" onClick={() => handleNav("settings", "staff access")} />
+              <NavItem
+                showLabel
+                active={activePage === "expenses"}
+                icon={FaMoneyBillWave}
+                label="Expenses"
+                onClick={() => handleNav("expenses")}
+              />
+              <NavItem
+                showLabel
+                active={activePage === "subjects"}
+                icon={FaBook}
+                label="Subjects"
+                onClick={() => handleNav("subjects")}
+              />
+              <NavItem
+                showLabel
+                active={activePage === "notice"}
+                icon={FaBell}
+                label="Notice"
+                onClick={() => {
+                  handleNav("notice");
+                }}
+              />
+              <NavItem
+                showLabel
+                active={activePage === "message"}
+                icon={FaRegMessage}
+                label="Message"
+                onClick={() => handleNav("message")}
+              />
+              <NavItem
+                showLabel
+                active={activePage === "settings"}
+                icon={FaCog}
+                label="Settings"
+                onClick={() => handleNav("settings", "staff access")}
+              />
               {activePage === "settings" && (
                 <div className="ml-8 space-y-1">
-                  <SubItem active={subActivePage === "staff access"} label="Staff Access" onClick={() => handleNav("settings", "staff access")} />
+                  <SubItem
+                    active={subActivePage === "staff access"}
+                    label="Staff Access"
+                    onClick={() => handleNav("settings", "staff access")}
+                  />
                 </div>
               )}
 
               <div className="pt-2 mt-2 border-t border-slate-800">
-                <NavItem showLabel active={false} icon={CiLogout} label="Logout" onClick={() => 
-                  {navigate("/"),clearAuthToken()} } />
+                <NavItem
+                  showLabel
+                  active={false}
+                  icon={CiLogout}
+                  label="Logout"
+                  onClick={() => {
+                    (navigate("/"), clearAuthToken());
+                  }}
+                />
               </div>
             </div>
           </aside>
@@ -349,11 +427,25 @@ useEffect(()=>{
         >
           <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">A</div>
+              <div className="h-9 w-9 rounded-lg bg-slate-800 grid place-items-center font-bold">
+                {adminProfile?.imgSrc ? (
+                  <img
+                    src={adminProfile?.imgSrc}
+                    alt="Admin Profile"
+                    className="h-9 w-9 rounded-lg object-cover"
+                  />
+                ) : (
+                  "A"
+                )}
+              </div>
               {sidebarOpen && (
                 <div className="min-w-0">
-                  <div className="font-semibold leading-5 truncate">Admin Panel</div>
-                  <div className="text-xs text-slate-400 truncate">ERP Dashboard</div>
+                  <div className="font-semibold leading-5 truncate">
+                    Admin Panel
+                  </div>
+                  <div className="text-xs text-slate-400 truncate">
+                    ERP Dashboard
+                  </div>
                 </div>
               )}
             </div>
@@ -363,30 +455,44 @@ useEffect(()=>{
               className="p-2 rounded-lg hover:bg-slate-800"
               aria-label="Toggle sidebar"
             >
-              <FaChevronLeft className={`${sidebarOpen ? "" : "rotate-180"} transition`} />
+              <FaChevronLeft
+                className={`${sidebarOpen ? "" : "rotate-180"} transition`}
+              />
             </button>
           </div>
 
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-           
-            <NavItem active={activePage === "home"} icon={FaHome} label="Home" onClick={() => handleNav("home")} />
-            <NavItem active={activePage === "profile"} icon={FaUserCircle} label="My Profile" onClick={() => handleNav("profile")} />
-          
+            <NavItem
+              active={activePage === "home"}
+              icon={FaHome}
+              label="Home"
+              onClick={() => handleNav("home")}
+            />
+            <NavItem
+              active={activePage === "profile"}
+              icon={FaUserCircle}
+              label="My Profile"
+              onClick={() => handleNav("profile")}
+            />
+
             <NavItem
               active={activePage === "student"}
               icon={PiStudent}
               label="Students"
               onClick={() => handleNav("student", "all Student")}
-              right={
-                studentInCollege ? (
-                  <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{studentInCollege}</span>
-                ) : null
-              }
             />
             {sidebarOpen && activePage === "student" && (
               <div className="ml-8 space-y-1">
-                <SubItem active={subActivePage === "all Student"} label="Student Record" onClick={() => handleNav("student", "all Student")} />
-                <SubItem active={subActivePage === "add Student"} label="Add Student" onClick={() => handleNav("student", "add Student")} />
+                <SubItem
+                  active={subActivePage === "all Student"}
+                  label="Student Record"
+                  onClick={() => handleNav("student", "all Student")}
+                />
+                <SubItem
+                  active={subActivePage === "add Student"}
+                  label="Add Student"
+                  onClick={() => handleNav("student", "add Student")}
+                />
               </div>
             )}
 
@@ -395,45 +501,110 @@ useEffect(()=>{
               icon={FaUserGraduate}
               label="Teachers"
               onClick={() => handleNav("teacher", "all Teacher")}
-              right={
-                totalTeacherInCollege ? (
-                  <span className="text-xs rounded-full bg-slate-700 px-2 py-0.5">{totalTeacherInCollege}</span>
-                ) : null
-              }
             />
             {sidebarOpen && activePage === "teacher" && (
               <div className="ml-8 space-y-1">
-                <SubItem active={subActivePage === "all Teacher"} label="Teacher Record" onClick={() => handleNav("teacher", "all Teacher")} />
-                <SubItem active={subActivePage === "add Teacher"} label="Add Teacher" onClick={() => handleNav("teacher", "add Teacher")} />
+                <SubItem
+                  active={subActivePage === "all Teacher"}
+                  label="Teacher Record"
+                  onClick={() => handleNav("teacher", "all Teacher")}
+                />
+                <SubItem
+                  active={subActivePage === "add Teacher"}
+                  label="Add Teacher"
+                  onClick={() => handleNav("teacher", "add Teacher")}
+                />
               </div>
             )}
 
-            <NavItem active={activePage === "payment"} icon={FaMoneyBillWave} label="Payments" onClick={() => handleNav("payment", "Dashboard")} />
+            <NavItem
+              active={activePage === "payment"}
+              icon={FaMoneyBillWave}
+              label="Payments"
+              onClick={() => handleNav("payment", "Dashboard")}
+            />
             {sidebarOpen && activePage === "payment" && (
               <div className="ml-8 space-y-1">
-                <SubItem active={subActivePage === "Dashboard"} label="Dashboard" onClick={() => handleNav("payment", "Dashboard")} />
-                <SubItem active={subActivePage === "Pay Fees"} label="Pay Fees" onClick={() => handleNav("payment", "Pay Fees")} />
-                <SubItem active={subActivePage === "received Payments"} label="Payment History" onClick={() => handleNav("payment", "received Payments")} />
-                <SubItem active={subActivePage === "pending payments"} label="Pending Payments" onClick={() => handleNav("payment", "pending payments")} />
-                <SubItem active={subActivePage === "pending requests"} label="Pending Requests" onClick={() => handleNav("payment", "pending requests")} />
+                <SubItem
+                  active={subActivePage === "Dashboard"}
+                  label="Dashboard"
+                  onClick={() => handleNav("payment", "Dashboard")}
+                />
+                <SubItem
+                  active={subActivePage === "Pay Fees"}
+                  label="Pay Fees"
+                  onClick={() => handleNav("payment", "Pay Fees")}
+                />
+                <SubItem
+                  active={subActivePage === "received Payments"}
+                  label="Payment History"
+                  onClick={() => handleNav("payment", "received Payments")}
+                />
+                <SubItem
+                  active={subActivePage === "pending payments"}
+                  label="Pending Payments"
+                  onClick={() => handleNav("payment", "pending payments")}
+                />
+                <SubItem
+                  active={subActivePage === "pending requests"}
+                  label="Pending Requests"
+                  onClick={() => handleNav("payment", "pending requests")}
+                />
               </div>
             )}
 
-            <NavItem active={activePage === "expenses"} icon={FaMoneyBillWave} label="Expenses" onClick={() => handleNav("expenses")} />
-            <NavItem active={activePage === "subjects"} icon={FaBook} label="Subjects" onClick={() => handleNav("subjects")} />
-            <NavItem active={activePage === "notice"} icon={FaBell} label="Notice" onClick={() => {handleNav("notice")} }/>
-            <NavItem active={activePage === "message"} icon={FaRegMessage} label="Message" onClick={() => handleNav("message")} />
-            <NavItem active={activePage === "settings"} icon={FaCog} label="Settings" onClick={() => handleNav("settings", "staff access")} />
+            <NavItem
+              active={activePage === "expenses"}
+              icon={FaMoneyBillWave}
+              label="Expenses"
+              onClick={() => handleNav("expenses")}
+            />
+            <NavItem
+              active={activePage === "subjects"}
+              icon={FaBook}
+              label="Subjects"
+              onClick={() => handleNav("subjects")}
+            />
+            <NavItem
+              active={activePage === "notice"}
+              icon={FaBell}
+              label="Notice"
+              onClick={() => {
+                handleNav("notice");
+              }}
+            />
+            <NavItem
+              active={activePage === "message"}
+              icon={FaRegMessage}
+              label="Message"
+              onClick={() => handleNav("message")}
+            />
+            <NavItem
+              active={activePage === "settings"}
+              icon={FaCog}
+              label="Settings"
+              onClick={() => handleNav("settings", "staff access")}
+            />
             {sidebarOpen && activePage === "settings" && (
               <div className="ml-8 space-y-1">
-                <SubItem active={subActivePage === "staff access"} label="Staff Access" onClick={() => handleNav("settings", "staff access")} />
+                <SubItem
+                  active={subActivePage === "staff access"}
+                  label="Staff Access"
+                  onClick={() => handleNav("settings", "staff access")}
+                />
               </div>
             )}
           </nav>
 
           <div className="p-3 border-t border-slate-800">
-            <NavItem active={false} icon={CiLogout} label="Logout"  onClick={() => 
-                  {navigate("/"),clearAuthToken()} } />
+            <NavItem
+              active={false}
+              icon={CiLogout}
+              label="Logout"
+              onClick={() => {
+                (navigate("/"), clearAuthToken());
+              }}
+            />
           </div>
         </aside>
 
@@ -450,8 +621,12 @@ useEffect(()=>{
                 <FaBars />
               </button>
               <div className="min-w-0">
-                <h1 className="text-lg font-semibold text-slate-900 truncate">{pageTitle}</h1>
-                <p className="text-xs text-slate-500 truncate">Manage students, teachers, payments and notices</p>
+                <h1 className="text-lg font-semibold text-slate-900 truncate">
+                  {pageTitle}
+                </h1>
+                <p className="text-xs text-slate-500 truncate">
+                  Manage students, teachers, payments and notices
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -465,8 +640,9 @@ useEffect(()=>{
               </button>
               <button
                 type="button"
-                onClick={() => 
-                  {navigate("/"),clearAuthToken()} }
+                onClick={() => {
+                  (navigate("/"), clearAuthToken());
+                }}
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 text-red-600"
               >
                 <CiLogout />
@@ -480,7 +656,11 @@ useEffect(()=>{
               {message && (
                 <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 flex items-start justify-between gap-4">
                   <span className="leading-5">{message}</span>
-                  <button type="button" onClick={() => setMessage("")} className="text-blue-900/70 hover:text-blue-900">
+                  <button
+                    type="button"
+                    onClick={() => setMessage("")}
+                    className="text-blue-900/70 hover:text-blue-900"
+                  >
                     Dismiss
                   </button>
                 </div>
@@ -489,7 +669,7 @@ useEffect(()=>{
               {activePage === "home" && (
                 <div className="flex flex-col gap-4">
                   <Card className="xl:col-span-2 p-3">
-                    <FinanceGraph />
+                    <FinanceGraph totalFees={totalFees} />
                   </Card>
                   <Card className="p-3">
                     <Dashboard />
@@ -546,31 +726,40 @@ useEffect(()=>{
 
               {activePage === "payment" && subActivePage === "Dashboard" && (
                 <Card className="p-3">
-                  {loading ? <p className="text-sm text-slate-600">Loading payments...</p> : <Dashboard />}
+                  {loading ? (
+                    <p className="text-sm text-slate-600">
+                      Loading payments...
+                    </p>
+                  ) : (
+                    <Dashboard />
+                  )}
                 </Card>
               )}
 
-              {activePage === "payment" && subActivePage === "pending requests" && (
-                <Card className="p-3">
-                  <PendingRequest />
-                </Card>
-              )}
+              {activePage === "payment" &&
+                subActivePage === "pending requests" && (
+                  <Card className="p-3">
+                    <PendingRequest />
+                  </Card>
+                )}
 
-              {activePage === "payment" && subActivePage === "received Payments" && (
-                <Card className="p-3">
-                  <History />
-                </Card>
-              )}
+              {activePage === "payment" &&
+                subActivePage === "received Payments" && (
+                  <Card className="p-3">
+                    <History />
+                  </Card>
+                )}
 
-              {activePage === "payment" && subActivePage === "pending payments" && (
-                <Card className="p-3">
-                  <PendingPayment />
-                </Card>
-              )}
+              {activePage === "payment" &&
+                subActivePage === "pending payments" && (
+                  <Card className="p-3">
+                    <PendingPayment />
+                  </Card>
+                )}
 
               {activePage === "payment" && subActivePage === "Pay Fees" && (
                 <Card className="p-3">
-                  <All_Payment notshow={true}/>
+                  <All_Payment notshow={true} />
                 </Card>
               )}
 
@@ -603,11 +792,12 @@ useEffect(()=>{
                 </Card>
               )}
 
-              {activePage === "settings" && subActivePage === "staff access" && (
-                <Card className="p-3">
-                  <StaffSettings refreshKey={staffRefreshKey} />
-                </Card>
-              )}
+              {activePage === "settings" &&
+                subActivePage === "staff access" && (
+                  <Card className="p-3">
+                    <StaffSettings refreshKey={staffRefreshKey} />
+                  </Card>
+                )}
             </div>
           </main>
         </div>

@@ -473,6 +473,7 @@ const TeacherDashboard = () => {
       setMobileNavOpen(false);
     }
   };
+  
 
   const setAllStudentStatus = (status) => {
     const next = {};
@@ -616,6 +617,7 @@ const TeacherDashboard = () => {
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,_#0f172a_0%,_#111827_45%,_#172554_100%)] text-white">
       <div className="mx-auto flex max-w-[120rem] gap-6 px-4 py-5 sm:px-6 lg:items-start lg:px-8">
+
         <aside
           className={`fixed inset-y-0 left-0 z-40 flex h-screen w-[18.5rem] flex-shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-slate-950/95 p-5 shadow-2xl transition-transform duration-300 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:sticky lg:top-5 lg:h-auto lg:min-h-[calc(100vh-2.5rem)] lg:translate-x-0 lg:self-start lg:rounded-[2rem] lg:border lg:bg-white/10 ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`}
         >
@@ -693,6 +695,7 @@ const TeacherDashboard = () => {
           />
         ) : null}
 
+        
         <main className="min-w-0 flex-1">
           <div className="rounded-[2rem] border border-white/10 bg-white/10 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur">
             <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-8">
@@ -1252,6 +1255,8 @@ const TeacherDashboard = () => {
             </div>
           </div>
         </main>
+
+
       </div>
     </div>
   );

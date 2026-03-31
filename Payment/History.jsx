@@ -87,6 +87,8 @@ const History = () => {
     });
   };
 
+
+
   return (
     <div className="space-y-6">
       <section className="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-900 p-6 text-white shadow-xl">
@@ -175,8 +177,8 @@ const History = () => {
             Loading payment history...
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1080px] w-full">
+          <div className="overflow-auto h-[400px]">
+            <table className=" w-full" >
               <thead className="bg-slate-100">
                 <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   <th className="px-5 py-4">Student Name</th>

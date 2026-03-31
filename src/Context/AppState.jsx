@@ -8,24 +8,9 @@ import { setAuthToken, clearAuthToken, setAuthUser } from "../utils/auth";
 const AppState = (props) => {
 
     // const url = 'http://localhost:1000/api/user'
-    const[Users,setUsers] = useState([])
+
     const [userLogin, setUserLogin] = useState(false)
-    useEffect(()=>{
-        const fetchUser = async() =>{
-            try {
-                const res = await api.get(`user/allUser`,{
-                    headers:{
-                        "Content-Type":"Application/json"
-                    },
-                    withCredentials: true
-                })
-                setUsers(res.data.alluser || []);
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
-        fetchUser();
-    },[])
+ 
 
     //register User
     const register = async(name,email,password) =>{
@@ -49,7 +34,7 @@ const AppState = (props) => {
             })
             if (res.data.success && res.data.token) {
                 setAuthToken(res.data.token);
-                setAuthUser(res.data.user);
+                // setAuthUser(res.data.user);
             } else {
                 clearAuthToken();
             }
@@ -159,8 +144,13 @@ const AppState = (props) => {
       const res = await api.get(`/teacher/profile/${teacherId}`);
       return res.data;
     }
+
+
+
+
+ 
   return (
-   <AppContext.Provider value={{Users,register,login,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance,teacherprofile}}>
+   <AppContext.Provider value={{register,login,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance,teacherprofile,}}>
     {
         props.children
     }

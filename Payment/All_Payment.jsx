@@ -1,9 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import api from "../src/api/axios";
 import { printPaymentReceipt } from "./PaymentReceipt";
 import { FEE_TYPE_OPTIONS, getFeeTotals } from "../src/utils/studentFees";
 
+
 const getSafeAssetValue = (value) => {
+
+ 
   const raw = String(value || "").trim();
   if (!raw) return null;
   if (raw.startsWith("data:image/")) return raw;
@@ -34,12 +37,22 @@ const All_Payment = ({ notshow }) => {
     allpayment();
   }, []);
 
+
+  
+
+  // Fetch all payment records and calculate fee summaries
+
+  
+
   const allpayment = async () => {
     try {
       setLoading(true);
       const response = await api.get("/payment/allPayment");
+      console.log(response.data.all);
 
+      
       if (response.data.success) {
+      
         const list = response.data.all || [];
         const cleanData = list.map((student) => ({
           ...student,

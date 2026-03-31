@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
-import AppContext from "../src/Context/AppContext";
+
 import logo from "../src/assest/logo.png"
 
 const Nav = () => {
-  const { userLogin } = useContext(AppContext);
+
   const [open, setOpen] = useState(false);
   const menuRef = useRef();
 
@@ -26,8 +26,8 @@ const Nav = () => {
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-        <img src={logo} alt="SKIT" className="h-11 w-auto opacity-90" title="Shakuntala Krishna Institute of Technology" />
-          {/* <h1 title="Shankutla Krishna Institute of Technology">SKIT</h1> */}
+        <img src={logo} alt="SKIT" className="h-15 w-auto opacity-90 " title="Shakuntala Krishna Institute of Technology" />
+          <h1 className="text-white text-3xl font-bold " title="Shankutla Krishna Institute of Technology">SKIT</h1>
 
         </Link>
 
@@ -47,14 +47,7 @@ const Nav = () => {
             </Link>
           ))}
 
-          {userLogin ? (
-            <Link
-              to="/users"
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
-            >
-              All Users
-            </Link>
-          ) : null}
+         
 
           <Link to="/login" className="ui-btn ui-btn-primary ml-2">
             Login
@@ -95,15 +88,7 @@ const Nav = () => {
                 </Link>
               ))}
 
-              {userLogin ? (
-                <Link
-                  to="/users"
-                  className="rounded-xl px-3 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10 hover:text-white"
-                  onClick={() => setOpen(false)}
-                >
-                  All Users
-                </Link>
-              ) : null}
+            
 
               <Link to="/login" className="ui-btn ui-btn-primary mt-2 w-full justify-center" onClick={() => setOpen(false)}>
                 Login

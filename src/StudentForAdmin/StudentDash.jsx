@@ -19,6 +19,10 @@ const StudentDash = () => {
   const [editingStudent, setEditingStudent] = useState(null);
 
   const fetchAllStudents = async () => {
+    
+    
+  
+
     try {
       setLoading(true);
       const response = await api.get(`/student/allStudents`);

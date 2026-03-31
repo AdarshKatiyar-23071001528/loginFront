@@ -189,7 +189,7 @@ const AppFeedbackProvider = ({ children }) => {
         </div>
       ) : null}
 
-      {showBuffering ? (
+      {/* {showBuffering ? (
         <div className="pointer-events-none fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/32 backdrop-blur-[2px]">
           <div className="w-[min(90vw,22rem)] rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 text-white shadow-2xl">
             <div className="flex items-center gap-4">
@@ -210,7 +210,7 @@ const AppFeedbackProvider = ({ children }) => {
             </div>
           </div>
         </div>
-      ) : null}
+      ) : null} */}
 
       <div className="pointer-events-none fixed inset-x-0 top-4 z-[130] flex justify-center px-4 sm:justify-end">
         <div className="flex w-full max-w-sm flex-col gap-3">

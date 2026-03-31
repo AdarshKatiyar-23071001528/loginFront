@@ -88,15 +88,25 @@ const CreateExpense = ({ onCreated }) => {
           className={inputClassName}
         />
 
-        <input
-          type="text"
+        
+         <select
           name="name"
-          placeholder="Expense name"
           value={form.name}
           onChange={handleChange}
-          required
           className={inputClassName}
-        />
+          required
+        >
+          <option value="" disabled>
+            Choose expense type
+          </option>
+          <option value="Salary">Salary</option>
+          <option value="Affiliation">Affiliation</option>
+          <option value="Challan">Challan</option>
+          <option value="Maintainence">Maintainence</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Lab">Lab</option>
+          <option value="Other">Other</option>
+        </select>
 
         <input
           type="text"

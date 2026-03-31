@@ -145,13 +145,13 @@ const TeacherEditModal = ({ teacher, onClose, onSaved }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-auto px-6 py-6">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-auto px-6 pt-6 ">
           <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
             <div className="space-y-6">
               <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <h3 className="text-lg font-bold text-slate-900">Photo</h3>
                 {imagePreview ? (
-                  <img src={imagePreview} alt="Teacher" className="mt-4 h-56 w-full rounded-2xl object-cover" />
+                  <img src={imagePreview} alt="Teacher" className="mt-4 h-56 w-full rounded-2xl object-fit" />
                 ) : null}
                 <input
                   type="file"
@@ -224,7 +224,7 @@ const TeacherEditModal = ({ teacher, onClose, onSaved }) => {
             </div>
           </div>
 
-          <div className="sticky bottom-0 mt-6 flex justify-end gap-3 border-t border-slate-200 bg-white pt-4">
+          <div className="sticky bottom-0 mt-6 flex justify-end gap-3 border-t border-slate-200 bg-white p-4">
             <button
               type="button"
               onClick={onClose}

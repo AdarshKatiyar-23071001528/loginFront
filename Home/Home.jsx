@@ -13,8 +13,12 @@ import {
 } from "react-icons/fa6";
 
 import StatsCard from "./StatsCard";
+import Admission from "../src/components/Admission/Admission";
 
 const Home = () => {
+
+
+  const[newAdmission, setNewAdmission] = useState(false);
   const text = "Welcome to SKIT 🎓";
   const [displayText, setDisplayText] = useState("");
   const [index, setIndex] = useState(0);
@@ -30,6 +34,8 @@ const Home = () => {
       return () => clearTimeout(timeout);
     }
   }, [index]);
+
+  console.log(newAdmission)
 
   return (
     <>
@@ -63,8 +69,9 @@ const Home = () => {
                 Login Portal <FaArrowRight />
               </Link>
               <Link
-                to="/student/register"
+                // to="/student/register"
                 className="ui-btn ui-btn-secondary bg-white/10 text-white ring-white/20 hover:bg-white/15"
+                onClick={() => setNewAdmission(true) }
               >
                 New Admission
               </Link>
@@ -218,6 +225,17 @@ const Home = () => {
           <div className="mt-10 text-center text-sm text-slate-500">© 2026 SKIT. All rights reserved.</div>
         </div>
       </footer>
+
+
+
+
+      {newAdmission && (
+      <div className="inset-0 flex flex-col fixed bg-black/40 h-screen w-screen justify-center items-center z-90">
+          <p className="text-red flex justify-end bg-white w-[400px] rounded-t-xl pr-5 pt-2" onClick={() => setNewAdmission(false)}>Cross</p>
+           <Admission/>
+      </div>
+       
+      )}
     </>
   );
 };

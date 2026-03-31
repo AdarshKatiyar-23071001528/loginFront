@@ -13,7 +13,8 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const FinanceGraph = () => {
+const FinanceGraph = (totalfees) => {
+  console.log("Total Fees from AdminDash:", totalfees.totalFees);
   const [graph, setGraph] = useState({
     labels: [],
     fees: [],
@@ -54,6 +55,7 @@ const FinanceGraph = () => {
       );
 
       setGraph(res.data);
+      
     } catch (err) {
       console.log(err);
     }
@@ -124,6 +126,12 @@ const FinanceGraph = () => {
 
   const summaryCards = [
     {
+      name: "Total Fees",
+      label: "This fees calculate after discount",
+      value: totalfees.totalFees,
+      accent: "border-indigo-500 bg-indigo-50 text-indigo-700",
+    },
+    {
       name: "Fees Collection",
       value: totalFees,
       accent: "border-emerald-500 bg-emerald-50 text-emerald-700",
@@ -138,6 +146,7 @@ const FinanceGraph = () => {
       value: totalProfit,
       accent: "border-sky-500 bg-sky-50 text-sky-700",
     },
+    
   ];
 
   return (
@@ -219,6 +228,12 @@ const FinanceGraph = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.18em]">
                 {card.name}
               </p>
+              {card.label && (
+                <p className="text-xs text-slate-500">
+                  {card.label}
+                </p>
+              )}
+            
               <p className="mt-3 text-2xl font-black sm:text-3xl">
                 Rs. {Number(card.value || 0).toLocaleString("en-IN")}
               </p>
