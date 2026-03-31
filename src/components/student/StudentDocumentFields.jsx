@@ -4,6 +4,7 @@ import {
   resolveDocumentType,
 } from "../../utils/studentDocuments";
 import { getSafeAssetUrl } from "./StudentProfileSheet";
+import DocumentPreview from "../shared/DocumentPreview";
 
 const StudentDocumentFields = ({
   documents,
@@ -96,15 +97,34 @@ const StudentDocumentFields = ({
           </p>
         ) : null}
 
-        {documentItem.url ? (
-          <a
-            href={getSafeAssetUrl(documentItem.url)}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-900"
-          >
-            View current file
-          </a>
+        {documentItem.file || documentItem.url ? (
+          <div className="mt-4 space-y-3">
+            <DocumentPreview
+              file={documentItem.file}
+              url={documentItem.file ? "" : getSafeAssetUrl(documentItem.url)}
+              title={resolveDocumentType(documentItem) || `Document ${index + 1}`}
+              className="h-64"
+            />
+
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="text-slate-500">
+                {documentItem.file
+                  ? `Selected file: ${documentItem.file.name}`
+                  : "Current uploaded file"}
+              </span>
+
+              {!documentItem.file && documentItem.url ? (
+                <a
+                  href={getSafeAssetUrl(documentItem.url)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-blue-700 hover:text-blue-900"
+                >
+                  Open current file
+                </a>
+              ) : null}
+            </div>
+          </div>
         ) : null}
       </div>
     ))}

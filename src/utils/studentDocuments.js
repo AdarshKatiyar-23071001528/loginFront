@@ -40,3 +40,12 @@ export const normalizeStudentDocuments = (documents = []) => {
     }),
   );
 };
+
+export const buildExistingDocuments = (documents = []) =>
+  documents
+    .filter((item) => item?.url && !item?.file)
+    .map((item) => ({
+      type: resolveDocumentType(item),
+      url: item.url,
+    }))
+    .filter((item) => item.type && item.url);

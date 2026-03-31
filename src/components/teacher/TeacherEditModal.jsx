@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import api from "../../api/axios";
 import StudentDocumentFields from "../student/StudentDocumentFields";
 import {
+  buildExistingDocuments,
   createDocumentItem,
   normalizeStudentDocuments,
   resolveDocumentType,
@@ -93,15 +94,10 @@ const TeacherEditModal = ({ teacher, onClose, onSaved }) => {
       if (imageFile) payload.append("imgSrc", imageFile);
       if (signatureFile) payload.append("signature", signatureFile);
 
-      const existingDocuments = documents
-        .filter((item) => item.url)
-        .map((item) => ({
-          type: resolveDocumentType(item),
-          url: item.url,
-        }))
-        .filter((item) => item.type && item.url);
-
-      payload.append("existingDocuments", JSON.stringify(existingDocuments));
+      payload.append(
+        "existingDocuments",
+        JSON.stringify(buildExistingDocuments(documents)),
+      );
 
       documents
         .filter((item) => item.file)

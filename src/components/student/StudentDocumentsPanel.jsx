@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import StudentDocumentFields from "./StudentDocumentFields";
 import {
+  buildExistingDocuments,
   createDocumentItem,
   normalizeStudentDocuments,
   resolveDocumentType,
@@ -35,15 +36,10 @@ const StudentDocumentsPanel = ({ student, studentId, onSaved }) => {
     try {
       const payload = new FormData();
 
-      const existingDocuments = documents
-        .filter((item) => item.url)
-        .map((item) => ({
-          type: resolveDocumentType(item),
-          url: item.url,
-        }))
-        .filter((item) => item.type && item.url);
-
-      payload.append("existingDocuments", JSON.stringify(existingDocuments));
+      payload.append(
+        "existingDocuments",
+        JSON.stringify(buildExistingDocuments(documents)),
+      );
 
       documents
         .filter((item) => item.file)

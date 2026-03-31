@@ -2,6 +2,7 @@ import React from "react";
 import { getFeeTotals } from "../../utils/studentFees";
 import collegeLogo from "../../assest/logo.png";
 import api from "../../api/axios";
+import DocumentPreview from "../shared/DocumentPreview";
 
 export const getSafeAssetUrl = (value) => {
   const raw = String(value || "").trim();
@@ -233,7 +234,13 @@ export const StudentProfileSheet = ({ student, onStudentUpdated }) => {
                   <p className="mt-2 text-base font-bold text-slate-900">
                     {documentItem.type}
                   </p>
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-4 space-y-4">
+                    <DocumentPreview
+                      url={getSafeAssetUrl(documentItem.url)}
+                      title={documentItem.type || `Document ${index + 1}`}
+                      className="h-64"
+                    />
+                    <div className="flex gap-3">
                     <a
                       href={getSafeAssetUrl(documentItem.url)}
                       target="_blank"
@@ -252,6 +259,7 @@ export const StudentProfileSheet = ({ student, onStudentUpdated }) => {
                         {deletingUrl === documentItem.url ? "Deleting..." : "Delete"}
                       </button>
                     ) : null}
+                    </div>
                   </div>
                 </div>
               ))

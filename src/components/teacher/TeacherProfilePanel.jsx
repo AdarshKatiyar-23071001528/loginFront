@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import TeacherEditModal from "./TeacherEditModal";
 import { getSafeAssetUrl } from "../student/StudentProfileSheet";
 import api from "../../api/axios";
+import DocumentPreview from "../shared/DocumentPreview";
 
 const InfoGrid = ({ title, items }) => (
   <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -182,7 +183,13 @@ const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
                   <p className="mt-2 text-base font-bold text-slate-900">
                     {documentItem.type || `Document ${index + 1}`}
                   </p>
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-4 space-y-4">
+                    <DocumentPreview
+                      url={getSafeAssetUrl(documentItem.url)}
+                      title={documentItem.type || `Document ${index + 1}`}
+                      className="h-64"
+                    />
+                    <div className="flex gap-3">
                     <a
                       href={getSafeAssetUrl(documentItem.url)}
                       target="_blank"
@@ -199,6 +206,7 @@ const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
                     >
                       {deletingUrl === documentItem.url ? "Deleting..." : "Delete"}
                     </button>
+                    </div>
                   </div>
                 </div>
               ))
