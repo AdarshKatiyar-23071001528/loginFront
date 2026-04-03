@@ -409,7 +409,7 @@ const AdminDash = () => {
                   icon={CiLogout}
                   label="Logout"
                   onClick={() => {
-                    (navigate("/"), clearAuthToken());
+                    (navigate("https://skitedu.in/"), clearAuthToken());
                   }}
                 />
               </div>
@@ -602,7 +602,7 @@ const AdminDash = () => {
               icon={CiLogout}
               label="Logout"
               onClick={() => {
-                (navigate("/"), clearAuthToken());
+                (navigate("https://skitedu.in/"), clearAuthToken());
               }}
             />
           </div>
@@ -641,7 +641,7 @@ const AdminDash = () => {
               <button
                 type="button"
                 onClick={() => {
-                  (navigate("/"), clearAuthToken());
+                  (navigate("https://skitedu.in/"), clearAuthToken());
                 }}
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 text-red-600"
               >

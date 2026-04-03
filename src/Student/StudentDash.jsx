@@ -275,7 +275,7 @@ const StudentDash = () => {
                   return (
                     <button
                       key={tab.id}
-                     onClick={ tab.id === "logout" ? () => {clearAuthToken(),navigate('/login')} : () => setActiveTab(tab.id)}
+                     onClick={ tab.id === "logout" ? () => {clearAuthToken(),navigate('https://skitedu.in/')} : () => setActiveTab(tab.id)}
                       className={`flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${
                         active
                           ? "border-cyan-300/40 bg-cyan-400/15 text-white shadow-lg"
