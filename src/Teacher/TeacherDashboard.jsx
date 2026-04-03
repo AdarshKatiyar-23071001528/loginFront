@@ -446,7 +446,7 @@ const TeacherDashboard = () => {
   const handleNav = (page, subPage = "") => {
     if (page === "logout") {
       clearAuthToken();
-      navigate("https://skitedu.in/");
+      navigate("/");
       return;
     }
     setActivePage(page);
