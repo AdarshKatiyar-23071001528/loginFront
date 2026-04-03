@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 
 const RedirectToWebsite = () => {
-useEffect(()=>{
-    window.location.href = "https://www.skitedu.in/";
-},[]) 
+  useEffect(() => {
+    window.location.replace("https://www.skitedu.in/");
+  }, []);
 
-  return null
-}
+  return null;
+};
 
-export default RedirectToWebsite
+export default RedirectToWebsite;
