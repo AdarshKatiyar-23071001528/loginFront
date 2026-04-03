@@ -36,13 +36,13 @@ const Layout = () => {
       {!hideNav && <Nav />}
       <Suspense fallback={<div className='min-h-[40vh] flex items-center justify-center text-lg font-medium text-slate-600'>Loading...</div>}>
         <Routes>
-          <Route path='/' element={<Home/>} />
+          {/* <Route path='/' element={<Home/>} /> */}
           <Route path='/users' element={<AllUsers/>}/>
           <Route path='/register' element={<Register/>}/>
           <Route path='/course' element={<Course/>} />
           <Route path='/carrer' element={<Carrer/>} />
           <Route path='/contact' element={<Contact/>} />
-          <Route path='/login' element={<MultiLogin/>} />
+          <Route path='/' element={<MultiLogin/>} />
           <Route path='/admin/login' element={<Login/>} />
           <Route path='/faculty/login' element={<Teacherlog/>} />
           <Route path='/student/login' element={<StudentLogin/>} />
