@@ -161,7 +161,7 @@ const StudentDash = () => {
             ))}
           </select>
         </div>
-      </section>
+      </section> 
 
       {message ? (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
@@ -179,8 +179,9 @@ const StudentDash = () => {
             Loading students...
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
+          <div className="overflow-y-auto h-[400px]
+          ">
+            <table className="w-full">
               <thead className="bg-slate-100">
                 <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   <th className="px-5 py-4">Name</th>
@@ -202,7 +203,7 @@ const StudentDash = () => {
                       <td className="px-5 py-4">{student.wrn || "-"}</td>
                       <td className="px-5 py-4">{student.course || "-"}</td>
                       <td className="px-5 py-4">{student.semester || "-"}</td>
-                      <td className="px-5 py-4">{student.email || "-"}</td>
+                      <td className="px-1 py-4 break-words text-[12px]">{student.email || "-"}</td>
                       <td className="px-5 py-4">{student.mobile1 || "-"}</td>
                       <td className="px-5 py-4">
                         <div className="flex justify-center gap-2">

@@ -30,23 +30,33 @@ const MONTHS = [
 const inputClassName =
   "rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-slate-400";
 
+const getCurrentPeriod = () => ({
+  month: String(new Date().getMonth() + 1),
+  year: String(new Date().getFullYear()),
+});
+
 const Dashboard = () => {
   const [todayPayment, setTodayPayment] = useState(0);
   const [monthPayment, setMonthPayment] = useState(0);
   const [graph, setGraph] = useState({ labels: [], values: [] });
   const [type, setType] = useState("daily");
-  const [month, setMonth] = useState(String(new Date().getMonth() + 1));
-  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [month, setMonth] = useState(getCurrentPeriod().month);
+  const [year, setYear] = useState(getCurrentPeriod().year);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
+        const latestPeriod = await fetchMonthPayment();
+        const initialPeriod = latestPeriod || getCurrentPeriod();
+
+        setMonth(initialPeriod.month);
+        setYear(initialPeriod.year);
+
         await Promise.all([
           fetchTodayPayment(),
-          fetchMonthPayment(),
-          fetchGraph("daily", String(new Date().getMonth() + 1), String(new Date().getFullYear())),
+          fetchGraph("daily", initialPeriod.month, initialPeriod.year),
         ]);
       } finally {
         setLoading(false);
@@ -65,8 +75,13 @@ const Dashboard = () => {
     const res = await api.get("/payment/month-payment");
     if (res?.data?.data?.length > 0) {
       setMonthPayment(res.data.data[0].totalPayment);
+      return {
+        month: String(res.data.data[0]?._id?.month || getCurrentPeriod().month),
+        year: String(res.data.data[0]?._id?.year || getCurrentPeriod().year),
+      };
     } else {
       setMonthPayment(0);
+      return null;
     }
   };
 

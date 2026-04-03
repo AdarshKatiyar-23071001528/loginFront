@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../src/api/axios.js";
 import { Bar } from "react-chartjs-2";
-
 import {
   Chart as ChartJS,
   BarElement,
@@ -13,14 +12,45 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const FinanceGraph = (totalfees) => {
-  console.log("Total Fees from AdminDash:", totalfees.totalFees);
+const getCurrentPeriod = () => ({
+  month: String(new Date().getMonth() + 1),
+  year: String(new Date().getFullYear()),
+});
+
+const getLatestPeriod = (paymentPeriods = [], expensePeriods = []) => {
+  const periods = [...paymentPeriods, ...expensePeriods]
+    .map((item) => ({
+      month: Number(item?._id?.month),
+      year: Number(item?._id?.year),
+    }))
+    .filter((item) => Number.isInteger(item.month) && Number.isInteger(item.year));
+
+  if (periods.length === 0) {
+    return getCurrentPeriod();
+  }
+
+  periods.sort((a, b) => {
+    if (b.year !== a.year) return b.year - a.year;
+    return b.month - a.month;
+  });
+
+  return {
+    month: String(periods[0].month),
+    year: String(periods[0].year),
+  };
+};
+
+const FinanceGraph = ({ totalFees: overallTotalFees = 0 }) => {
   const [graph, setGraph] = useState({
     labels: [],
     fees: [],
     expenses: [],
     profit: [],
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [initialized, setInitialized] = useState(false);
+
   const monthNames = [
     "Jan",
     "Feb",
@@ -37,46 +67,95 @@ const FinanceGraph = (totalfees) => {
   ];
 
   const [type, setType] = useState("month");
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(getCurrentPeriod().month);
+  const [year, setYear] = useState(getCurrentPeriod().year);
 
   useEffect(() => {
-    fetchGraph();
-  }, [type, month, year]);
+    const initializeGraphFilters = async () => {
+      try {
+        setLoading(true);
+        const [paymentRes, expenseRes] = await Promise.all([
+          api.get("/payment/month-payment"),
+          api.get("/expense/month-expense"),
+        ]);
 
-  const totalFees = graph.fees.reduce((sum, val) => sum + val, 0);
-  const totalExpense = graph.expenses.reduce((sum, val) => sum + val, 0);
-  const totalProfit = totalFees - totalExpense;
+        const latestPeriod = getLatestPeriod(
+          paymentRes?.data?.data || [],
+          expenseRes?.data?.data || [],
+        );
+
+        setMonth(latestPeriod.month);
+        setYear(latestPeriod.year);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+        setInitialized(true);
+      }
+    };
+
+    initializeGraphFilters();
+  }, []);
+
+  useEffect(() => {
+    if (!initialized) return;
+
+    const loadGraph = async () => {
+      await fetchGraph();
+    };
+
+    loadGraph();
+  }, [initialized, type, month, year]);
+
+  const safeLabels = Array.isArray(graph.labels) ? graph.labels : [];
+  const safeFees = Array.isArray(graph.fees) ? graph.fees : [];
+  const safeExpenses = Array.isArray(graph.expenses) ? graph.expenses : [];
+  const safeProfit = Array.isArray(graph.profit) ? graph.profit : [];
+
+  const totalCollected = safeFees.reduce((sum, val) => sum + Number(val || 0), 0);
+  const totalExpense = safeExpenses.reduce((sum, val) => sum + Number(val || 0), 0);
+  const totalProfit = totalCollected - totalExpense;
 
   const fetchGraph = async () => {
     try {
+      setLoading(true);
+      setError("");
+
       const res = await api.get(
         `/student/finance-graph?type=${type}&month=${month}&year=${year}`,
       );
 
-      setGraph(res.data);
-      
+      setGraph({
+        labels: Array.isArray(res?.data?.labels) ? res.data.labels : [],
+        fees: Array.isArray(res?.data?.fees) ? res.data.fees : [],
+        expenses: Array.isArray(res?.data?.expenses) ? res.data.expenses : [],
+        profit: Array.isArray(res?.data?.profit) ? res.data.profit : [],
+      });
     } catch (err) {
       console.log(err);
+      setError(err?.response?.data?.message || "Unable to load finance chart");
+      setGraph({ labels: [], fees: [], expenses: [], profit: [] });
+    } finally {
+      setLoading(false);
     }
   };
 
   const chartData = {
-    labels: type === "year" ? monthNames : graph.labels,
+    labels: type === "year" ? monthNames : safeLabels,
     datasets: [
       {
         label: "Fees Collection",
-        data: graph.fees,
+        data: safeFees,
         backgroundColor: "rgba(34,197,94,0.6)",
       },
       {
         label: "Expense",
-        data: graph.expenses,
+        data: safeExpenses,
         backgroundColor: "rgba(239,68,68,0.6)",
       },
       {
         label: "Profit",
-        data: graph.profit,
+        data: safeProfit,
         backgroundColor: "rgba(59,130,246,0.6)",
       },
     ],
@@ -128,12 +207,12 @@ const FinanceGraph = (totalfees) => {
     {
       name: "Total Fees",
       label: "This fees calculate after discount",
-      value: totalfees.totalFees,
+      value: overallTotalFees,
       accent: "border-indigo-500 bg-indigo-50 text-indigo-700",
     },
     {
       name: "Fees Collection",
-      value: totalFees,
+      value: totalCollected,
       accent: "border-emerald-500 bg-emerald-50 text-emerald-700",
     },
     {
@@ -146,8 +225,10 @@ const FinanceGraph = (totalfees) => {
       value: totalProfit,
       accent: "border-sky-500 bg-sky-50 text-sky-700",
     },
-    
   ];
+
+  const hasChartData =
+    safeFees.length > 0 || safeExpenses.length > 0 || safeProfit.length > 0;
 
   return (
     <section className="w-full rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
@@ -160,7 +241,7 @@ const FinanceGraph = (totalfees) => {
             Finance Overview
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            Compare fee collection, expenses, and profit by month or across the year.
+            Compare fee collection, expenses, and profit using the latest available records.
           </p>
         </div>
 
@@ -180,9 +261,9 @@ const FinanceGraph = (totalfees) => {
               onChange={(e) => setMonth(e.target.value)}
               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
             >
-              {monthNames.map((m, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {m}
+              {monthNames.map((item, index) => (
+                <option key={item} value={String(index + 1)}>
+                  {item}
                 </option>
               ))}
             </select>
@@ -193,9 +274,9 @@ const FinanceGraph = (totalfees) => {
             onChange={(e) => setYear(e.target.value)}
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400"
           >
-            {[2023, 2024, 2025, 2026, 2027].map((y) => (
-              <option key={y} value={y}>
-                {y}
+            {[2023, 2024, 2025, 2026, 2027].map((item) => (
+              <option key={item} value={String(item)}>
+                {item}
               </option>
             ))}
           </select>
@@ -213,9 +294,23 @@ const FinanceGraph = (totalfees) => {
             </div>
           </div>
           <div className="min-w-0 overflow-hidden rounded-3xl bg-slate-50 p-3 sm:p-4">
-            <div className="relative h-[260px] w-full sm:h-[380px] lg:h-[420px]">
-              <Bar data={chartData} options={chartOptions} />
-            </div>
+            {loading ? (
+              <div className="flex h-[260px] items-center justify-center text-sm font-semibold text-slate-500 sm:h-[380px] lg:h-[420px]">
+                Loading finance chart...
+              </div>
+            ) : error ? (
+              <div className="flex h-[260px] items-center justify-center px-4 text-center text-sm font-semibold text-rose-600 sm:h-[380px] lg:h-[420px]">
+                {error}
+              </div>
+            ) : hasChartData ? (
+              <div className="relative h-[260px] w-full sm:h-[380px] lg:h-[420px]">
+                <Bar data={chartData} options={chartOptions} />
+              </div>
+            ) : (
+              <div className="flex h-[260px] items-center justify-center text-sm font-semibold text-slate-500 sm:h-[380px] lg:h-[420px]">
+                No finance graph data found.
+              </div>
+            )}
           </div>
         </div>
 
@@ -228,12 +323,7 @@ const FinanceGraph = (totalfees) => {
               <p className="text-xs font-semibold uppercase tracking-[0.18em]">
                 {card.name}
               </p>
-              {card.label && (
-                <p className="text-xs text-slate-500">
-                  {card.label}
-                </p>
-              )}
-            
+              {card.label ? <p className="text-xs text-slate-500">{card.label}</p> : null}
               <p className="mt-3 text-2xl font-black sm:text-3xl">
                 Rs. {Number(card.value || 0).toLocaleString("en-IN")}
               </p>

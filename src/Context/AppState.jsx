@@ -34,14 +34,41 @@ const AppState = (props) => {
             })
             if (res.data.success && res.data.token) {
                 setAuthToken(res.data.token);
-                // setAuthUser(res.data.user);
+                setAuthUser(res.data.user);
             } else {
                 clearAuthToken();
             }
             setUserLogin(res.data.success);
-          alert(res.data.message);
           return res.data;
         }
+
+    const verifyAdminOtp = async(challengeToken, otp) =>{
+        const res = await api.post(`user/verify-login-otp`,
+            {challengeToken, otp},{
+            headers:{
+                "Content-Type":"Application/json"
+            },
+            withCredentials: true
+        })
+        if (res.data.success && res.data.token) {
+            setAuthToken(res.data.token);
+            setAuthUser(res.data.user);
+        } else {
+            clearAuthToken();
+        }
+        return res.data;
+    }
+
+    const resendAdminOtp = async(challengeToken) =>{
+        const res = await api.post(`user/resend-login-otp`,
+            {challengeToken},{
+            headers:{
+                "Content-Type":"Application/json"
+            },
+            withCredentials: true
+        })
+        return res.data;
+    }
 
     const studentRegister = async(rollno, email, password) =>{
         const res = await api.post('/student/register', {rollno, email, password},{
@@ -150,7 +177,7 @@ const AppState = (props) => {
 
  
   return (
-   <AppContext.Provider value={{register,login,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance,teacherprofile,}}>
+   <AppContext.Provider value={{register,login,verifyAdminOtp,resendAdminOtp,userLogin,studentRegister,studentLogin,teacherLogin,createSubject,assignTeacher,getSubjects,getTeachers,subjectsByTeacher,studentsForSubject,markAttendance,teacherprofile,}}>
     {
         props.children
     }

@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Nav from '../Nav/Nav';
 import NetworkStatus from './NetworkStatus';
+import About1 from '../Parts/About1';
 
 const Home = lazy(() => import('../Home/Home'));
 const AllUsers = lazy(() => import('../Users/AllUsers'));
@@ -17,6 +18,7 @@ const StudentLogin = lazy(() => import('./Student/StudentLogin'));
 const AdminDash = lazy(() => import('../Users/AdminDash'));
 const StudentDash = lazy(() => import('./Student/StudentDash'));
 const TeacherDashboard = lazy(() => import('./Teacher/TeacherDashboard'));
+const About = lazy(() => import('../Parts/About')); 
 
 
 const Layout = () => {
@@ -48,6 +50,7 @@ const Layout = () => {
           <Route path="/admin/dash" element={<AdminDash/>} />
           <Route path="/student/dash" element={<StudentDash/>} />
           <Route path="/teacher/dash/:id" element={<TeacherDashboard/>} />
+          <Route path="/about" element={<About/>} />
           <Route path="*" element={<h1 className='text-center text-2xl mt-20'>404 Not Found</h1>} />
         </Routes>
       </Suspense>

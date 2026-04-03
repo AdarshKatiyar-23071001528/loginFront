@@ -187,10 +187,10 @@ const StudentRegister = () => {
                       ["rollno", "Roll Number"],
                       ["enrollment", "Enrollment"],
                       ["wrn", "WRN"],
-                      ["course", "Course"],
+                      // ["course", "Course"],
                       ["semester", "Semester", "number"],
                       ["section", "Section"],
-                      ["branch", "Branch"],
+                      // ["branch", "Branch"],
                       ["reference", "Reference"],
                     ].map(([name, label, type = "text"]) => (
                       <div key={name}>
@@ -206,6 +206,18 @@ const StudentRegister = () => {
                         />
                       </div>
                     ))}
+
+                    <select name="course" id="course" value={formData.course} onChange={handleChange} className={inputClass}>
+                      <option value="">Select Course</option>
+                      <option value="BBA">BBA</option>
+                      <option value="BCA">BCA</option>
+                    </select>
+
+                    <select name="branch" id="branch" value={formData.branch} onChange={handleChange} className={inputClass}>
+                      <option value="">Select Branch</option>
+                      <option value="BBA">BBA</option>
+                      <option value="BCA">BCA</option>
+                    </select>
                   </div>
                 </section>
 
@@ -238,6 +250,8 @@ const StudentRegister = () => {
                       </div>
                     ))}
                   </div>
+
+
                 </section>
 
                 <section className={sectionClass}>

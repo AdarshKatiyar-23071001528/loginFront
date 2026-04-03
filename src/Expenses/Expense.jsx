@@ -12,10 +12,19 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
+const getCurrentPeriod = () => ({
+  month: String(new Date().getMonth() + 1),
+  year: String(new Date().getFullYear()),
+});
+
+const getMonthLabel = (value) =>
+  new Date(2000, Number(value) - 1, 1).toLocaleString("en-US", { month: "short" });
+
 const Expense = () => {
   const [todayExpense, setTodayExpense] = useState(0);
   const [monthExpense, setMonthExpense] = useState(0);
   const [graph, setGraph] = useState({ labels: [], values: [] });
+  const [selectedPeriod, setSelectedPeriod] = useState(getCurrentPeriod());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,11 +34,12 @@ const Expense = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      await Promise.all([
-        fetchTodayExpense(),
-        fetchMonthExpense(),
-        fetchGraph(),
-      ]);
+      const latestPeriod = await fetchMonthExpense();
+      const period = latestPeriod || getCurrentPeriod();
+
+      setSelectedPeriod(period);
+
+      await Promise.all([fetchTodayExpense(), fetchGraph(period.month, period.year)]);
     } catch (err) {
       console.log(err);
     } finally {
@@ -46,16 +56,17 @@ const Expense = () => {
     const res = await api.get("/expense/month-expense");
     if (res?.data?.data?.length > 0) {
       setMonthExpense(res.data.data[0].totalExpense);
+      return {
+        month: String(res.data.data[0]?._id?.month || getCurrentPeriod().month),
+        year: String(res.data.data[0]?._id?.year || getCurrentPeriod().year),
+      };
     } else {
       setMonthExpense(0);
+      return null;
     }
   };
 
-  const fetchGraph = async () => {
-    const today = new Date();
-    const month = today.getMonth() + 1;
-    const year = today.getFullYear();
-
+  const fetchGraph = async (month, year) => {
     const res = await api.get(
       `/expense/expense-graph?type=daily&month=${month}&year=${year}`,
     );
@@ -205,10 +216,10 @@ const Expense = () => {
                 Report Scope
               </p>
               <p className="mt-3 text-lg font-black text-slate-900">
-                Current Month
+                {getMonthLabel(selectedPeriod.month)} {selectedPeriod.year}
               </p>
               <p className="mt-2 text-sm text-slate-600">
-                Daily expense totals for the active calendar month.
+                Daily expense totals for the latest month with expense data.
               </p>
             </div>
 
