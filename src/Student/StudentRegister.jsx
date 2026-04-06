@@ -44,8 +44,10 @@ const sectionClass =
   "rounded-3xl border border-slate-200 bg-white p-5 shadow-sm";
 const inputClass =
   "w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white";
+const otpInputClass =
+  "mt-2 w-full rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-center text-lg font-semibold tracking-[0.35em] text-slate-900 outline-none transition focus:border-cyan-400 focus:bg-white";
 
-const StudentRegister = () => {
+const StudentRegister = ({ onSuccess }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormState);
   const [image, setImage] = useState(null);
@@ -54,6 +56,21 @@ const StudentRegister = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpState, setOtpState] = useState({
+    challengeToken: "",
+    maskedEmail: "",
+    student: null,
+  });
+
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setImage(null);
+    setSignature(null);
+    setDocuments([createDocumentItem()]);
+    setOtp("");
+    setOtpState({ challengeToken: "", maskedEmail: "", student: null });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -123,19 +140,84 @@ const StudentRegister = () => {
       const response = await api.post("/student/register", payload);
 
       if (response.data.success) {
-        setMessage("Registration successful");
+        setOtp("");
+        setOtpState({
+          challengeToken: response.data.challengeToken || "",
+          maskedEmail: response.data.maskedEmail || formData.email,
+          student: response.data.student || null,
+        });
+        setMessage(response.data.message || "OTP sent to student email");
         setMessageType("success");
-        setFormData(initialFormState);
-        setImage(null);
-        setSignature(null);
-        setDocuments([createDocumentItem()]);
-        window.setTimeout(() => navigate("/student/login"), 800);
       } else {
         setMessage(response.data.message || "Registration failed");
         setMessageType("error");
       }
     } catch (error) {
       setMessage(error.response?.data?.message || "Registration failed");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (otp.trim().length !== 6) {
+      setMessage("Please enter 6-digit OTP");
+      setMessageType("error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.post("/student/verify-email-otp", {
+        challengeToken: otpState.challengeToken,
+        otp: otp.trim(),
+      });
+
+      if (response.data.success) {
+        const verifiedStudent = response.data.student || otpState.student;
+        setMessage(response.data.message || "Student email verified successfully");
+        setMessageType("success");
+        resetForm();
+        if (onSuccess) {
+          onSuccess(verifiedStudent);
+        } else {
+          window.setTimeout(() => navigate("/student/login"), 800);
+        }
+      } else {
+        setMessage(response.data.message || "OTP verification failed");
+        setMessageType("error");
+      }
+    } catch (error) {
+      setMessage(error.response?.data?.message || "OTP verification failed");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!otpState.challengeToken) return;
+    setLoading(true);
+    try {
+      const response = await api.post("/student/resend-email-otp", {
+        challengeToken: otpState.challengeToken,
+      });
+      if (response.data.success) {
+        setOtpState((prev) => ({
+          ...prev,
+          challengeToken: response.data.challengeToken || prev.challengeToken,
+          maskedEmail: response.data.maskedEmail || prev.maskedEmail,
+        }));
+        setMessage(response.data.message || "OTP resent successfully");
+        setMessageType("success");
+      } else {
+        setMessage(response.data.message || "Unable to resend OTP");
+        setMessageType("error");
+      }
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Unable to resend OTP");
       setMessageType("error");
     } finally {
       setLoading(false);
@@ -172,7 +254,63 @@ const StudentRegister = () => {
             </div>
           ) : null}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+          {otpState.challengeToken ? (
+            <section className="mt-6 rounded-[1.75rem] border border-cyan-200 bg-cyan-50/80 p-5 shadow-sm">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-700">
+                    Email Verification
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black text-slate-950">
+                    Verify student email
+                  </h2>
+                  <p className="mt-2 text-sm text-slate-600">
+                    OTP sent to {otpState.maskedEmail}. Verification complete
+                    hone ke baad hi student login kar payega.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={loading}
+                  className="rounded-2xl border border-cyan-300 bg-white px-4 py-3 text-sm font-semibold text-cyan-800 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Resend OTP
+                </button>
+              </div>
+
+              <form onSubmit={handleVerifyOtp} className="mt-5 flex flex-col gap-4 md:flex-row md:items-end">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Enter 6-digit OTP
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) =>
+                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
+                    className={otpInputClass}
+                    placeholder="000000"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || otp.length !== 6}
+                  className="rounded-2xl bg-cyan-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading ? "Verifying..." : "Verify Email"}
+                </button>
+              </form>
+            </section>
+          ) : null}
+
+          <form
+            onSubmit={handleSubmit}
+            className={`mt-6 space-y-6 ${otpState.challengeToken ? "opacity-70" : ""}`}
+          >
             <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="space-y-6">
                 <section className={sectionClass}>
@@ -362,10 +500,14 @@ const StudentRegister = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || Boolean(otpState.challengeToken)}
                 className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? "Submitting..." : "Register Student"}
+                {loading
+                  ? "Submitting..."
+                  : otpState.challengeToken
+                    ? "OTP Pending"
+                    : "Register Student"}
               </button>
             </div>
           </form>

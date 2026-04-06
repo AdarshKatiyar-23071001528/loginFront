@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"];
-
+const PDF_HINTS = [".pdf", "/raw/upload/", "resource_type=raw", "application/pdf"];
 
 const isPdfSource = (url = "", file = null) => {
   const fileName = String(file?.name || "").toLowerCase();
@@ -11,7 +11,7 @@ const isPdfSource = (url = "", file = null) => {
   return (
     fileType === "application/pdf" ||
     fileName.endsWith(".pdf") ||
-    safeUrl.includes(".pdf")
+    PDF_HINTS.some((hint) => safeUrl.includes(hint))
   );
 };
 
@@ -31,6 +31,7 @@ const isImageSource = (url = "", file = null) => {
 const DocumentPreview = ({
   file = null,
   url = "",
+  openUrl = "",
   title = "Document preview",
   className = "",
   emptyMessage = "Preview not available",
@@ -52,6 +53,7 @@ const DocumentPreview = ({
   }, [file]);
 
   const previewUrl = useMemo(() => objectUrl || url || "", [objectUrl, url]);
+  const actionUrl = useMemo(() => objectUrl || openUrl || url || "", [objectUrl, openUrl, url]);
 
   if (!previewUrl) {
     return (
@@ -66,15 +68,16 @@ const DocumentPreview = ({
   if (isPdfSource(previewUrl, file)) {
     return (
       <div
-        className={`flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center ${className}`}
+        className={`flex min-h-56 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-gradient-to-br from-rose-50 via-white to-slate-50 px-4 py-6 text-center ${className}`}
       >
-        <p className="text-sm font-semibold text-slate-700">PDF preview is not available inline.</p>
-        <p className="text-xs text-slate-500">
-          Open or download the file in a new tab.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-rose-100 text-3xl font-black text-rose-700">
+          PDF
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-900">{title}</p>
+        <p className="mt-2 text-xs text-slate-500">PDF document available. Open it in a new tab for full view.</p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           <a
-            href={previewUrl}
+            href={actionUrl}
             target="_blank"
             rel="noreferrer"
             className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
@@ -82,7 +85,7 @@ const DocumentPreview = ({
             Open PDF
           </a>
           <a
-            href={previewUrl}
+            href={actionUrl}
             download
             className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
@@ -105,13 +108,19 @@ const DocumentPreview = ({
 
   return (
     <div
-      className={`flex min-h-32 items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500 ${className}`}
+      className={`flex min-h-32 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500 ${className}`}
     >
-      {emptyMessage}
+      <p>{emptyMessage}</p>
+      <a
+        href={actionUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+      >
+        Open file
+      </a>
     </div>
   );
 };
 
 export default DocumentPreview;
-
-

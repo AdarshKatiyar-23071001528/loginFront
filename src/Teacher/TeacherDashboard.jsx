@@ -163,6 +163,10 @@ const TeacherDashboard = () => {
   const [marksStudents, setMarksStudents] = useState([]);
   const [marksByStudent, setMarksByStudent] = useState({});
   const [marksStudentsLoading, setMarksStudentsLoading] = useState(false);
+  const [projectForm, setProjectForm] = useState({ subjectId: "", dueDate: "" });
+  const [projectStudents, setProjectStudents] = useState([]);
+  const [projectsByStudent, setProjectsByStudent] = useState({});
+  const [projectStudentsLoading, setProjectStudentsLoading] = useState(false);
   const fetchedIdRef = useRef("");
 
   const permissions =
@@ -172,6 +176,7 @@ const TeacherDashboard = () => {
 
   const canManageAttendance = can("attendance.manage");
   const canManageMarks = can("marks.manage");
+  const canManageProjects = can("marks.manage", "students.read", "students.manage");
   const canStudentRecord = can("students.read");
   const canAddStudent = can("students.manage");
   const canTeacherRecord = can(
@@ -223,6 +228,7 @@ const TeacherDashboard = () => {
               ? { key: "attendance", label: "Attendance" }
               : null,
             canManageMarks ? { key: "marks", label: "Marks" } : null,
+            canManageProjects ? { key: "project", label: "Project" } : null,
             canUseAcademicSubjects
               ? {
                   key: "subject",
@@ -295,6 +301,7 @@ const TeacherDashboard = () => {
       canManageAttendance,
       canManageExpenses,
       canManageMarks,
+      canManageProjects,
       canManageMessages,
       canManageNotices,
       canManageSubjects,
@@ -443,6 +450,38 @@ const TeacherDashboard = () => {
     loadMarksStudents();
   }, [markForm.subjectId, canManageMarks]);
 
+  useEffect(() => {
+    const loadProjectStudents = async () => {
+      if (!projectForm.subjectId || !canManageProjects) {
+        setProjectStudents([]);
+        setProjectsByStudent({});
+        return;
+      }
+      setProjectStudentsLoading(true);
+      try {
+        const res = await api.get(`/attendance/students/${projectForm.subjectId}`);
+        const list = res.data.students || [];
+        setProjectStudents(list);
+        setProjectsByStudent((prev) => {
+          const next = { ...prev };
+          list.forEach((student) => {
+            if (!next[student._id]) {
+              next[student._id] = { title: "", description: "" };
+            }
+          });
+          return next;
+        });
+      } catch {
+        setProjectStudents([]);
+        setProjectsByStudent({});
+      } finally {
+        setProjectStudentsLoading(false);
+      }
+    };
+
+    loadProjectStudents();
+  }, [projectForm.subjectId, canManageProjects]);
+
   const handleNav = (page, subPage = "") => {
     if (page === "logout") {
       clearAuthToken();
@@ -504,6 +543,10 @@ const TeacherDashboard = () => {
       const refreshed = await api.get(`/attendance/teacher/${id}`);
       setAttendance(refreshed.data.records || []);
       setAttendanceForm((prev) => ({ ...prev, date: "" }));
+
+      if(refreshed.data.success){
+        alert("Attendance marked successfully");
+      }
     } catch {
       alert("Attendance mark failed");
     }
@@ -541,6 +584,39 @@ const TeacherDashboard = () => {
       setMarksByStudent({});
     } catch {
       alert("Marks entry failed");
+    }
+  };
+
+  const handleProjectSubmit = async () => {
+    if (!projectForm.subjectId || !canManageProjects) return;
+    try {
+      const selectedSubject = subjects.find(
+        (subject) => String(subject._id) === String(projectForm.subjectId),
+      );
+      const records = projectStudents
+        .map((student) => ({
+          studentId: student._id,
+          title: projectsByStudent[student._id]?.title || "",
+          description: projectsByStudent[student._id]?.description || "",
+        }))
+        .filter((item) => item.title.trim());
+
+      if (!records.length) {
+        alert("Please enter project title for at least one student");
+        return;
+      }
+
+      await api.post("/student/assign-project/bulk", {
+        subjectId: projectForm.subjectId,
+        subjectName: selectedSubject ? subjectTitle(selectedSubject) : "",
+        dueDate: projectForm.dueDate || undefined,
+        records,
+      });
+      setProjectForm((prev) => ({ ...prev, dueDate: "" }));
+      setProjectsByStudent({});
+      alert("Projects assigned successfully");
+    } catch {
+      alert("Project assignment failed");
     }
   };
 
@@ -932,7 +1008,7 @@ const TeacherDashboard = () => {
               {activePage === "academic" &&
               subActivePage === "marks" &&
               canManageMarks ? (
-                <Panel title="Marks" subtitle="Bulk marks entry workspace">
+                <Panel title="Marks" subtitle="Marks entry workspace">
                   <div className="grid gap-4 md:grid-cols-3">
                     <Field
                       label="Subject"
@@ -1019,6 +1095,123 @@ const TeacherDashboard = () => {
                                 }
                                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none sm:w-32"
                                 placeholder="Marks"
+                              />
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <EmptyBlock label="Select a subject to load students." />
+                      )}
+                    </div>
+                  </div>
+                </Panel>
+              ) : null}
+              {activePage === "academic" &&
+              subActivePage === "project" &&
+              canManageProjects ? (
+                <Panel title="Project" subtitle="Project assignment workspace">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <Field
+                      label="Subject"
+                      as="select"
+                      value={projectForm.subjectId}
+                      onChange={(e) =>
+                        setProjectForm((prev) => ({
+                          ...prev,
+                          subjectId: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Select subject</option>
+                      {subjects.map((subject) => (
+                        <option key={subject._id} value={subject._id}>
+                          {subjectTitle(subject)}
+                        </option>
+                      ))}
+                    </Field>
+                    <Field
+                      label="Due Date"
+                      type="date"
+                      value={projectForm.dueDate}
+                      onChange={(e) =>
+                        setProjectForm((prev) => ({
+                          ...prev,
+                          dueDate: e.target.value,
+                        }))
+                      }
+                    />
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleProjectSubmit}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white"
+                      >
+                        <FaSave />
+                        Save Projects
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          Project grid
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Assign projects to students.
+                        </p>
+                      </div>
+                      {projectStudentsLoading ? (
+                        <span className="text-xs font-semibold text-slate-500">
+                          Loading students...
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-4 grid gap-3">
+                      {projectStudents.length ? (
+                        projectStudents.map((student) => (
+                          <div
+                            key={student._id}
+                            className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-900"
+                          >
+                            <div className="grid gap-3 lg:grid-cols-[220px_1fr_1.2fr] lg:items-start">
+                              <div>
+                                <p className="font-semibold">
+                                  {student.name || "Student"}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {student.wrn || student.enrollment || "-"}
+                                </p>
+                              </div>
+                              <input
+                                type="text"
+                                value={projectsByStudent[student._id]?.title ?? ""}
+                                onChange={(e) =>
+                                  setProjectsByStudent((prev) => ({
+                                    ...prev,
+                                    [student._id]: {
+                                      title: e.target.value,
+                                      description:
+                                        prev[student._id]?.description || "",
+                                    },
+                                  }))
+                                }
+                                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none"
+                                placeholder="Project title"
+                              />
+                              <textarea
+                                value={projectsByStudent[student._id]?.description ?? ""}
+                                onChange={(e) =>
+                                  setProjectsByStudent((prev) => ({
+                                    ...prev,
+                                    [student._id]: {
+                                      title: prev[student._id]?.title || "",
+                                      description: e.target.value,
+                                    },
+                                  }))
+                                }
+                                className="min-h-24 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none"
+                                placeholder="Project description"
                               />
                             </div>
                           </div>

@@ -4,8 +4,16 @@ import api from "../api/axios";
 import ViewStudent from "./ViewStudent";
 import StudentEditModal from "../components/student/StudentEditModal";
 import { printStudentProfile } from "../components/student/StudentProfileSheet";
+import { getAuthUser } from "../utils/auth";
+
+const formatProjectDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+};
 
 const StudentDash = () => {
+  const authUser = useMemo(() => getAuthUser(), []);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -17,6 +25,18 @@ const StudentDash = () => {
   });
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
+  const [projectForm, setProjectForm] = useState({
+    studentId: "",
+    title: "",
+    description: "",
+    dueDate: "",
+  });
+  const [assigningProject, setAssigningProject] = useState(false);
+
+  const canAssignProject =
+    authUser?.role === "admin" ||
+    authUser?.permissions?.includes("students.read") ||
+    authUser?.permissions?.includes("students.manage");
 
   const fetchAllStudents = async () => {
     
@@ -88,6 +108,53 @@ const StudentDash = () => {
       }
     } catch (error) {
       setMessage(`Error deleting student: ${error.message}`);
+    }
+  };
+
+  const handleProjectAssign = async (e) => {
+    e.preventDefault();
+
+    if (!projectForm.studentId || !projectForm.title.trim()) {
+      setMessage("Please select a student and enter project title");
+      return;
+    }
+
+    try {
+      setAssigningProject(true);
+      const response = await api.post(
+        `/student/assign-project/${projectForm.studentId}`,
+        {
+          title: projectForm.title.trim(),
+          description: projectForm.description.trim(),
+          dueDate: projectForm.dueDate || null,
+        },
+      );
+
+      if (response.data?.success) {
+        const updatedStudent = response.data.student;
+        setStudents((prev) =>
+          prev.map((student) =>
+            student._id === updatedStudent._id ? updatedStudent : student,
+          ),
+        );
+        if (selectedStudent?._id === updatedStudent._id) {
+          setSelectedStudent(updatedStudent);
+        }
+        if (editingStudent?._id === updatedStudent._id) {
+          setEditingStudent(updatedStudent);
+        }
+        setProjectForm({
+          studentId: "",
+          title: "",
+          description: "",
+          dueDate: "",
+        });
+        setMessage(response.data.message || "Project assigned successfully");
+      }
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Unable to assign project");
+    } finally {
+      setAssigningProject(false);
     }
   };
 
@@ -169,6 +236,81 @@ const StudentDash = () => {
         </div>
       ) : null}
 
+      {canAssignProject ? (
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Teacher Project Assignment
+          </p>
+          <h2 className="mt-2 text-xl font-bold text-slate-900">
+            Assign project to student
+          </h2>
+
+          <form
+            onSubmit={handleProjectAssign}
+            className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+          >
+            <select
+              value={projectForm.studentId}
+              onChange={(e) =>
+                setProjectForm((prev) => ({
+                  ...prev,
+                  studentId: e.target.value,
+                }))
+              }
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
+            >
+              <option value="">Select student</option>
+              {students.map((student) => (
+                <option key={student._id} value={student._id}>
+                  {student.name} {student.wrn ? `| ${student.wrn}` : ""}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Project title"
+              value={projectForm.title}
+              onChange={(e) =>
+                setProjectForm((prev) => ({
+                  ...prev,
+                  title: e.target.value,
+                }))
+              }
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
+            />
+            <input
+              type="date"
+              value={projectForm.dueDate}
+              onChange={(e) =>
+                setProjectForm((prev) => ({
+                  ...prev,
+                  dueDate: e.target.value,
+                }))
+              }
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
+            />
+            <button
+              type="submit"
+              disabled={assigningProject}
+              className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
+            >
+              {assigningProject ? "Assigning..." : "Assign Project"}
+            </button>
+            <textarea
+              placeholder="Project description"
+              value={projectForm.description}
+              onChange={(e) =>
+                setProjectForm((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              className="min-h-28 rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400 md:col-span-2 xl:col-span-4"
+            />
+          </form>
+        </section>
+      ) : null}
+
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-200 px-5 py-4">
           <h2 className="text-xl font-bold text-slate-900">Students</h2>
@@ -190,6 +332,7 @@ const StudentDash = () => {
                   <th className="px-5 py-4">Semester</th>
                   <th className="px-5 py-4">Email</th>
                   <th className="px-5 py-4">Mobile</th>
+                  <th className="px-5 py-4">Latest Project</th>
                   <th className="px-5 py-4 text-center">Actions</th>
                 </tr>
               </thead>
@@ -205,6 +348,20 @@ const StudentDash = () => {
                       <td className="px-5 py-4">{student.semester || "-"}</td>
                       <td className="px-1 py-4 break-words text-[12px]">{student.email || "-"}</td>
                       <td className="px-5 py-4">{student.mobile1 || "-"}</td>
+                      <td className="px-5 py-4">
+                        {student.assignedProjects?.[0]?.title ? (
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {student.assignedProjects[0].title}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Due {formatProjectDate(student.assignedProjects[0].dueDate)}
+                            </p>
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="px-5 py-4">
                         <div className="flex justify-center gap-2">
                           <button
@@ -241,7 +398,7 @@ const StudentDash = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-5 py-10 text-center text-sm text-slate-500">
+                    <td colSpan="8" className="px-5 py-10 text-center text-sm text-slate-500">
                       No students found.
                     </td>
                   </tr>

@@ -17,9 +17,12 @@ const StudentLogin = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     setloading(true);
-    const result = await studentLogin(formData.email, formData.password);
-    if (result.success) {
-      navigate(`/student/dash?id=${result.student._id}`);
+    try {
+      const result = await studentLogin(formData.email, formData.password);
+      if (result.success) {
+        navigate(`/student/dash?id=${result.student._id}`);
+      }
+    } finally {
       setloading(false);
     }
   };

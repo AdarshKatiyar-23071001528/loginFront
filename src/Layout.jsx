@@ -37,7 +37,8 @@ const Layout = () => {
       {!hideNav && <Nav />}
       <Suspense fallback={<div className='min-h-[40vh] flex items-center justify-center text-lg font-medium text-slate-600'>Loading...</div>}>
         <Routes>
-          <Route path='/' element={<RedirectToWebsite/>} />
+          {/* <Route path='/' element={<RedirectToWebsite/>} /> */}
+          <Route path='/' element={<Home/>}/>
           <Route path='/users' element={<AllUsers/>}/>
           <Route path='/register' element={<Register/>}/>
           <Route path='/course' element={<Course/>} />

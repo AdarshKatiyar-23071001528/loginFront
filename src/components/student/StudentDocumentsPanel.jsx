@@ -7,7 +7,7 @@ import {
   normalizeStudentDocuments,
   resolveDocumentType,
 } from "../../utils/studentDocuments";
-import { getSafeAssetUrl } from "./StudentProfileSheet";
+import { getDocumentAssetUrl, getSafeAssetUrl } from "./StudentProfileSheet";
 
 const StudentDocumentsPanel = ({ student, studentId, onSaved }) => {
   const [documents, setDocuments] = useState(() =>
@@ -103,9 +103,8 @@ const StudentDocumentsPanel = ({ student, studentId, onSaved }) => {
               Upload and manage your files
             </h3>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">
-              Aadhaar, certificates, and other required files yahan se update
-              kar sakte ho. Save karte hi latest documents list refresh ho
-              jayegi.
+              Aadhaar, certificates, and other required files can update from here.
+               
             </p>
           </div>
 
@@ -154,7 +153,7 @@ const StudentDocumentsPanel = ({ student, studentId, onSaved }) => {
                 </p>
                 <div className="mt-4 flex gap-3">
                   <a
-                    href={getSafeAssetUrl(documentItem.url)}
+                    href={getDocumentAssetUrl(documentItem.url)}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm font-semibold text-blue-700 hover:text-blue-900"

@@ -25,6 +25,11 @@ const formatDate = (value) => {
 };
 
 const formatAmount = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
+const formatProjectDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+};
 
 const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -331,6 +336,41 @@ const StudentDash = () => {
                       </div>
                     ))}
                   </div>
+                </Panel>
+              )}
+
+              {activeTab === "overview" && (
+                <Panel title="Assigned Projects" subtitle="Projects shared by teacher">
+                  {profile?.assignedProjects?.length ? (
+                    <div className="mt-6 grid gap-4">
+                      {profile.assignedProjects.map((project) => (
+                        <div
+                          key={project._id || `${project.title}-${project.assignedAt}`}
+                          className="rounded-3xl border border-white/10 bg-white/5 p-5"
+                        >
+                          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                            <div>
+                              <h3 className="text-lg font-bold text-white">
+                                {project.title}
+                              </h3>
+                              <p className="mt-2 text-sm text-slate-300">
+                                {project.description || "No project description added yet."}
+                              </p>
+                            </div>
+                            <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">
+                              <p>Subject: {project.subjectName || "-"}</p>
+                              <p>Due: {formatProjectDate(project.dueDate)}</p>
+                              <p>By: {project.assignedByName || "Teacher"}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-6 rounded-3xl border border-dashed border-white/15 px-5 py-10 text-center text-sm text-slate-300">
+                      No project assigned yet.
+                    </div>
+                  )}
                 </Panel>
               )}
 

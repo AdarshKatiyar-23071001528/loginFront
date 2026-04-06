@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from "react";
 import TeacherEditModal from "./TeacherEditModal";
-import { getSafeAssetUrl } from "../student/StudentProfileSheet";
+import { getDocumentAssetUrl, getSafeAssetUrl } from "../student/StudentProfileSheet";
 import api from "../../api/axios";
-import DocumentPreview from "../shared/DocumentPreview";
 
 const InfoGrid = ({ title, items }) => (
   <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -28,6 +27,23 @@ const formatDate = (value) => {
   return Number.isNaN(date.getTime())
     ? "-"
     : date.toLocaleDateString("en-IN");
+};
+
+const getDocumentMeta = (documentItem = {}) => {
+  const source = String(
+    documentItem?.mimeType || documentItem?.originalName || documentItem?.url || "",
+  ).toLowerCase();
+  const isPdf = source.includes("pdf");
+
+  return {
+    badge: isPdf ? "PDF" : "IMAGE",
+    badgeClassName: isPdf
+      ? "bg-rose-100 text-rose-700"
+      : "bg-cyan-100 text-cyan-700",
+    helperText: isPdf
+      ? "Open in a new tab to view the full PDF."
+      : "Open in a new tab to view the full image.",
+  };
 };
 
 const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
@@ -128,7 +144,7 @@ const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
           title="Professional Details"
           items={[
             ["Role", teacher?.role],
-            ["Designation", teacher?.post],
+            ["Designation", teacher?.branch],
             ["Department", teacher?.destination],
             ["Email", teacher?.email],
             ["Mobile", teacher?.mobile],
@@ -144,6 +160,7 @@ const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
             ["Address", teacher?.address],
             ["Landmark", teacher?.landmark],
             ["District", teacher?.district],
+            ["Post",teacher?.post],
             ["Pincode", teacher?.pincode],
           ]}
         />
@@ -173,42 +190,61 @@ const TeacherProfilePanel = ({ teacher, onTeacherUpdated }) => {
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {documents.length ? (
               documents.map((documentItem, index) => (
+                (() => {
+                  const documentMeta = getDocumentMeta(documentItem);
+                  const documentUrl = getDocumentAssetUrl(documentItem.url);
+                  return (
                 <div
                   key={`${documentItem.type}-${index}`}
                   className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-300 hover:bg-blue-50"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Document
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {documentItem.type || `Document ${index + 1}`}
-                  </p>
-                  <div className="mt-4 space-y-4">
-                    <DocumentPreview
-                      url={getSafeAssetUrl(documentItem.url)}
-                      title={documentItem.type || `Document ${index + 1}`}
-                      className="h-64"
-                    />
-                    <div className="flex gap-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Document
+                      </p>
+                      <p className="mt-2 text-base font-bold text-slate-900">
+                        {documentItem.type || `Document ${index + 1}`}
+                      </p>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${documentMeta.badgeClassName}`}>
+                      {documentMeta.badge}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
+                    <p className="text-3xl font-black text-slate-900">{documentMeta.badge}</p>
+                    <p className="mt-2 text-sm text-slate-500">{documentMeta.helperText}</p>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
                     <a
-                      href={getSafeAssetUrl(documentItem.url)}
+                      href={documentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm font-semibold text-blue-700 hover:text-blue-900"
+                      className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
                     >
                       Open file
+                    </a>
+                    <a
+                      href={documentUrl}
+                      download
+                      className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                    >
+                      Download
                     </a>
                     <button
                       type="button"
                       onClick={() => handleDeleteDocument(documentItem.url)}
                       disabled={deletingUrl === documentItem.url}
-                      className="text-sm font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
+                      className="rounded-xl border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-50"
                     >
                       {deletingUrl === documentItem.url ? "Deleting..." : "Delete"}
                     </button>
-                    </div>
                   </div>
                 </div>
+                  );
+                })()
               ))
             ) : (
               <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">

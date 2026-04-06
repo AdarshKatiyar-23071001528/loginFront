@@ -20,21 +20,22 @@ const FIELD_GROUPS = [
       ["role", "Role"],
     ],
   },
-  // {
-  //   title: "Professional Details",
-  //   fields: [
-  //     ["post", "Post / Designation"],
-  //     ["destination", "Department / Specialization"],
-  //     ["salary", "Salary", "number"],
-  //     ["joiningDate", "Joining Date", "date"],
-  //   ],
-  // },
+  {
+    title: "Professional Details",
+    fields: [
+      ["destination", "Post / Designation"],
+      ["branch", "Department / Specialization"],
+      ["salary", "Salary", "number"],
+      ["joiningDate", "Joining Date", "date"],
+    ],
+  },
   {
     title: "Address Details",
     fields: [
       ["address", "Address"],
       ["landmark", "Landmark"],
       ["district", "District"],
+      ["post", "Post Office"],
       ["pincode", "Pincode"],
     ],
   },

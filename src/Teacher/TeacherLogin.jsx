@@ -18,8 +18,12 @@ const TeacherLogin = () => {
     e.preventDefault();
     setloading(true);
     const result = await teacherLogin(formData.email, formData.password);
+  
     if (result?.success) {
       navigate(`/teacher/dash/${result.teacher._id}`);
+      setloading(false);
+    }
+    if(result?.message == "Register First"){
       setloading(false);
     }
   };

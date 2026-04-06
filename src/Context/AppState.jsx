@@ -81,20 +81,30 @@ const AppState = (props) => {
         return res.data;
     }
     const studentLogin = async(email,password) => {
-        const res = await api.post('/student/login', {email,password},{
-            headers:{
-                'Content-Type' : "Application/json"
-        },
-        withCredentials: true
-    })
-    if (res.data.success && res.data.token) {
-        setAuthToken(res.data.token);
-        setAuthUser(res.data.student);
-    } else {
-        clearAuthToken();
-    }
-    alert(res.data.message);
-    return res.data;
+        try {
+            const res = await api.post('/student/login', {email,password},{
+                headers:{
+                    'Content-Type' : "Application/json"
+            },
+            withCredentials: true
+        })
+        if (res.data.success && res.data.token) {
+            setAuthToken(res.data.token);
+            setAuthUser(res.data.student);
+        } else {
+            clearAuthToken();
+        }
+        alert(res.data.message);
+        return res.data;
+        } catch (error) {
+            clearAuthToken();
+            const payload = {
+                success: false,
+                message: error.response?.data?.message || "Student login failed",
+            };
+            alert(payload.message);
+            return payload;
+        }
     }
 
     const teacherLogin = async(email,password) => {
